@@ -1,0 +1,14 @@
+
+database management
+
+CREATE TABLE user_auth (
+    id SERIAL UNIQUE,
+    email VARCHAR(255) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE admin_auth (
+    id SERIAL UNIQUE,
+    email VARCHAR(255) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL
+);

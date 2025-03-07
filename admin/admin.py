@@ -71,3 +71,4 @@ def register_user():
         return redirect(url_for("admin.admin_dashboard"))
 
     return render_template("register_user.html", form=form)
+

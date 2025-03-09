@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-admin = Blueprint("admin", __name__, template_folder="templates")
+admin = Blueprint("admin", __name__, template_folder="templates", static_folder="static")
 
 try:
     conn = psycopg2.connect(
@@ -38,7 +38,7 @@ def login():
 
                 if stored_password and password == stored_password[0]:
                     flash(f'Login successful for {email}', 'success')
-                    return redirect(url_for('admin.admin_dashboard'))
+                    return redirect(url_for('admin.a_dashboard'))
 
         flash('Invalid credentials. Please try again.', 'danger')
         return redirect(url_for('admin.login'))
@@ -46,12 +46,12 @@ def login():
     return render_template('admin_login.html', form=form)
 
 @admin.route('/dashboard')
-def admin_dashboard():
+def a_dashboard():
     print("admin dashboard")
-    return render_template("dashboard.html")
+    return render_template("admin_dashboard.html")
 
-@admin.route('/register', methods=['GET', 'POST'])
-def register_user():
+@admin.route('/createuser', methods=['GET', 'POST'])
+def create_user():
     form = UserRegistrationForm()
 
     if form.validate_on_submit():
@@ -68,7 +68,7 @@ def register_user():
                 conn.rollback()
                 flash(f"Error: {str(e)}", "danger")
 
-        return redirect(url_for("admin.admin_dashboard"))
+        return redirect(url_for("admin.a_dashboard"))
 
-    return render_template("register_user.html", form=form)
+    return render_template("create_user.html", form=form)
 

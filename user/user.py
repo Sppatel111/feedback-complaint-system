@@ -33,7 +33,7 @@ def login():
 
                 if stored_password and password == stored_password[0]:
                     flash(f'Login successful for {email}', 'success')
-                    return redirect(url_for("user.dashboard"))
+                    return redirect(url_for("user.u_dashboard"))
 
         flash('Invalid credentials. Please try again.', 'danger')
         return redirect(url_for('user.login'))
@@ -41,7 +41,9 @@ def login():
     return render_template('user_login.html', form=form)
 
 @user.route('/dashboard')
-def user_dashboard():
-    print("user dashboard")
-    return render_template("dashboard.html")
+def u_dashboard():
+    return render_template("user_dashboard.html")
 
+@user.route('/dashboard/settings')
+def u_settings():
+    return render_template("user_settings.html")

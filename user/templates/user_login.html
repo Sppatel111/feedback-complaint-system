@@ -7,35 +7,16 @@
     <div class="row shadow-lg rounded bg-white overflow-hidden" style="max-width: 900px; width: 100%;">
 
         <!-- Left Side: Image -->
-        <div class="col-md-5 d-none d-md-block p-0">
+        <div class="col-md-6 d-none d-md-block p-0">
             <div class="left-side h-100">
-                <img src="{{ url_for('user.static', filename='assets/login_image.png') }}" alt="Login Image" class="img-fluid h-100 w-100" style="object-fit: cover;">
+                <img src="{{ url_for('user.static', filename='assets/login_image2.png') }}" alt="Login Image" class="img-fluid h-100 w-100" style="object-fit: cover;">
             </div>
-        </div>
-
-        <!-- Separation Line -->
-        <div class="col-md-1 d-flex align-items-center justify-content-center">
-            <div class="vr" style="height: 80%; width: 2px; background-color: #ccc;"></div>
         </div>
 
         <!-- Right Side: Login Card -->
         <div class="col-md-6 p-5 d-flex align-items-center">
             <div class="card w-100 shadow-sm p-4">
                 <h2 class="text-center mb-4">Login</h2>
-                <!-- Flash Messages -->
-<!--                {% with messages = get_flashed_messages(with_categories=true) %}-->
-<!--                    {% if messages %}-->
-<!--                        <div class="flash-messages">-->
-<!--                            {% for category, message in messages %}-->
-<!--                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">-->
-<!--                                    {{ message }}-->
-<!--                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>-->
-<!--                                </div>-->
-<!--                            {% endfor %}-->
-<!--                        </div>-->
-<!--                    {% endif %}-->
-<!--                {% endwith %}-->
-<!--                -->
                 <form method="POST">
                     {{ form.hidden_tag() }}
 

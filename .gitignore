@@ -1,6 +1,9 @@
 #.gitignore
 #env file
-
+#home
+virtualenv
+#com
+virtual1env
 .env
 
 .venv

@@ -1,0 +1,47 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Feedback Management{% endblock %}
+
+{% block content %}
+
+<!-- Feedback Management Content -->
+<div class="container mt-5">
+    <div class="text-center">
+        <h1 class="mb-3">📩 Feedback Management</h1>
+        <p class="lead">Manage user feedback, support tickets, and task assignments efficiently.</p>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Raise Tickets -->
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 text-center p-4">
+                <i class="fas fa-ticket-alt fa-3x text-primary"></i>
+                <h5 class="mt-3">Raise Tickets</h5>
+                <p>Create and manage support tickets for user issues.</p>
+                <a href="{{ url_for('admin.raise_tickets') }}" class="btn btn-primary w-100">Go to Tickets</a>
+            </div>
+        </div>
+
+        <!-- View User Feedback -->
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 text-center p-4">
+                <i class="fas fa-comments fa-3x text-success"></i>
+                <h5 class="mt-3">User Feedback</h5>
+                <p>View and analyze feedback submitted by users.</p>
+                <a href="{{ url_for('admin.view_feedback') }}" class="btn btn-success w-100">View Feedback</a>
+            </div>
+        </div>
+
+        <!-- Assign Tasks -->
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 text-center p-4">
+                <i class="fas fa-tasks fa-3x text-warning"></i>
+                <h5 class="mt-3">Assign Tasks</h5>
+                <p>Distribute tasks to team members based on feedback.</p>
+                <a href="{{ url_for('admin.assign_tasks') }}" class="btn btn-warning w-100">Assign Tasks</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<!-- Settings Content -->
+<div class="container mt-5">
+    <div class="text-center">
+        <h1 class="mb-3">⚙️ Admin Settings</h1>
+        <p class="lead">Manage your account settings and security.</p>
+    </div>
+
+    <div class="container my-5">
+       <hr>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="list-group">
+                    <a href="{{ url_for('admin.a_details') }}" class="list-group-item list-group-item-action">Details</a>
+                    <a href="{{ url_for('admin.change_password') }}" class="list-group-item list-group-item-action">Change Password</a>
+                    <!-- Add more settings options here -->
+                </div>
+            </div>
+            <div class="col-md-9">
+                {% block settings_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

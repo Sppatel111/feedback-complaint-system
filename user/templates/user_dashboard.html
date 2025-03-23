@@ -1,5 +1,5 @@
 {% extends 'user_base.html' %}
-
+{% include 'user_headers.html' %}
 {% block title %} User Dashboard {% endblock %}
 
 {% block content %}
@@ -20,11 +20,15 @@
 
 
             <div class="mt-auto">
-                <a href="{{ url_for('user.u_settings') }}" class="btn btn-secondary w-100">Settings</a>
+                <a href="{{ url_for('user.u_settings') }}" class="btn btn-info w-100">Settings</a>
             </div>
         </div>
         <div class="col-md-9 p-4">
-        <h1>Hello, User!</h1>
+        <h1>
+            {% if current_user.is_authenticated %}
+                Hi {{ current_user.email }}!
+            {% endif %}
+        </h1>
         <p>Welcome to your dashboard.</p>
 
     </div>

@@ -1,0 +1,50 @@
+{% extends 'admin_base.html' %}
+
+{% block title %} Add New User {% endblock %}
+
+{% block content %}
+
+<!-- Form Container -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 p-4">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Add New User</h2>
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.email.label }}</label>
+                            {{ form.email(class="form-control", placeholder="Enter user email") }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.password.label }}</label>
+                            {{ form.password(class="form-control", placeholder="Enter password") }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.department.label }}</label>
+                            {{ form.department(class="form-control") }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.role.label }}</label>
+                            {{ form.role(class="form-control") }}
+                        </div>
+
+                        <!-- Centered Submit Button -->
+                        <div class="text-center">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, EmailField, SelectField, SubmitField
+from wtforms import StringField, PasswordField, EmailField, SelectField, SubmitField,TextAreaField
 from wtforms.validators import DataRequired, Email, Length,  Regexp, EqualTo
 
 
@@ -46,3 +46,21 @@ class ChangePasswordForm(FlaskForm):
     new_password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password', message="Passwords must match")])
     submit = SubmitField('Change Password')
+
+class RaiseTicket(FlaskForm):
+    ticket_label = StringField('Ticket Label', validators=[DataRequired()])
+    ticket_question = TextAreaField('Ticket Question', validators=[DataRequired()])
+    department = SelectField(
+        'Department',
+        validators=[DataRequired()],
+        choices=[('ALL','ALL'),
+                 ('AI/ML', 'AI/ML'),
+                 ('Python', 'Python'),
+                 ('QA', 'QA'),
+                 ('UI/UX', 'UI/UX'),
+                 ('Frontend', 'Frontend')
+                 ]
+    )
+
+
+

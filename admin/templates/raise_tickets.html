@@ -1,0 +1,29 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Raise Ticket{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Raise a Ticket</h2>
+    <form method="POST" action="{{ url_for('admin.raise_tickets') }}">
+        {{ form.hidden_tag() }}  <!-- CSRF Token -->
+
+        <div class="mb-3">
+            <label class="form-label">{{ form.ticket_label.label }}</label>
+                            {{ form.ticket_label(class="form-control", placeholder="eg. Development, Production ") }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">{{ form.ticket_question.label }}</label>
+                            {{ form.ticket_question(class="form-control", placeholder="Detailed explanation of the ticket...") }}
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">{{ form.department.label }}</label>
+                            {{ form.department(class="form-control") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Raise Ticket</button>
+    </form>
+</div>
+{% endblock %}

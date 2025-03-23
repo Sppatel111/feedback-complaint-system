@@ -7,38 +7,40 @@ from models import db,User
 app=Flask(__name__)
 
 app.config['SECRET_KEY'] = '9c6a7d0a3e4f2b1c8d5e9f7a2b3c4d6e'
-
-# -----------------
-# create database
-# class Base(DeclarativeBase):
-#     pass
-#
-# db = SQLAlchemy(model_class=Base)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sneha@localhost:5432/management'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 migrate = Migrate()
+db.init_app(app)
 
-def create_app():
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sneha@localhost:5432/management'
-    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    db.init_app(app)
+app.register_blueprint(admin,url_prefix='/admin')
+app.register_blueprint(user,url_prefix='/user')
+migrate.init_app(app,db)
 
-    with app.app_context():
-        db.create_all()
+user_login_manager=LoginManager()
+user_login_manager.init_app(app)
+user_login_manager.login_view = "user.login"
 
-    app.register_blueprint(admin,url_prefix='/admin')
-    app.register_blueprint(user,url_prefix='/user')
-    migrate.init_app(app)
-    return app
+admin_login_manager=LoginManager()
+admin_login_manager.init_app(app)
+admin_login_manager.login_view = "admin.login"
 
-login_manager=LoginManager()
-login_manager.init_app(app)
+# @user_login_manager.user_loader
+# def load_user(user_id):
+#     return db.get_or_404(User,email=user_id,role='employee')
+#
+# @admin_login_manager.user_loader
+# def load_admin(user_id):
+#     return db.get_or_404(User,email=user_id,role='admin')
 
-login_manager.login_view = "user.login"
-login_manager.login_message = u" you have to login first! with correct credential!!"
-
-@login_manager.user_loader
+@user_login_manager.user_loader
 def load_user(user_id):
-    return db.get_or_404(User,user_id)
+    return User.query.filter_by(email=user_id, role='employee').first()
+
+@admin_login_manager.user_loader
+def load_admin(user_id):
+    return User.query.filter_by(email=user_id, role='admin').first()
+
 
 
 @app.route('/')
@@ -46,5 +48,6 @@ def user_login():
     return redirect(url_for('user.login'))
 
 if __name__ =='__main__':
-    app = create_app()
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)

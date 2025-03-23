@@ -1,8 +1,8 @@
 import psycopg2
 from flask import Blueprint, render_template, redirect, url_for, flash,request
-from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm
+from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm,RaiseTicket
 from dotenv import load_dotenv
-from models import db, User, Detail
+from models import db, User, Detail, FeedbackTicket
 from flask_login import login_user, current_user
 import os
 
@@ -132,8 +132,23 @@ def change_password():
 # Feedback routes
 @admin.route('/dashboard/managefeedback/raisetickets', methods=['GET', 'POST'])
 def raise_tickets():
+    form=RaiseTicket()
+    if form.validate_on_submit():
 
-    return render_template("raise_tickets.html")
+        new_ticket = FeedbackTicket(
+            user_email=current_user.email,
+            ticket_label=form.ticket_label.data,
+            question=form.ticket_question.data,
+            department_name=form.department.data
+        )
+
+
+        db.session.add(new_ticket)
+        db.session.commit()
+        flash('Successfully created ticket!!','success')
+        return redirect(url_for('admin.manage_feedback'))
+
+    return render_template("raise_tickets.html",form=form)
 
 @admin.route('/dashboard/managefeedback/viewfeedback', methods=['GET', 'POST'])
 def view_feedback():

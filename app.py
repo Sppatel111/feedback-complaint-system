@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask, redirect, url_for
 from flask_migrate import Migrate
 from admin.admin import admin
@@ -16,8 +14,11 @@ app.config['SECRET_KEY'] = '9c6a7d0a3e4f2b1c8d5e9f7a2b3c4d6e'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('database')
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-migrate = Migrate()
+
+print("Database URL:", app.config['SQLALCHEMY_DATABASE_URI'])  # Debugging
+
 db.init_app(app)
+migrate = Migrate()
 
 app.register_blueprint(admin, url_prefix='/admin')
 app.register_blueprint(user, url_prefix='/user')

@@ -7,34 +7,52 @@
     <h1>Feedback Tickets</h1>
 
     {% if tickets %}
-        <div class="d-flex flex-row flex-wrap">
-            {% for ticket in tickets %}
-                <div class="card m-2" style="width: 300px;">
-                    <div class="card-body">
-                        <h5 class="card-title">Ticket ID: {{ ticket.ticket_id }}</h5>
-                        <p class="card-text"><strong>Department:</strong> {{ ticket.department_name }}</p>
-                        <p class="card-text"><strong>Label:</strong> {{ ticket.ticket_label }}</p>
-                        <p class="card-text"><strong>Question:</strong> {{ ticket.question }}</p>
-                        <p class="card-text"><strong>Status:</strong> {{ ticket.ticket_status }}</p>
-                        <p class="card-text"><strong>Created At:</strong> {{ ticket.created_at }}</p>
-
-                        <h6>Responses:</h6>
-                        <ul>
-                            {% for response in ticket.responses %}
-                                <li>{{ response.response }} - <em>by {{ response.user_email }} on {{ response.created_at }}</em></li>
-                            {% endfor %}
-                        </ul>
-
-                        <form action="{{ url_for('user.respond_to_ticket', ticket_id=ticket.ticket_id) }}" method="POST">
-                            <div class="form-group">
-                                <label for="response">Your Response:</label>
-                                <textarea class="form-control" id="response" name="response" rows="2" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary mt-2">Submit Response</button>
-                        </form>
-                    </div>
-                </div>
-            {% endfor %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Ticket ID</th>
+                        <th>Department</th>
+                        <th>Label</th>
+                        <th>Question</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Responses</th>
+                        <th>Respond</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td>{{ ticket.ticket_id }}</td>
+                        <td>{{ ticket.department_name }}</td>
+                        <td>{{ ticket.ticket_label }}</td>
+                        <td>{{ ticket.question }}</td>
+                        <td>{{ ticket.ticket_status }}</td>
+                        <td>{{ ticket.created_at }}</td>
+                        <td>
+                            {% if ticket.responses %}
+                                <ul class="list-unstyled">
+                                    {% for response in ticket.responses %}
+                                        <li>→ {{ response.response }} <br>
+                                            <small><em>by {{ response.user_email }} on {{ response.created_at }}</em></small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                No responses yet.
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form action="{{ url_for('user.respond_to_ticket', ticket_id=ticket.ticket_id) }}" method="POST">
+                                <textarea class="form-control" name="response" rows="2" required></textarea>
+                                <button type="submit" class="btn btn-sm btn-primary mt-2">Submit</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     {% else %}
         <p>No tickets available for your department.</p>

@@ -53,7 +53,7 @@ class RaiseTicket(FlaskForm):
     department = SelectField(
         'Department',
         validators=[DataRequired()],
-        choices=[('ALL','ALL'),
+        choices=[('ALL', 'ALL'),
                  ('AI/ML', 'AI/ML'),
                  ('Python', 'Python'),
                  ('QA', 'QA'),

@@ -2,13 +2,35 @@ import psycopg2
 from flask import Blueprint, render_template, redirect, url_for, flash,request
 from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm,RaiseTicket
 from dotenv import load_dotenv
-from models import db, User, Detail, FeedbackTicket
-from flask_login import login_user, current_user
+from models import db, User, Detail, FeedbackTicket,FeedbackResponse
+from flask_login import login_user, current_user,login_required, logout_user
 import os
 
 load_dotenv()
 admin = Blueprint("admin", __name__, template_folder="templates", static_folder="static")
 
+
+# @admin.route('/', methods=['GET', 'POST'])
+# @admin.route('/login', methods=['GET', 'POST'])
+# def login():
+#     form = LoginForm()
+#
+#     if form.validate_on_submit():
+#         email = form.email.data
+#         password = form.password.data
+#         result = db.session.execute(db.select(User).where(User.email == email))
+#         admin1= result.scalars().first()
+#         print(admin1)
+#         if admin1:
+#             if admin1.password == password and admin1.role == 'admin':
+#                 login_user(admin1)
+#                 flash(f'Login successful for {email}', 'success')
+#                 return redirect(url_for("admin.a_dashboard"))
+#
+#         flash('Invalid credentials. Please try again.', 'danger')
+#         return redirect(url_for('admin.login'))
+#
+#     return render_template('admin_login.html', form=form, current_user=current_user)
 
 @admin.route('/', methods=['GET', 'POST'])
 @admin.route('/login', methods=['GET', 'POST'])
@@ -18,25 +40,29 @@ def login():
     if form.validate_on_submit():
         email = form.email.data
         password = form.password.data
-        result = db.session.execute(db.select(User).where(User.email == email))
-        user1= result.scalars().first()
-        print(user1)
-        if user1:
-            if user1.password == password and user1.role == 'admin':
-                login_user(user1)
-                flash(f'Login successful for {email}', 'success')
-                return redirect(url_for("admin.a_dashboard"))
+        admin1 = User.query.filter_by(email=email, role='admin').first()
+
+        if admin1 and admin1.password == password:
+            login_user(admin1)
+            flash(f'Login successful for {email}', 'success')
+            return redirect(url_for("admin.a_dashboard"))
 
         flash('Invalid credentials. Please try again.', 'danger')
         return redirect(url_for('admin.login'))
 
-    return render_template('admin_login.html', form=form)
+    return render_template('admin_login.html', form=form, current_user=current_user)
+
+@admin.route('/logout',methods=['GET', 'POST'])
+def logout():
+    logout_user()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('admin.login'))
 
 # Dashboard routes
 @admin.route('/dashboard')
 def a_dashboard():
-
-    return render_template("admin_dashboard.html")
+    print(current_user.email)
+    return render_template("admin_dashboard.html",current_user=current_user)
 
 @admin.route('/adduser', methods=['GET', 'POST'])
 def add_user():
@@ -62,26 +88,24 @@ def add_user():
         flash("User registered successfully!", "success")
         return redirect(url_for("admin.a_dashboard"))
 
-    return render_template("add_user.html",form=form)
+    return render_template("add_user.html",form=form,current_user=current_user)
 
 @admin.route('/dashboard/managefeedback', methods=['GET', 'POST'])
 def manage_feedback():
-    return render_template("manage_feedback.html")
+    return render_template("manage_feedback.html",current_user=current_user)
 
 # Settings Route
 @admin.route('/dashboard/settings', methods=['GET', 'POST'])
 def a_settings():
 
-    return render_template("admin_settings.html")
+    return render_template("admin_settings.html",current_user=current_user)
 
 @admin.route('/dashboard/settings/admindetails', methods=['GET', 'POST'])
 def a_details():
     form = UserDetailForm(obj=current_user.user_detail)
 
-
     form.email.data = current_user.email
     form.department.data = current_user.department
-
 
 
     if form.validate_on_submit():
@@ -109,7 +133,7 @@ def a_details():
         return redirect(url_for("admin.a_settings"))
     else:
         print("Else form not submitted")
-    return render_template("user_details.html", form=form)
+    return render_template("user_details.html", form=form,current_user=current_user)
 
 @admin.route('/dashboard/settings/change-password', methods=['GET', 'POST'])
 def change_password():
@@ -127,7 +151,15 @@ def change_password():
         else:
             flash('Incorrect current password.', 'danger')
 
-    return render_template("change_password.html", form=form)
+    return render_template("change_password.html", form=form,current_user=current_user)
+
+@admin.route('/dashboard/setting/view-profile', methods=['GET', 'POST'])
+def profile():
+    profile = db.session.execute(db.select(User).where(User.email == current_user.email))
+    profile_detail = db.session.execute(db.select(Detail).where(Detail.email == current_user.email))
+    result = profile.scalars().all()
+    print(result)
+    return render_template("admin_profile.html", current_user=current_user)
 
 # Feedback routes
 @admin.route('/dashboard/managefeedback/raisetickets', methods=['GET', 'POST'])
@@ -148,12 +180,51 @@ def raise_tickets():
         flash('Successfully created ticket!!','success')
         return redirect(url_for('admin.manage_feedback'))
 
-    return render_template("raise_tickets.html",form=form)
+    return render_template("raise_tickets.html",form=form,current_user=current_user)
 
 @admin.route('/dashboard/managefeedback/viewfeedback', methods=['GET', 'POST'])
 def view_feedback():
+    departments = db.session.query(FeedbackTicket.department_name).distinct().all()
+    department_names = [dept[0] for dept in departments]
+    selected_department = request.args.get('department')
 
-    return render_template("view_feedback.html")
+    if selected_department:
+        feedback_responses = FeedbackResponse.query.join(FeedbackTicket).filter(
+            FeedbackTicket.department_name == selected_department
+        ).all()
+    else:
+        feedback_responses = FeedbackResponse.query.all()
+
+    return render_template("view_feedback.html", feedback_responses=feedback_responses,
+                           department_names=department_names, selected_department=selected_department)
+
+@admin.route('/dashboard/managefeedback/ticket/<int:ticket_id>', methods=['GET'])
+def view_ticket_details(ticket_id):
+    ticket = FeedbackTicket.query.get(ticket_id)
+    if ticket is None:
+        flash('Ticket not found.', 'danger')
+        return redirect(url_for('admin.view_feedback'))
+
+    return render_template("ticket_details.html", ticket=ticket)
+
+
+@admin.route('/dashboard/managefeedback/ticket/<int:ticket_id>/respond', methods=['POST'])
+def respond_to_ticket(ticket_id):
+    response_text = request.form.get('response')
+    if response_text:
+        new_response = FeedbackResponse(
+            ticket_id=ticket_id,
+            user_email=current_user.email,
+            response=response_text
+        )
+        db.session.add(new_response)
+        db.session.commit()
+        flash('Your response has been submitted!', 'success')
+    else:
+        flash('Response cannot be empty.', 'danger')
+
+    return redirect(url_for('admin.view_ticket_details', ticket_id=ticket_id))
+
 
 @admin.route('/dashboard/managefeedback/assigntasks', methods=['GET', 'POST'])
 def assign_tasks():

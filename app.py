@@ -1,53 +1,74 @@
+import os
+
 from flask import Flask, redirect, url_for
 from flask_migrate import Migrate
 from admin.admin import admin
 from user.user import user
-from flask_login import LoginManager
-from models import db,User
-app=Flask(__name__)
+from flask_login import LoginManager,current_user
+from models import db, User
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+app = Flask(__name__)
 
 app.config['SECRET_KEY'] = '9c6a7d0a3e4f2b1c8d5e9f7a2b3c4d6e'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:sneha@localhost:5432/management'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('database')
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 migrate = Migrate()
 db.init_app(app)
 
-app.register_blueprint(admin,url_prefix='/admin')
-app.register_blueprint(user,url_prefix='/user')
-migrate.init_app(app,db)
+app.register_blueprint(admin, url_prefix='/admin')
+app.register_blueprint(user, url_prefix='/user')
+migrate.init_app(app, db)
 
-user_login_manager=LoginManager()
-user_login_manager.init_app(app)
-user_login_manager.login_view = "user.login"
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'user.login'
 
-admin_login_manager=LoginManager()
-admin_login_manager.init_app(app)
-admin_login_manager.login_view = "admin.login"
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
 
+# user_login_manager = LoginManager()
+# user_login_manager.init_app(app)
+# user_login_manager.login_view = "user.login"
+# user_login_manager.session_cookie_name = 'user_session'
+#
+# admin_login_manager = LoginManager()
+# admin_login_manager.init_app(app)
+# admin_login_manager.login_view = "admin.login"
+# admin_login_manager.session_cookie_name = 'admin_session'
+#
 # @user_login_manager.user_loader
 # def load_user(user_id):
-#     return db.get_or_404(User,email=user_id,role='employee')
+#     return User.query.filter_by(email=user_id, role='employee').first()
+#
 #
 # @admin_login_manager.user_loader
 # def load_admin(user_id):
-#     return db.get_or_404(User,email=user_id,role='admin')
+#     return User.query.filter_by(email=user_id, role='admin').first()
 
-@user_login_manager.user_loader
-def load_user(user_id):
-    return User.query.filter_by(email=user_id, role='employee').first()
 
-@admin_login_manager.user_loader
-def load_admin(user_id):
-    return User.query.filter_by(email=user_id, role='admin').first()
+# user_login_manager.session_cookie_name = 'user_session'
+# admin_login_manager.session_cookie_name = 'admin_session'
 
+@app.before_request
+def before_request():
+    print(f"Current user: {current_user}")
+    print(f"Is authenticated: {current_user.is_authenticated}")
+    print(f"User role: {getattr(current_user, 'role', 'No role')}")
 
 
 @app.route('/')
 def user_login():
     return redirect(url_for('user.login'))
 
-if __name__ =='__main__':
-    with app.app_context():
-        db.create_all()
+
+with app.app_context():
+    db.create_all()
+
+if __name__ == '__main__':
+
     app.run(debug=True)

@@ -1,0 +1,53 @@
+{% extends "admin_base.html" %}
+
+{% block title %}View Feedback Responses{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Feedback Responses</h1>
+
+    <form method="GET" class="mb-4">
+        <div class="form-group">
+            <label for="department">Filter by Department:</label>
+            <select id="department" name="department" class="form-control">
+                <option value="">All Departments</option>
+                {% for department in department_names %}
+                    <option value="{{ department }}" {% if department == selected_department %}selected{% endif %}>{{ department }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+    {% if feedback_responses %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Response ID</th>
+                    <th>Ticket ID</th>
+                    <th>User Email</th>
+                    <th>Response</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for response in feedback_responses %}
+                    <tr>
+                        <td>{{ response.response_id }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.view_ticket_details', ticket_id=response.ticket_id) }}">
+                                {{ response.ticket_id }}
+                            </a>
+                        </td>
+                        <td>{{ response.user_email }}</td>
+                        <td>{{ response.response }}</td>
+                        <td>{{ response.created_at }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No feedback responses available.</p>
+    {% endif %}
+</div>
+{% endblock %}

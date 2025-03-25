@@ -1,36 +1,14 @@
 import psycopg2
-from flask import Blueprint, render_template, redirect, url_for, flash,request
-from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm,RaiseTicket
+from flask import Blueprint, render_template, redirect, url_for, flash, request
+from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm, RaiseTicket
 from dotenv import load_dotenv
-from models import db, User, Detail, FeedbackTicket,FeedbackResponse
-from flask_login import login_user, current_user,login_required, logout_user
+from models import db, User, Detail, FeedbackTicket, FeedbackResponse
+from flask_login import login_user, current_user, login_required, logout_user
 import os
 
 load_dotenv()
 admin = Blueprint("admin", __name__, template_folder="templates", static_folder="static")
 
-
-# @admin.route('/', methods=['GET', 'POST'])
-# @admin.route('/login', methods=['GET', 'POST'])
-# def login():
-#     form = LoginForm()
-#
-#     if form.validate_on_submit():
-#         email = form.email.data
-#         password = form.password.data
-#         result = db.session.execute(db.select(User).where(User.email == email))
-#         admin1= result.scalars().first()
-#         print(admin1)
-#         if admin1:
-#             if admin1.password == password and admin1.role == 'admin':
-#                 login_user(admin1)
-#                 flash(f'Login successful for {email}', 'success')
-#                 return redirect(url_for("admin.a_dashboard"))
-#
-#         flash('Invalid credentials. Please try again.', 'danger')
-#         return redirect(url_for('admin.login'))
-#
-#     return render_template('admin_login.html', form=form, current_user=current_user)
 
 @admin.route('/', methods=['GET', 'POST'])
 @admin.route('/login', methods=['GET', 'POST'])
@@ -52,17 +30,19 @@ def login():
 
     return render_template('admin_login.html', form=form, current_user=current_user)
 
-@admin.route('/logout',methods=['GET', 'POST'])
+
+@admin.route('/logout', methods=['GET', 'POST'])
 def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('admin.login'))
 
+
 # Dashboard routes
 @admin.route('/dashboard')
 def a_dashboard():
-    print(current_user.email)
-    return render_template("admin_dashboard.html",current_user=current_user)
+    return render_template("admin_dashboard.html", current_user=current_user)
+
 
 @admin.route('/adduser', methods=['GET', 'POST'])
 def add_user():
@@ -71,34 +51,39 @@ def add_user():
     if form.validate_on_submit():
 
         new_user = User(
-            email = form.email.data,
+            email=form.email.data,
             password=form.password.data,
             department=form.department.data,
             role=form.role.data,
         )
-        db.session.add(new_user)
-        db.session.commit()
+        result=db.session.execute(db.select(User.email))
+        if not form.email.data in result.scalars():
+            db.session.add(new_user)
+            db.session.commit()
 
-        new_detail = Detail(
-            email=form.email.data,
-        )
-        db.session.add(new_detail)
-        db.session.commit()
+            new_detail = Detail(
+                email=form.email.data,
+            )
+            db.session.add(new_detail)
+            db.session.commit()
 
-        flash("User registered successfully!", "success")
-        return redirect(url_for("admin.a_dashboard"))
+            flash("User registered successfully!", "success")
+            return redirect(url_for("admin.a_dashboard"))
+        print("nope")
+        flash("User already registered!!! ", "danger")
+    return render_template("add_user.html", form=form, current_user=current_user)
 
-    return render_template("add_user.html",form=form,current_user=current_user)
 
-@admin.route('/dashboard/managefeedback', methods=['GET', 'POST'])
+@admin.route('/dashboard/manage-feedback', methods=['GET', 'POST'])
 def manage_feedback():
-    return render_template("manage_feedback.html",current_user=current_user)
+    return render_template("manage_feedback.html", current_user=current_user)
+
 
 # Settings Route
 @admin.route('/dashboard/settings', methods=['GET', 'POST'])
 def a_settings():
+    return render_template("admin_settings.html", current_user=current_user)
 
-    return render_template("admin_settings.html",current_user=current_user)
 
 @admin.route('/dashboard/settings/admindetails', methods=['GET', 'POST'])
 def a_details():
@@ -106,7 +91,6 @@ def a_details():
 
     form.email.data = current_user.email
     form.department.data = current_user.department
-
 
     if form.validate_on_submit():
         print("Form Submitted!")
@@ -117,14 +101,12 @@ def a_details():
         else:
             user_detail = current_user.user_detail
 
-
         print(f"Before update: {user_detail.firstname}, {user_detail.lastname}, {user_detail.phone_number}")
 
         # Update details
         user_detail.firstname = form.f_name.data
         user_detail.lastname = form.l_name.data
         user_detail.phone_number = form.phone.data
-
 
         print(f"After update: {user_detail.firstname}, {user_detail.lastname}, {user_detail.phone_number}")
 
@@ -133,7 +115,8 @@ def a_details():
         return redirect(url_for("admin.a_settings"))
     else:
         print("Else form not submitted")
-    return render_template("user_details.html", form=form,current_user=current_user)
+    return render_template("user_details.html", form=form, current_user=current_user)
+
 
 @admin.route('/dashboard/settings/change-password', methods=['GET', 'POST'])
 def change_password():
@@ -151,22 +134,24 @@ def change_password():
         else:
             flash('Incorrect current password.', 'danger')
 
-    return render_template("change_password.html", form=form,current_user=current_user)
+    return render_template("change_password.html", form=form, current_user=current_user)
 
+
+# you have ti ckeck logic pending
 @admin.route('/dashboard/setting/view-profile', methods=['GET', 'POST'])
 def profile():
     profile = db.session.execute(db.select(User).where(User.email == current_user.email))
     profile_detail = db.session.execute(db.select(Detail).where(Detail.email == current_user.email))
     result = profile.scalars().all()
     print(result)
-    return render_template("admin_profile.html", current_user=current_user)
+    return render_template("user_profile.html", current_user=current_user)
+
 
 # Feedback routes
 @admin.route('/dashboard/managefeedback/raisetickets', methods=['GET', 'POST'])
 def raise_tickets():
-    form=RaiseTicket()
+    form = RaiseTicket()
     if form.validate_on_submit():
-
         new_ticket = FeedbackTicket(
             user_email=current_user.email,
             ticket_label=form.ticket_label.data,
@@ -174,13 +159,13 @@ def raise_tickets():
             department_name=form.department.data
         )
 
-
         db.session.add(new_ticket)
         db.session.commit()
-        flash('Successfully created ticket!!','success')
+        flash('Successfully created ticket!!', 'success')
         return redirect(url_for('admin.manage_feedback'))
 
-    return render_template("raise_tickets.html",form=form,current_user=current_user)
+    return render_template("raise_tickets.html", form=form, current_user=current_user)
+
 
 @admin.route('/dashboard/managefeedback/viewfeedback', methods=['GET', 'POST'])
 def view_feedback():
@@ -198,6 +183,7 @@ def view_feedback():
     return render_template("view_feedback.html", feedback_responses=feedback_responses,
                            department_names=department_names, selected_department=selected_department)
 
+
 @admin.route('/dashboard/managefeedback/ticket/<int:ticket_id>', methods=['GET'])
 def view_ticket_details(ticket_id):
     ticket = FeedbackTicket.query.get(ticket_id)
@@ -211,22 +197,21 @@ def view_ticket_details(ticket_id):
 @admin.route('/dashboard/managefeedback/ticket/<int:ticket_id>/respond', methods=['POST'])
 def respond_to_ticket(ticket_id):
     response_text = request.form.get('response')
-    if response_text:
-        new_response = FeedbackResponse(
-            ticket_id=ticket_id,
-            user_email=current_user.email,
-            response=response_text
-        )
-        db.session.add(new_response)
-        db.session.commit()
-        flash('Your response has been submitted!', 'success')
-    else:
-        flash('Response cannot be empty.', 'danger')
+    # if response_text:
+    #     new_response = FeedbackResponse(
+    #         ticket_id=ticket_id,
+    #         user_email=current_user.email,
+    #         response=response_text
+    #     )
+    #     db.session.add(new_response)
+    #     db.session.commit()
+    #     flash('Your response has been submitted!', 'success')
+    # else:
+    #     flash('Response cannot be empty.', 'danger')
 
     return redirect(url_for('admin.view_ticket_details', ticket_id=ticket_id))
 
 
 @admin.route('/dashboard/managefeedback/assigntasks', methods=['GET', 'POST'])
 def assign_tasks():
-
     return render_template("assign_tasks.html")

@@ -1,32 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Details</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/lux/bootstrap.min.css">
-</head>
-<body>
+{% extends 'user_settings.html' %}
 
+{% block settings_content %}
 <div class="container mt-5">
-    <h2 class="text-center"><i class="fas fa-key"></i>Details</h2>
+    <h2 class="text-center"><i class="fas fa-key"></i> Details</h2>
     <p class="text-center text-muted">Update your personal details below.</p>
 
     <form method="POST" class="mx-auto" style="max-width: 400px;">
         {{ form.hidden_tag() }}
-
 
         <div class="mb-3">
             {{ form.email.label(class="form-label") }}
             {{ form.email(class="form-control", readonly=true) }}
         </div>
 
-
         <div class="mb-3">
             {{ form.department.label(class="form-label") }}
             {{ form.department(class="form-control", readonly=true) }}
         </div>
-
 
         <div class="mb-3">
             {{ form.f_name.label(class="form-label") }}
@@ -36,7 +26,6 @@
             {% endfor %}
         </div>
 
-
         <div class="mb-3">
             {{ form.l_name.label(class="form-label") }}
             {{ form.l_name(class="form-control", placeholder="Enter Last Name") }}
@@ -44,7 +33,6 @@
                 <div class="text-danger small">{{ error }}</div>
             {% endfor %}
         </div>
-
 
         <div class="mb-3">
             {{ form.phone.label(class="form-label") }}
@@ -58,10 +46,5 @@
             {{ form.submit(class="btn btn-primary") }}
         </div>
     </form>
-
 </div>
-
-</body>
-</html>
-
-
+{% endblock %}

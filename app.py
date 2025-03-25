@@ -15,7 +15,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('database')
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
-print("Database URL:", app.config['SQLALCHEMY_DATABASE_URI'])  # Debugging
+# print("Database URL:",app.config['SQLALCHEMY_DATABASE_URI'])
 
 db.init_app(app)
 migrate = Migrate()
@@ -32,34 +32,11 @@ login_manager.login_view = 'user.login'
 def load_user(user_id):
     return User.query.get(user_id)
 
-# user_login_manager = LoginManager()
-# user_login_manager.init_app(app)
-# user_login_manager.login_view = "user.login"
-# user_login_manager.session_cookie_name = 'user_session'
-#
-# admin_login_manager = LoginManager()
-# admin_login_manager.init_app(app)
-# admin_login_manager.login_view = "admin.login"
-# admin_login_manager.session_cookie_name = 'admin_session'
-#
-# @user_login_manager.user_loader
-# def load_user(user_id):
-#     return User.query.filter_by(email=user_id, role='employee').first()
-#
-#
-# @admin_login_manager.user_loader
-# def load_admin(user_id):
-#     return User.query.filter_by(email=user_id, role='admin').first()
-
-
-# user_login_manager.session_cookie_name = 'user_session'
-# admin_login_manager.session_cookie_name = 'admin_session'
-
-@app.before_request
-def before_request():
-    print(f"Current user: {current_user}")
-    print(f"Is authenticated: {current_user.is_authenticated}")
-    print(f"User role: {getattr(current_user, 'role', 'No role')}")
+# @app.before_request
+# def before_request():
+#     print(f"Current user: {current_user}")
+#     print(f"Is authenticated: {current_user.is_authenticated}")
+#     print(f"User role: {getattr(current_user, 'role', 'No role')}")
 
 
 @app.route('/')

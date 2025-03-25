@@ -6,3 +6,26 @@ pip install -r requirements.txt
 {{ url_for('user.view_tickets') }}
 {{ url_for('user.assign_task') }}
 {{ url_for('user.a_settings') }}
+
+# user_login_manager = LoginManager()
+# user_login_manager.init_app(app)
+# user_login_manager.login_view = "user.login"
+# user_login_manager.session_cookie_name = 'user_session'
+#
+# admin_login_manager = LoginManager()
+# admin_login_manager.init_app(app)
+# admin_login_manager.login_view = "admin.login"
+# admin_login_manager.session_cookie_name = 'admin_session'
+#
+# @user_login_manager.user_loader
+# def load_user(user_id):
+#     return User.query.filter_by(email=user_id, role='employee').first()
+#
+#
+# @admin_login_manager.user_loader
+# def load_admin(user_id):
+#     return User.query.filter_by(email=user_id, role='admin').first()
+
+
+# user_login_manager.session_cookie_name = 'user_session'
+# admin_login_manager.session_cookie_name = 'admin_session'

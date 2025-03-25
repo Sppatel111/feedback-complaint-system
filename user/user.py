@@ -1,5 +1,7 @@
-import sqlalchemy
+
 from flask import Blueprint, render_template, redirect, url_for, flash, request
+from sqlalchemy import or_
+
 from .forms import LoginForm, UserDetailForm, ChangePasswordForm
 from models import db, User, Detail, FeedbackTicket, FeedbackResponse
 from flask_login import login_user, current_user, logout_user
@@ -9,29 +11,6 @@ user = Blueprint("user", __name__, template_folder="templates", static_folder="s
 
 
 # Login Route
-# @user.route('/', methods=['GET', 'POST'])
-# @user.route('/login', methods=['GET', 'POST'])
-# def login():
-#     form = LoginForm()
-#
-#     if form.validate_on_submit():
-#         email = form.email.data
-#         password = form.password.data
-#         result = db.session.execute(db.select(User).where(User.email == email))
-#         user1 = result.scalars().first()
-#         print("yep")
-#         print(user1)
-#         if user1:
-#             if user1.password == password and user1.role =='employee':
-#                 login_user(user1)
-#                 flash(f'Login successful for {email}', 'success')
-#                 return redirect(url_for("user.u_dashboard"))
-#         print('nope')
-#         # flash('Invalid credentials. Please try again.', 'danger')
-#         # return redirect(url_for('user.login'))
-#
-#     return render_template('user_login.html', form=form,current_user=current_user)
-
 @user.route('/', methods=['GET', 'POST'])
 @user.route('/login', methods=['GET', 'POST'])
 def login():
@@ -96,7 +75,7 @@ def u_details():
 
     return render_template("user_details.html", form=form, current_user=current_user)
 
-
+# you have to check
 @user.route('/dashboard/setting/view-profile', methods=['GET', 'POST'])
 def profile():
     profile = db.session.execute(db.select(User).where(User.email == current_user.email))
@@ -130,15 +109,15 @@ def manage_feedback():
     return render_template("feedback_management.html", current_user=current_user)
 
 
-@user.route('dashboard/view', methods=['GET', 'POST'])
+@user.route('dashboard/feedback/view-tickets', methods=['GET', 'POST'])
 def view_tickets():
     if current_user.department:
-        tickets = FeedbackTicket.query.filter_by(department_name=current_user.department).all()
+        tickets = FeedbackTicket.query.filter(or_(FeedbackTicket.department_name == current_user.department,FeedbackTicket.department_name =='ALL')).all()
     else:
-        tickets = []
+        tickets=[]
     return render_template('f_tickets.html', tickets=tickets, current_user=current_user)
 
-
+# for the response in view tickets
 @user.route('dashboard/respond/<int:ticket_id>', methods=['POST'])
 def respond_to_ticket(ticket_id):
     response_text = request.form.get('response')
@@ -156,3 +135,11 @@ def respond_to_ticket(ticket_id):
 
     return redirect(url_for('user.view_tickets'))
 
+@user.route('/dashboard/ticket/<int:ticket_id>', methods=['GET'])
+def ticket_detail_response(ticket_id):
+    ticket = FeedbackTicket.query.get(ticket_id)
+    if ticket is None:
+        flash('Ticket not found.', 'danger')
+        return redirect(url_for('user.view_tickets'))
+
+    return render_template("ticket_detail_response.html", ticket=ticket)

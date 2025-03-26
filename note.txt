@@ -29,3 +29,17 @@ pip install -r requirements.txt
 
 # user_login_manager.session_cookie_name = 'user_session'
 # admin_login_manager.session_cookie_name = 'admin_session'
+
+
+  # response_text = request.form.get('response')
+    # # if response_text:
+    # #     new_response = FeedbackResponse(
+    # #         ticket_id=ticket_id,
+    # #         user_email=current_user.email,
+    # #         response=response_text
+    # #     )
+    # #     db.session.add(new_response)
+    # #     db.session.commit()
+    # #     flash('Your response has been submitted!', 'success')
+    # # else:
+    # #     flash('Response cannot be empty.', 'danger')

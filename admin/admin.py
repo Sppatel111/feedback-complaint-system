@@ -82,7 +82,7 @@ def manage_feedback():
 # Settings Route
 @admin.route('/dashboard/settings', methods=['GET', 'POST'])
 def a_settings():
-    return render_template("admin_settings.html", current_user=current_user)
+    return render_template("settings.html", current_user=current_user)
 
 
 @admin.route('/dashboard/settings/admindetails', methods=['GET', 'POST'])
@@ -140,10 +140,6 @@ def change_password():
 # you have ti ckeck logic pending
 @admin.route('/dashboard/setting/view-profile', methods=['GET', 'POST'])
 def profile():
-    profile = db.session.execute(db.select(User).where(User.email == current_user.email))
-    profile_detail = db.session.execute(db.select(Detail).where(Detail.email == current_user.email))
-    result = profile.scalars().all()
-    print(result)
     return render_template("user_profile.html", current_user=current_user)
 
 
@@ -167,6 +163,7 @@ def raise_tickets():
     return render_template("raise_tickets.html", form=form, current_user=current_user)
 
 
+### user feedback
 @admin.route('/dashboard/managefeedback/viewfeedback', methods=['GET', 'POST'])
 def view_feedback():
     departments = db.session.query(FeedbackTicket.department_name).distinct().all()
@@ -183,7 +180,8 @@ def view_feedback():
     return render_template("view_feedback.html", feedback_responses=feedback_responses,
                            department_names=department_names, selected_department=selected_department)
 
-
+### need check below two function
+###  ticket detail and user responses on it
 @admin.route('/dashboard/managefeedback/ticket/<int:ticket_id>', methods=['GET'])
 def view_ticket_details(ticket_id):
     ticket = FeedbackTicket.query.get(ticket_id)
@@ -193,25 +191,12 @@ def view_ticket_details(ticket_id):
 
     return render_template("ticket_details.html", ticket=ticket)
 
-
 @admin.route('/dashboard/managefeedback/ticket/<int:ticket_id>/respond', methods=['POST'])
 def respond_to_ticket(ticket_id):
-    response_text = request.form.get('response')
-    # if response_text:
-    #     new_response = FeedbackResponse(
-    #         ticket_id=ticket_id,
-    #         user_email=current_user.email,
-    #         response=response_text
-    #     )
-    #     db.session.add(new_response)
-    #     db.session.commit()
-    #     flash('Your response has been submitted!', 'success')
-    # else:
-    #     flash('Response cannot be empty.', 'danger')
-
     return redirect(url_for('admin.view_ticket_details', ticket_id=ticket_id))
 
 
 @admin.route('/dashboard/managefeedback/assigntasks', methods=['GET', 'POST'])
 def assign_tasks():
-    return render_template("assign_tasks.html")
+    all_task=FeedbackTicket.query.all()
+    return render_template("assign_tasks.html",all_task=all_task)

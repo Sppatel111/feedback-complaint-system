@@ -3,11 +3,13 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship,DeclarativeBase
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from flask import session
+
+
 # create database
 class Base(DeclarativeBase):
     pass
 db = SQLAlchemy(model_class=Base)
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'user_auth'
@@ -97,4 +99,5 @@ class Task(db.Model):
 
     def __repr__(self):
         return f'<Task {self.task_id} - {self.task_status}>'
+
 

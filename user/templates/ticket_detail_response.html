@@ -23,11 +23,12 @@
     {% else %}
         <p>No responses yet.</p>
     {% endif %}
-<!--here you have to add  as if ticket open then you rsponse option-->
+    {% if ticket.ticket_status == 'open': %}
     <h2>Add a Response</h2>
     <form action="{{ url_for('user.respond_to_ticket', ticket_id=ticket.ticket_id) }}" method="POST">
         <textarea class="form-control" name="response" rows="2" required></textarea>
         <button type="submit" class="btn btn-primary mt-2">Submit</button>
     </form>
+    {% endif %}
 </div>
 {% endblock %}

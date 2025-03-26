@@ -48,7 +48,7 @@ def u_dashboard():
 # Settings Route
 @user.route('/dashboard/settings')
 def u_settings():
-    return render_template("user_settings.html", current_user=current_user)
+    return render_template("settings.html", current_user=current_user)
 
 
 # User Details Route
@@ -143,3 +143,7 @@ def ticket_detail_response(ticket_id):
         return redirect(url_for('user.view_tickets'))
 
     return render_template("ticket_detail_response.html", ticket=ticket)
+
+@user.route('dashboad/feedback/task',methods=['GET','POST'])
+def assigned_task():
+    return render_template()

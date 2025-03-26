@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/lux/bootstrap.min.css">
+    <style>
+        .settings-container {
+            display: flex; /* Use flexbox for layout */
+            margin-top: 20px; /* Add some margin to the top */
+        }
+        .settings-sidebar {
+            flex: 0 0 25%; /* Sidebar takes 25% of the width */
+            padding: 15px; /* Add some padding */
+            background-color: #f8f9fa; /* Light background for sidebar */
+            border-right: 1px solid #dee2e6; /* Optional border for separation */
+        }
+        .settings-content {
+            flex: 1; /* Content takes the remaining width */
+            padding: 15px; /* Add some padding */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    {% if current_user.role == 'employee' %}
+        {% set side_panel = False %}
+        {% include 'user_base.html' %}
+    {% elif current_user.role == 'admin' %}
+        {% include 'admin_base.html' %}
+    {% endif %}
+
+    <div class="text-center my-4">
+        <h1>Settings</h1>
+        <hr>
+    </div>
+
+    <div class="settings-container">
+        <div class="settings-sidebar">
+            <div class="list-group">
+                {% if current_user.role == 'employee' %}
+                    <a href="{{ url_for('user.u_details') }}" class="list-group-item list-group-item-action">User Details</a>
+                    <a href="{{ url_for('user.change_password') }}" class="list-group-item list-group-item-action">Change Password</a>
+                {% elif current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.a_details') }}" class="list-group-item list-group-item-action">Admin Details</a>
+                    <a href="{{ url_for('admin.change_password') }}" class="list-group-item list-group-item-action">Change Password</a>
+                {% endif %}
+                <!-- Add more settings options here if needed -->
+            </div>
+        </div>
+        <div class="settings-content">
+            {% block settings_content %}
+            <!-- This block will be filled with specific content for user details or change password -->
+            {% endblock %}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+{% extends "admin_base.html" %}
+
+{% block title %}View Feedback Responses{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1> ALL TASK </h1>
+
+<!--    <form method="GET" class="mb-4">-->
+<!--        <div class="form-group">-->
+<!--            <label for="department">Filter by Department:</label>-->
+<!--            <select id="department" name="department" class="form-control">-->
+<!--                <option value="">All Departments</option>-->
+<!--                {% for department in department_names %}-->
+<!--                    <option value="{{ department }}" {% if department == selected_department %}selected{% endif %}>{{ department }}</option>-->
+<!--                {% endfor %}-->
+<!--            </select>-->
+<!--        </div>-->
+<!--        <button type="submit" class="btn btn-primary">Filter</button>-->
+<!--    </form>-->
+
+    {% if all_task %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Task ID</th>
+                    <th>Department</th>
+                    <th>Task </th>
+                    <th>Task Detail</th>
+                    <th>Created At</th>
+                    <th> Task status</th>
+                    <th> Change Status</th>
+                    <th> Assign Task</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in all_task %}
+                    <tr>
+                        <td>{{ task.ticket_id }}</td>
+                        <td>{{ task.department_name }}</td>
+                        <td>{{ task.ticket_label }}</td>
+                        <td>{{ task.question }}</td>
+                        <td>{{ task.created_at }}</td>
+                        <td>{{ task.ticket_status }}</td>
+                        <td>
+                            <a href='#' class="btn btn-sm btn-primary">Status</a>
+                        </td>
+                        <td>
+                            <a href='#' class="btn btn-sm btn-primary">Assign </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No feedback ticket available.</p>
+    {% endif %}
+</div>
+{% endblock %}

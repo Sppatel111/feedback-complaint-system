@@ -2,7 +2,7 @@ import psycopg2
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm, RaiseTicket
 from dotenv import load_dotenv
-from models import db, User, Detail, FeedbackTicket, FeedbackResponse
+from models import db, User, Detail, FeedbackTicket, FeedbackResponse,Task
 from flask_login import login_user, current_user, login_required, logout_user
 import os
 
@@ -196,7 +196,47 @@ def respond_to_ticket(ticket_id):
     return redirect(url_for('admin.view_ticket_details', ticket_id=ticket_id))
 
 
+###Assign task
 @admin.route('/dashboard/managefeedback/assigntasks', methods=['GET', 'POST'])
 def assign_tasks():
     all_task=FeedbackTicket.query.all()
     return render_template("assign_tasks.html",all_task=all_task)
+
+
+# @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>',methods=['GET','POST'])
+# def assign_user(ticket_id):
+#     ticket1 = FeedbackTicket.query.get(ticket_id)
+#     if ticket1 is None:
+#         flash('Ticket not found.', 'danger')
+#     return render_template("assign_user.html",ticket=ticket1)
+
+@admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>', methods=['GET', 'POST'])
+def assign_user(ticket_id):
+    ticket1 = FeedbackTicket.query.get(ticket_id)
+    if ticket1 is None:
+        flash('Ticket not found.', 'danger')
+        return redirect(url_for('admin.assign_tasks'))
+
+    if request.method == 'POST':
+        assigned_email = request.form.get('assigned_email')
+        details = request.form.get('details')
+        deadline = request.form.get('deadline')
+
+        if assigned_email and details:
+            new_task = Task(ticket_id=ticket_id, assigned_to_email=assigned_email, details=details, deadline=deadline)
+            db.session.add(new_task)
+            db.session.commit()
+            flash('User assigned to the task successfully!', 'success')
+            return redirect(url_for('admin.assign_tasks'))
+
+
+    all_users = User.query.all()
+    return render_template("assign_user.html", ticket=ticket1, all_users=all_users)
+
+
+# @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>',methods=['GET','POST'])
+# def ticket_status(ticket_id):
+#     ticket = FeedbackTicket.query.get(ticket_id)
+#     if ticket is None:
+#         flash('Ticket not found.', 'danger')
+#     return render_template("",ticket=ticket)

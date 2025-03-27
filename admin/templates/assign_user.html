@@ -1,0 +1,66 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Ticket Details - Ticket ID: {{ ticket.ticket_id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Ticket Details</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Ticket ID: {{ ticket.ticket_id }}</h5>
+            <p><strong>Department:</strong> {{ ticket.department_name }}</p>
+            <p><strong>Label:</strong> {{ ticket.ticket_label }}</p>
+            <p><strong>Question:</strong> {{ ticket.question }}</p>
+            <p><strong>Status:</strong> {{ ticket.ticket_status }}</p>
+            <p><strong>Created At:</strong> {{ ticket.created_at }}</p>
+        </div>
+    </div>
+
+    <h2>Assign User to Task</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label for="assigned_email">Select User:</label>
+            <select id="assigned_email" name="assigned_email" class="form-control" required>
+                <option value="">Select a user</option>
+                {% for user in all_users %}
+                    <option value="{{ user.email }}">{{ user.email }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="details">Task Details:</label>
+            <textarea id="details" name="details" class="form-control" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="deadline">Deadline:</label>
+            <input type="date" id="deadline" name="deadline" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Assign User</button>
+    </form>
+    <br>
+    <h2>Responses</h2>
+    {% if ticket.responses %}
+        <table class="table table-bordered mb-4">
+            <thead>
+                <tr>
+                    <th>User Email</th>
+                    <th>Response</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for response in ticket.responses %}
+                    <tr>
+                        <td>{{ response.user_email }}</td>
+                        <td>{{ response.response }}</td>
+                        <td>{{ response.created_at }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No responses for this ticket.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -4,6 +4,8 @@
 {% set side_panel =False %}
 {% set show_navbar = False %}
 {% block content %}
+
+
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
     <div class="row shadow-lg rounded bg-white overflow-hidden" style="max-width: 900px; width: 100%;">
 
@@ -20,7 +22,23 @@
                 <h2 class="text-center mb-4">Login</h2>
                 <form method="POST">
                     {{ form.hidden_tag() }}
-
+                    <!--        flash -->
+                   <div class="container mt-3">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                <div class="alert alert-dismissible alert-success">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    <a href="#" class="alert-link">
+                                        <ul class="flashes">
+                                            {% for category, message in messages %}
+                                                <li class="{{ category }}">{{ message }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
                     <div class="mb-3">
                         {{ form.email.label(class="form-label") }}
                         {{ form.email(class="form-control", placeholder="Enter your email") }}

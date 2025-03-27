@@ -46,7 +46,7 @@
                             <a href='#' class="btn btn-sm btn-primary">Status</a>
                         </td>
                         <td>
-                            <a href='#' class="btn btn-sm btn-primary">Assign </a>
+                            <a href="{{ url_for('admin.assign_user',ticket_id=task.ticket_id) }}" class="btn btn-sm btn-primary">Assign </a>
                         </td>
                     </tr>
                 {% endfor %}

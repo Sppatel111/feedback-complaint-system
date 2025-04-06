@@ -8,6 +8,7 @@ from datetime import datetime
 # create database
 class Base(DeclarativeBase):
     pass
+
 db = SQLAlchemy(model_class=Base)
 
 

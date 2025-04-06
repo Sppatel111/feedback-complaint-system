@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy import or_
 
 from .forms import LoginForm, UserDetailForm, ChangePasswordForm
-from models import db, User, Detail, FeedbackTicket, FeedbackResponse
+from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task
 from flask_login import login_user, current_user, logout_user
 
 # Flask Blueprint for user-related routes
@@ -144,6 +144,7 @@ def ticket_detail_response(ticket_id):
 
     return render_template("ticket_detail_response.html", ticket=ticket)
 
-@user.route('dashboad/feedback/task',methods=['GET','POST'])
+@user.route('/dashboard/feedback/task', methods=['GET'])
 def assigned_task():
-    return render_template("")
+    tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
+    return render_template("tasks.html", tasks=tasks)

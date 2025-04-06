@@ -90,3 +90,5 @@ pip install -r requirements.txt
 
             {% endblock %}
         </div>
+
+https://alisonstech.ae/wp-content/uploads/2022/09/complaints-management-food-beverage.png

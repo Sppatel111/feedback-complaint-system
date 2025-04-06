@@ -29,7 +29,7 @@
                     <th>Task Detail</th>
                     <th>Created At</th>
                     <th> Task status</th>
-                    <th> Change Status</th>
+<!--                    <th> Change Status</th>-->
                     <th> Assign Task</th>
                 </tr>
             </thead>
@@ -42,9 +42,9 @@
                         <td>{{ task.question }}</td>
                         <td>{{ task.created_at }}</td>
                         <td>{{ task.ticket_status }}</td>
-                        <td>
-                            <a href='#' class="btn btn-sm btn-primary">Status</a>
-                        </td>
+<!--                        <td>-->
+<!--                            <a href='#' class="btn btn-sm btn-primary">Status</a>-->
+<!--                        </td>-->
                         <td>
                             <a href="{{ url_for('admin.assign_user',ticket_id=task.ticket_id) }}" class="btn btn-sm btn-primary">Assign </a>
                         </td>

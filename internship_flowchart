@@ -1,0 +1,13 @@
+digraph {
+	A [label="Phase 1 - Learning Backend & Databases"]
+	B [label="Phase 2 - API Development & Authentication"]
+	C [label="Phase 3 - Testing & Debugging"]
+	D [label="Phase 4 - Web Scraping & Automation"]
+	E [label="Phase 5 - Version Control & Deployment"]
+	F [label="Phase 6 - Project Development & Implementation"]
+	A -> B
+	B -> C
+	C -> D
+	D -> E
+	E -> F
+}

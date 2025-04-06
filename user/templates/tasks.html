@@ -1,0 +1,39 @@
+{% extends "user_base.html" %}
+
+{% block title %}View Feedback Responses{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1> ASSIGNED Tasks TASK </h1>
+
+    {% if tasks %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Task ID</th>
+                    <th>Details</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                    <tr>
+<!--                         <td>{{ task.task_id }}</td>-->
+                        <td>
+                            <a href="{{ url_for('user.ticket_detail_response', ticket_id=task.ticket_id) }}">
+                                {{ task.ticket_id }}
+                            </a>
+                        </td>
+                        <td>{{ task.details }}</td>
+                        <td>{{ task.deadline if task.deadline else 'No deadline' }}</td>
+                        <td>{{ task.task_status }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No Task available.</p>
+    {% endif %}
+</div>
+{% endblock %}

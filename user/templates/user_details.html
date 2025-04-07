@@ -21,7 +21,7 @@
 <!--                    {% endif %}-->
 <!--                {% endwith %}-->
 <!--            </div>-->
-    <form method="POST" class="mx-auto" style="max-width: 400px;">
+    <form method="POST" enctype="multipart/form-data" class="mx-auto" style="max-width: 400px;">
         {{ form.hidden_tag() }}
 
         <div class="mb-3">
@@ -32,6 +32,14 @@
         <div class="mb-3">
             {{ form.department.label(class="form-label") }}
             {{ form.department(class="form-control", readonly=true) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.profile_image.label(class="form-label") }}
+            {{ form.profile_image(class="form-control") }}
+            {% for error in form.profile_image.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
         </div>
 
         <div class="mb-3">

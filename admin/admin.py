@@ -4,7 +4,11 @@ from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm, R
 from dotenv import load_dotenv
 from models import db, User, Detail, FeedbackTicket, FeedbackResponse,Task
 from flask_login import login_user, current_user, login_required, logout_user
+from werkzeug.utils import secure_filename
 import os
+
+UPLOAD_FOLDER = 'user/static/assets/'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 load_dotenv()
 admin = Blueprint("admin", __name__, template_folder="templates", static_folder="static")
@@ -84,37 +88,36 @@ def manage_feedback():
 def a_settings():
     return render_template("settings.html", current_user=current_user)
 
-
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 @admin.route('/dashboard/settings/admindetails', methods=['GET', 'POST'])
 def a_details():
     form = UserDetailForm(obj=current_user.user_detail)
-
     form.email.data = current_user.email
     form.department.data = current_user.department
 
     if form.validate_on_submit():
-        print("Form Submitted!")
-        print(f"First Name: {form.f_name.data}, Last Name: {form.l_name.data}, Phone: {form.phone.data}")
         if not current_user.user_detail:
             user_detail = Detail(email=current_user.email)
             db.session.add(user_detail)
         else:
             user_detail = current_user.user_detail
 
-        print(f"Before update: {user_detail.firstname}, {user_detail.lastname}, {user_detail.phone_number}")
-
-        # Update details
         user_detail.firstname = form.f_name.data
         user_detail.lastname = form.l_name.data
         user_detail.phone_number = form.phone.data
+        file = form.profile_image.data
+        print(file)
 
-        print(f"After update: {user_detail.firstname}, {user_detail.lastname}, {user_detail.phone_number}")
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            user_detail.profile_image = filename
 
         db.session.commit()
         flash("Details updated successfully!", "success")
         return redirect(url_for("admin.a_settings"))
-    else:
-        print("Else form not submitted")
+
     return render_template("user_details.html", form=form, current_user=current_user)
 
 
@@ -137,7 +140,7 @@ def change_password():
     return render_template("change_password.html", form=form, current_user=current_user)
 
 
-# you have ti ckeck logic pending
+# you have ti check logic pending
 @admin.route('/dashboard/setting/view-profile', methods=['GET', 'POST'])
 def profile():
     return render_template("user_profile.html", current_user=current_user)
@@ -202,13 +205,6 @@ def assign_tasks():
     all_task=FeedbackTicket.query.all()
     return render_template("assign_tasks.html",all_task=all_task)
 
-
-# @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>',methods=['GET','POST'])
-# def assign_user(ticket_id):
-#     ticket1 = FeedbackTicket.query.get(ticket_id)
-#     if ticket1 is None:
-#         flash('Ticket not found.', 'danger')
-#     return render_template("assign_user.html",ticket=ticket1)
 
 @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>', methods=['GET', 'POST'])
 def assign_user(ticket_id):

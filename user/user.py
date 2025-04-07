@@ -1,10 +1,14 @@
-
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy import or_
 
 from .forms import LoginForm, UserDetailForm, ChangePasswordForm
 from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task
 from flask_login import login_user, current_user, logout_user
+from werkzeug.utils import secure_filename
+import os
+
+UPLOAD_FOLDER = 'user/static/assets/'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 # Flask Blueprint for user-related routes
 user = Blueprint("user", __name__, template_folder="templates", static_folder="static")
@@ -52,6 +56,9 @@ def u_settings():
 
 
 # User Details Route
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 @user.route('/dashboard/settings/userdetails', methods=['GET', 'POST'])
 def u_details():
     form = UserDetailForm(obj=current_user.user_detail)
@@ -64,16 +71,24 @@ def u_details():
             db.session.add(user_detail)
         else:
             user_detail = current_user.user_detail
-        # Update details
+
+
         user_detail.firstname = form.f_name.data
         user_detail.lastname = form.l_name.data
         user_detail.phone_number = form.phone.data
+        file = form.profile_image.data
+        print(file)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            user_detail.profile_image = filename
 
         db.session.commit()
         flash("Details updated successfully!", "success")
         return redirect(url_for("user.u_details"))
 
     return render_template("user_details.html", form=form, current_user=current_user)
+
 
 # you have to check
 @user.route('/dashboard/setting/view-profile', methods=['GET', 'POST'])

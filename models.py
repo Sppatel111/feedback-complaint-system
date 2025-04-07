@@ -38,7 +38,7 @@ class Detail(db.Model):
     firstname: Mapped[str] = mapped_column(String, nullable=True)
     lastname: Mapped[str] = mapped_column(String, nullable=True)
     phone_number: Mapped[str] = mapped_column(String, nullable=True)
-
+    profile_image: Mapped[str] = mapped_column(String, default=('default-profile.jpg'), nullable=True)
     __table_args__ = (ForeignKeyConstraint
                       (['email'], ['user_auth.email'], ondelete='CASCADE'),
                       )

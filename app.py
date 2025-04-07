@@ -1,7 +1,7 @@
 from flask import Flask, redirect, url_for
 from flask_migrate import Migrate
 from admin.admin import admin
-from user.user import user
+from user.user import user,UPLOAD_FOLDER
 from flask_login import LoginManager,current_user
 from models import db, User
 import os
@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '9c6a7d0a3e4f2b1c8d5e9f7a2b3c4d6e'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('database')
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # print("Database URL:",app.config['SQLALCHEMY_DATABASE_URI'])
 

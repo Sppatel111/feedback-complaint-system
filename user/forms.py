@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField,EmailField,StringField,SubmitField
+from wtforms import PasswordField,EmailField,StringField,SubmitField,FileField
 from wtforms.validators import DataRequired, Email, Length, Regexp,EqualTo
 
 class LoginForm(FlaskForm):
@@ -21,6 +21,7 @@ class UserDetailForm(FlaskForm):
             Regexp(r'^\d{10}$', message="Phone number must contain only digits")
         ]
     )
+    profile_image = FileField('Profile Image')
     submit = SubmitField('Submit')
 
 class ChangePasswordForm(FlaskForm):

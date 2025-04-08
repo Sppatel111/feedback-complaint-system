@@ -159,7 +159,49 @@ def ticket_detail_response(ticket_id):
 
     return render_template("ticket_detail_response.html", ticket=ticket)
 
+
 @user.route('/dashboard/feedback/task', methods=['GET'])
 def assigned_task():
     tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
-    return render_template("tasks.html", tasks=tasks)
+
+    status_colors = {
+        'todo': 'orange',
+        'in_progress': '#007bff',
+        'in_review': '#6f42c1',
+        'backlog': 'red',
+        'on_hold': '#ffc107',
+        'done': '#28a745',
+        'completed': '#20c997',
+    }
+
+    return render_template("tasks.html", tasks=tasks, status_colors=status_colors)
+
+
+# @user.route('/dashboard/feedback/task/update/<int:task_id>', methods=['POST'])
+# def update_task_status(task_id):
+#     task = Task.query.get(task_id)
+#     if task:
+#         new_status = request.form.get('task_status')
+#         task.task_status = new_status
+#         db.session.commit()
+#         flash('Task status updated successfully!', 'success')
+#     else:
+#         flash('Task not found!', 'error')
+#     return redirect(url_for('user.assigned_task'))
+
+@user.route('/dashboard/feedback/task/update/<int:task_id>', methods=['POST'])
+def update_task_status(task_id):
+    task = Task.query.get(task_id)
+    if not task:
+        flash('Task not found!', 'error')
+        return redirect(url_for('user.assigned_task'))
+
+    if task.ticket.ticket_status == 'closed':
+        flash('Cannot update task status. The ticket is closed.', 'warning')
+        return redirect(url_for('user.assigned_task'))
+
+    new_status = request.form.get('task_status')
+    task.task_status = new_status
+    db.session.commit()
+    flash('Task status updated successfully!', 'success')
+    return redirect(url_for('user.assigned_task'))

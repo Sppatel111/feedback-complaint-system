@@ -147,3 +147,15 @@ def a_details():
     else:
         print("Else form not submitted")
     return render_template("user_details.html", form=form, current_user=current_user)
+
+
+
+#### python all
+https://www.datacamp.com/blog/what-is-python-used-for
+
+# priority: Mapped[str] = mapped_column(String, CheckConstraint("priority IN ('low', 'medium', 'high')"),
+                                       default='medium')
+
+SELECT conname, pg_get_constraintdef(oid) AS constraint_definition
+FROM pg_constraint
+WHERE conname = 'tasks_task_status_check';

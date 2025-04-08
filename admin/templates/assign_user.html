@@ -1,66 +1,113 @@
 {% extends "admin_base.html" %}
 
-{% block title %}Ticket Details - Ticket ID: {{ ticket.ticket_id }}{% endblock %}
+{% block title %}Assign Task - Ticket ID: {{ ticket.ticket_id }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Ticket Details</h1>
-    
-    <div class="card mb-4">
+    <h2 class="mb-4 text-center">Assign Task for Ticket #{{ ticket.ticket_id }}</h2>
+
+    <!-- Ticket Details -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-dark text-white">Ticket Details</div>
         <div class="card-body">
-            <h5 class="card-title">Ticket ID: {{ ticket.ticket_id }}</h5>
-            <p><strong>Department:</strong> {{ ticket.department_name }}</p>
-            <p><strong>Label:</strong> {{ ticket.ticket_label }}</p>
-            <p><strong>Question:</strong> {{ ticket.question }}</p>
-            <p><strong>Status:</strong> {{ ticket.ticket_status }}</p>
-            <p><strong>Created At:</strong> {{ ticket.created_at }}</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Department:</strong> {{ ticket.department_name }}</p>
+                    <p><strong>Label:</strong> {{ ticket.ticket_label }}</p>
+                    <p><strong>Status:</strong>
+                        <span class="badge
+                            {% if ticket.ticket_status == 'open' %} bg-success
+                            {% elif ticket.ticket_status == 'in_progress' %} bg-warning text-dark
+                            {% else %} bg-secondary {% endif %}">
+                            {{ ticket.ticket_status|capitalize }}
+                        </span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Created At:</strong> {{ ticket.created_at }}</p>
+                    <p><strong>Question:</strong><br>{{ ticket.question }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <h2>Assign User to Task</h2>
-    <form method="POST">
-        <div class="form-group">
-            <label for="assigned_email">Select User:</label>
-            <select id="assigned_email" name="assigned_email" class="form-control" required>
-                <option value="">Select a user</option>
-                {% for user in all_users %}
-                    <option value="{{ user.email }}">{{ user.email }}</option>
-                {% endfor %}
-            </select>
+    <!-- Department Filter Form (GET) -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">Filter Users by Department</div>
+        <div class="card-body">
+            <form method="GET">
+                <div class="mb-3">
+                    <label for="department" class="form-label">Select Department:</label>
+                    <select name="department" id="department" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- Select Department --</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
         </div>
-        <div class="form-group">
-            <label for="details">Task Details:</label>
-            <textarea id="details" name="details" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <!-- Task Assignment Form -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-success text-white">Assign User to Task</div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="assigned_email" class="form-label">Select User:</label>
+                    <select id="assigned_email" name="assigned_email" class="form-select" required {% if not all_users %}disabled{% endif %}>
+                        <option value="">-- Choose a user --</option>
+                        {% for user in all_users %}
+                            <option value="{{ user.email }}">{{ user.email }} ({{ user.department }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="details" class="form-label">Task Details:</label>
+                    <textarea id="details" name="details" class="form-control" rows="4" placeholder="Describe the task..." required></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="deadline" class="form-label">Deadline:</label>
+                    <input type="date" id="deadline" name="deadline" class="form-control" required>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-success" {% if not all_users %}disabled{% endif %}>Assign Task</button>
+                </div>
+            </form>
         </div>
-        <div class="form-group">
-            <label for="deadline">Deadline:</label>
-            <input type="date" id="deadline" name="deadline" class="form-control" required>
+    </div>
+
+    <!-- Ticket Responses -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">Ticket Responses</div>
+        <div class="card-body">
+            {% if ticket.responses %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>User Email</th>
+                            <th>Response</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for response in ticket.responses %}
+                            <tr>
+                                <td>{{ response.user_email }}</td>
+                                <td>{{ response.response }}</td>
+                                <td>{{ response.created_at }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">No responses submitted for this ticket.</p>
+            {% endif %}
         </div>
-        <button type="submit" class="btn btn-primary">Assign User</button>
-    </form>
-    <br>
-    <h2>Responses</h2>
-    {% if ticket.responses %}
-        <table class="table table-bordered mb-4">
-            <thead>
-                <tr>
-                    <th>User Email</th>
-                    <th>Response</th>
-                    <th>Created At</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for response in ticket.responses %}
-                    <tr>
-                        <td>{{ response.user_email }}</td>
-                        <td>{{ response.response }}</td>
-                        <td>{{ response.created_at }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No responses for this ticket.</p>
-    {% endif %}
+    </div>
 </div>
 {% endblock %}

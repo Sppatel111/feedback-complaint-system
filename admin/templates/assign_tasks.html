@@ -6,19 +6,6 @@
 <div class="container mt-5">
     <h1> ALL TASK </h1>
 
-<!--    <form method="GET" class="mb-4">-->
-<!--        <div class="form-group">-->
-<!--            <label for="department">Filter by Department:</label>-->
-<!--            <select id="department" name="department" class="form-control">-->
-<!--                <option value="">All Departments</option>-->
-<!--                {% for department in department_names %}-->
-<!--                    <option value="{{ department }}" {% if department == selected_department %}selected{% endif %}>{{ department }}</option>-->
-<!--                {% endfor %}-->
-<!--            </select>-->
-<!--        </div>-->
-<!--        <button type="submit" class="btn btn-primary">Filter</button>-->
-<!--    </form>-->
-
     {% if all_task %}
         <table class="table table-bordered">
             <thead>
@@ -28,9 +15,8 @@
                     <th>Task </th>
                     <th>Task Detail</th>
                     <th>Created At</th>
-                    <th> Task status</th>
-<!--                    <th> Change Status</th>-->
-                    <th> Assign Task</th>
+                    <th>Task Status</th>
+                    <th>Assign Task</th>
                 </tr>
             </thead>
             <tbody>
@@ -41,10 +27,22 @@
                         <td>{{ task.ticket_label }}</td>
                         <td>{{ task.question }}</td>
                         <td>{{ task.created_at }}</td>
-                        <td>{{ task.ticket_status }}</td>
-<!--                        <td>-->
-<!--                            <a href='#' class="btn btn-sm btn-primary">Status</a>-->
-<!--                        </td>-->
+                        <td>
+                            <form action="{{ url_for('admin.update_ticket_status', ticket_id=task.ticket_id) }}" method="POST" class="status-form d-inline">
+                                <!-- Status Label -->
+                                <span class="status-label badge px-2 py-1"
+                                      style="cursor: pointer; background-color: {{ status_colors[task.ticket_status] }}; color: white;">
+                                    {{ task.ticket_status.replace('_', ' ').title() }}
+                                </span>
+
+                                <!-- Status Dropdown -->
+                                <select name="ticket_status" class="status-select form-control d-none" style="width: auto;">
+                                    <option value="open" data-color="#17a2b8" {% if task.ticket_status == 'open' %}selected{% endif %}>Open</option>
+                                    <option value="in_progress" data-color="#ffc107" {% if task.ticket_status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="closed" data-color="#28a745" {% if task.ticket_status == 'closed' %}selected{% endif %}>Closed</option>
+                                </select>
+                            </form>
+                        </td>
                         <td>
                             <a href="{{ url_for('admin.assign_user',ticket_id=task.ticket_id) }}" class="btn btn-sm btn-primary">Assign </a>
                         </td>
@@ -56,4 +54,42 @@
         <p>No feedback ticket available.</p>
     {% endif %}
 </div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function () {
+    // Show dropdown on badge click
+    $('.status-label').on('click', function () {
+        const $form = $(this).closest('.status-form');
+        $(this).hide();
+        const $select = $form.find('.status-select');
+        $select.removeClass('d-none').focus();
+    });
+
+    // Submit form on change
+    $('.status-select').on('change', function () {
+        $(this).closest('form').submit();
+    });
+
+    // Hide dropdown if blurred
+    $('.status-select').on('blur', function () {
+        const $form = $(this).closest('.status-form');
+        $(this).addClass('d-none');
+        $form.find('.status-label').show();
+    });
+});
+</script>
+
+<style>
+    .status-label:hover {
+        opacity: 0.9;
+        box-shadow: 0 0 3px rgba(0,0,0,0.2);
+    }
+    .status-select {
+        padding: 3px 8px;
+        font-size: 0.95rem;
+        width: 160px !important;
+    }
+</style>
 {% endblock %}

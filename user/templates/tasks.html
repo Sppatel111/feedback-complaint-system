@@ -4,11 +4,11 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1> ASSIGNED Tasks TASK </h1>
+    <h1 class="mb-4">ASSIGNED TASKS</h1>
 
     {% if tasks %}
         <table class="table table-bordered">
-            <thead>
+            <thead class="thead-light">
                 <tr>
                     <th>Task ID</th>
                     <th>Details</th>
@@ -19,7 +19,6 @@
             <tbody>
                 {% for task in tasks %}
                     <tr>
-<!--                         <td>{{ task.task_id }}</td>-->
                         <td>
                             <a href="{{ url_for('user.ticket_detail_response', ticket_id=task.ticket_id) }}">
                                 {{ task.ticket_id }}
@@ -27,7 +26,27 @@
                         </td>
                         <td>{{ task.details }}</td>
                         <td>{{ task.deadline if task.deadline else 'No deadline' }}</td>
-                        <td>{{ task.task_status }}</td>
+                        <td>
+                            {% if task.ticket.ticket_status == 'closed' %}
+                                <small class="text-danger">Ticket Closed</small>
+                            {% endif %}
+                            <form action="{{ url_for('user.update_task_status', task_id=task.task_id) }}" method="POST" class="status-form d-inline">
+                                <!-- Status Label -->
+                                <span class="status-label badge px-2 py-1"
+                                      style="cursor: pointer; background-color: {{ status_colors[task.task_status] }}; color: white;">
+                                    {{ task.task_status.replace('_', ' ').title() }}
+                                </span>
+
+                                <!-- Status Dropdown -->
+                                <select name="task_status" class="status-select form-control d-none" style="width: auto; display: inline-block; {% if task.ticket.ticket_status == 'closed' %}disabled{% endif %}">
+                                    <option value="todo" data-color="orange" {% if task.task_status == 'todo' %}selected{% endif %}>To Do</option>
+                                    <option value="in_progress" data-color="#007bff" {% if task.task_status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="in_review" data-color="#6f42c1" {% if task.task_status == 'in_review' %}selected{% endif %}>In Review - TL</option>
+                                    <option value="backlog" data-color="red" {% if task.task_status == 'backlog' %}selected{% endif %}>Backlog</option>
+                                    <option value="completed" data-color="#20c997" {% if task.task_status == 'completed' %}selected{% endif %}>Complete</option>
+                                </select>
+                            </form>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -36,4 +55,33 @@
         <p>No Task available.</p>
     {% endif %}
 </div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Status Change Script -->
+<script>
+$(document).ready(function () {
+    // Click on status badge to show dropdown
+    $('.status-label').on('click', function () {
+        const $form = $(this).closest('.status-form');
+        $(this).hide();
+        const $select = $form.find('.status-select');
+        $select.removeClass('d-none').focus();
+    });
+
+    // Submit form on status change
+    $('.status-select').on('change', function () {
+        $(this).closest('form').submit();
+    });
+
+    // Hide dropdown and show label back if user clicks out
+    $('.status-select').on('blur', function () {
+        const $form = $(this).closest('.status-form');
+        $(this).addClass('d-none');
+        $form.find('.status-label').show();
+    });
+});
+</script>
+
 {% endblock %}

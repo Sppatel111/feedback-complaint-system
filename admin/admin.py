@@ -202,9 +202,49 @@ def respond_to_ticket(ticket_id):
 ###Assign task
 @admin.route('/dashboard/managefeedback/assigntasks', methods=['GET', 'POST'])
 def assign_tasks():
-    all_task=FeedbackTicket.query.all()
-    return render_template("assign_tasks.html",all_task=all_task)
+    all_task = FeedbackTicket.query.all()
 
+    status_colors = {
+        'open': '#17a2b8',
+        'closed': '#28a745',
+        'in_progress': '#ffc107'
+    }
+    return render_template("assign_tasks.html", all_task=all_task, status_colors=status_colors)
+
+@admin.route('/dashboard/managefeedback/assigntasks/status/<int:ticket_id>', methods=['POST'])
+def update_ticket_status(ticket_id):
+    ticket = FeedbackTicket.query.get(ticket_id)
+    if ticket:
+        new_status = request.form.get('ticket_status')
+        ticket.ticket_status = new_status
+        db.session.commit()
+        flash('Ticket status updated successfully!', 'success')
+    else:
+        flash('Ticket not found!', 'danger')
+    return redirect(url_for('admin.assign_tasks'))
+
+# @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>', methods=['GET', 'POST'])
+# def assign_user(ticket_id):
+#     ticket1 = FeedbackTicket.query.get(ticket_id)
+#     if ticket1 is None:
+#         flash('Ticket not found.', 'danger')
+#         return redirect(url_for('admin.assign_tasks'))
+#
+#     if request.method == 'POST':
+#         assigned_email = request.form.get('assigned_email')
+#         details = request.form.get('details')
+#         deadline = request.form.get('deadline')
+#
+#         if assigned_email and details:
+#             new_task = Task(ticket_id=ticket_id, assigned_to_email=assigned_email, details=details, deadline=deadline)
+#             db.session.add(new_task)
+#             db.session.commit()
+#             flash('User assigned to the task successfully!', 'success')
+#             return redirect(url_for('admin.assign_tasks'))
+#
+#
+#     all_users = User.query.all()
+#     return render_template("assign_user.html", ticket=ticket1, all_users=all_users)
 
 @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>', methods=['GET', 'POST'])
 def assign_user(ticket_id):
@@ -213,10 +253,27 @@ def assign_user(ticket_id):
         flash('Ticket not found.', 'danger')
         return redirect(url_for('admin.assign_tasks'))
 
+    # Get department from query param
+    selected_department = request.args.get('department')
+
+    # Get all departments for the dropdown
+    departments = db.session.query(User.department).distinct().all()
+    departments = [d[0] for d in departments if d[0]]
+
+    # Filter users by selected department
+    if selected_department:
+        all_users = User.query.filter_by(department=selected_department).all()
+    else:
+        all_users = []
+
     if request.method == 'POST':
         assigned_email = request.form.get('assigned_email')
         details = request.form.get('details')
         deadline = request.form.get('deadline')
+
+        if ticket1.ticket_status == 'closed':
+            flash('This ticket is closed. You cannot assign new tasks.', 'danger')
+            return redirect(url_for('admin.assign_user', ticket_id=ticket_id, department=selected_department))
 
         if assigned_email and details:
             new_task = Task(ticket_id=ticket_id, assigned_to_email=assigned_email, details=details, deadline=deadline)
@@ -225,9 +282,7 @@ def assign_user(ticket_id):
             flash('User assigned to the task successfully!', 'success')
             return redirect(url_for('admin.assign_tasks'))
 
-
-    all_users = User.query.all()
-    return render_template("assign_user.html", ticket=ticket1, all_users=all_users)
+    return render_template("assign_user.html", ticket=ticket1, all_users=all_users, departments=departments, selected_department=selected_department)
 
 
 # @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>',methods=['GET','POST'])

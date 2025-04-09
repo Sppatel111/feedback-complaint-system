@@ -35,7 +35,7 @@ def login():
 
     return render_template('user_login.html', form=form, current_user=current_user)
 
-
+#logout Route
 @user.route('/logout', methods=['GET', 'POST'])
 def logout():
     logout_user()
@@ -177,17 +177,6 @@ def assigned_task():
     return render_template("tasks.html", tasks=tasks, status_colors=status_colors)
 
 
-# @user.route('/dashboard/feedback/task/update/<int:task_id>', methods=['POST'])
-# def update_task_status(task_id):
-#     task = Task.query.get(task_id)
-#     if task:
-#         new_status = request.form.get('task_status')
-#         task.task_status = new_status
-#         db.session.commit()
-#         flash('Task status updated successfully!', 'success')
-#     else:
-#         flash('Task not found!', 'error')
-#     return redirect(url_for('user.assigned_task'))
 
 @user.route('/dashboard/feedback/task/update/<int:task_id>', methods=['POST'])
 def update_task_status(task_id):

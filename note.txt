@@ -1,7 +1,15 @@
 pip freeze > requirements.txt
 pip list
-
 pip install -r requirements.txt
+#### python all
+https://www.datacamp.com/blog/what-is-python-used-for
+##setting design
+https://www.behance.net/gallery/184520011/User-Page?tracking_source=search_projects|settings+page+design&l=21
+
+##manage users
+https://www.phpkb.com/kb/article/managing-user-accounts-97.html
+https://support.monday.com/hc/en-us/articles/360002426980-How-to-manage-users-on-your-account
+https://docs.wavemaker.com/learn/v10.15/teams/manage-users/
 
 {{ url_for('user.view_tickets') }}
 {{ url_for('user.assign_task') }}
@@ -150,8 +158,7 @@ def a_details():
 
 
 
-#### python all
-https://www.datacamp.com/blog/what-is-python-used-for
+
 
 # priority: Mapped[str] = mapped_column(String, CheckConstraint("priority IN ('low', 'medium', 'high')"),
                                        default='medium')
@@ -159,3 +166,4 @@ https://www.datacamp.com/blog/what-is-python-used-for
 SELECT conname, pg_get_constraintdef(oid) AS constraint_definition
 FROM pg_constraint
 WHERE conname = 'tasks_task_status_check';
+

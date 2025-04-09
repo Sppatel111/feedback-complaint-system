@@ -1,0 +1,38 @@
+{% extends "admin_base.html" %}
+{% block title %}View User{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">User Details</h4>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center mb-4">
+                <div class="col-md-2 text-center">
+                    <img src="{{ url_for('user.static', filename='assets/' + (user.user_detail.profile_image or 'default-profile.jpg')) }}"
+                         class="rounded-circle" width="80" height="80">
+                </div>
+                <div class="col-md-10">
+                    <h5>{{ user.user_detail.firstname }} {{ user.user_detail.lastname }}</h5>
+                    <p class="mb-1"><strong>Email:</strong> {{ user.email }}</p>
+                    <p class="mb-1"><strong>Role:</strong> {{ user.role|capitalize }}</p>
+                    <p class="mb-1"><strong>Department:</strong> {{ user.department or '—' }}</p>
+                    <p class="mb-1"><strong>Phone:</strong> {{ user.user_detail.phone_number or '—' }}</p>
+                    <p class="mb-0"><strong>Status:</strong>
+                        {% if user.is_active %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-secondary">Disabled</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <a href="{{ url_for('admin.manage_users') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Users
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+>

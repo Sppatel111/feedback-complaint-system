@@ -2,7 +2,7 @@ import psycopg2
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm, RaiseTicket
 from dotenv import load_dotenv
-from models import db, User, Detail, FeedbackTicket, FeedbackResponse,Task
+from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task
 from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.utils import secure_filename
 import os
@@ -48,6 +48,12 @@ def a_dashboard():
     return render_template("admin_dashboard.html", current_user=current_user)
 
 
+@admin.route('/manage-user', methods=['GET', 'POST'])
+def manage_users():
+    users = User.query.join(Detail).all()
+    return render_template("admin_manage_users.html", users=users)
+
+
 @admin.route('/adduser', methods=['GET', 'POST'])
 def add_user():
     form = AddUserForm()
@@ -60,7 +66,7 @@ def add_user():
             department=form.department.data,
             role=form.role.data,
         )
-        result=db.session.execute(db.select(User.email))
+        result = db.session.execute(db.select(User.email))
         if not form.email.data in result.scalars():
             db.session.add(new_user)
             db.session.commit()
@@ -77,6 +83,38 @@ def add_user():
         flash("User already registered!!! ", "danger")
     return render_template("add_user.html", form=form, current_user=current_user)
 
+@admin.route('/user/<email>')
+@login_required
+def view_user(email):
+    user = User.query.filter_by(email=email).first_or_404()
+    return render_template('admin_view_user.html', user=user)
+
+@admin.route('/edit-user/<email>', methods=['GET', 'POST'])
+@login_required
+def edit_user(email):
+    user = User.query.filter_by(email=email).first_or_404()
+
+    if request.method == 'POST':
+        user.role = request.form['role']
+        user.department = request.form['department']
+        user.user_detail.firstname = request.form['firstname']
+        user.user_detail.lastname = request.form['lastname']
+        db.session.commit()
+        flash('User updated successfully!', 'success')
+        return redirect(url_for('admin.manage_users'))
+
+    return render_template('admin_edit_user.html', user=user)
+
+@admin.route('/toggle-user/<email>')
+@login_required
+def toggle_user_status(email):
+    user = User.query.filter_by(email=email).first_or_404()
+    user.is_active = not user.is_active
+    db.session.commit()
+    flash(f"User {'enabled' if user.is_active else 'disabled'} successfully!", 'info')
+    return redirect(url_for('admin.manage_users'))
+
+
 
 @admin.route('/dashboard/manage-feedback', methods=['GET', 'POST'])
 def manage_feedback():
@@ -88,8 +126,12 @@ def manage_feedback():
 def a_settings():
     return render_template("settings.html", current_user=current_user)
 
+
+# Admin detail Route
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 @admin.route('/dashboard/settings/admindetails', methods=['GET', 'POST'])
 def a_details():
     form = UserDetailForm(obj=current_user.user_detail)
@@ -183,6 +225,7 @@ def view_feedback():
     return render_template("view_feedback.html", feedback_responses=feedback_responses,
                            department_names=department_names, selected_department=selected_department)
 
+
 ### need check below two function
 ###  ticket detail and user responses on it
 @admin.route('/dashboard/managefeedback/ticket/<int:ticket_id>', methods=['GET'])
@@ -193,6 +236,7 @@ def view_ticket_details(ticket_id):
         return redirect(url_for('admin.view_feedback'))
 
     return render_template("ticket_details.html", ticket=ticket)
+
 
 @admin.route('/dashboard/managefeedback/ticket/<int:ticket_id>/respond', methods=['POST'])
 def respond_to_ticket(ticket_id):
@@ -211,6 +255,7 @@ def assign_tasks():
     }
     return render_template("assign_tasks.html", all_task=all_task, status_colors=status_colors)
 
+
 @admin.route('/dashboard/managefeedback/assigntasks/status/<int:ticket_id>', methods=['POST'])
 def update_ticket_status(ticket_id):
     ticket = FeedbackTicket.query.get(ticket_id)
@@ -223,28 +268,6 @@ def update_ticket_status(ticket_id):
         flash('Ticket not found!', 'danger')
     return redirect(url_for('admin.assign_tasks'))
 
-# @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>', methods=['GET', 'POST'])
-# def assign_user(ticket_id):
-#     ticket1 = FeedbackTicket.query.get(ticket_id)
-#     if ticket1 is None:
-#         flash('Ticket not found.', 'danger')
-#         return redirect(url_for('admin.assign_tasks'))
-#
-#     if request.method == 'POST':
-#         assigned_email = request.form.get('assigned_email')
-#         details = request.form.get('details')
-#         deadline = request.form.get('deadline')
-#
-#         if assigned_email and details:
-#             new_task = Task(ticket_id=ticket_id, assigned_to_email=assigned_email, details=details, deadline=deadline)
-#             db.session.add(new_task)
-#             db.session.commit()
-#             flash('User assigned to the task successfully!', 'success')
-#             return redirect(url_for('admin.assign_tasks'))
-#
-#
-#     all_users = User.query.all()
-#     return render_template("assign_user.html", ticket=ticket1, all_users=all_users)
 
 @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>', methods=['GET', 'POST'])
 def assign_user(ticket_id):
@@ -282,8 +305,8 @@ def assign_user(ticket_id):
             flash('User assigned to the task successfully!', 'success')
             return redirect(url_for('admin.assign_tasks'))
 
-    return render_template("assign_user.html", ticket=ticket1, all_users=all_users, departments=departments, selected_department=selected_department)
-
+    return render_template("assign_user.html", ticket=ticket1, all_users=all_users, departments=departments,
+                           selected_department=selected_department)
 
 # @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>',methods=['GET','POST'])
 # def ticket_status(ticket_id):

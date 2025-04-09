@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, CheckConstraint, ForeignKeyConstraint,ForeignKey,Text,DateTime
+from sqlalchemy import Integer, String, CheckConstraint, ForeignKeyConstraint,ForeignKey,Text,DateTime,Boolean
 from sqlalchemy.orm import mapped_column, Mapped, relationship,DeclarativeBase
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
@@ -20,6 +20,7 @@ class User(UserMixin, db.Model):
         CheckConstraint("department IN('AI/ML', 'Python', 'QA', 'UI/UX', 'Frontend') OR department IS NULL"),
         nullable=True)
     role: Mapped[str] = mapped_column(String, CheckConstraint("role IN ('admin', 'employee')"), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     user_detail = relationship("Detail", back_populates="user_auth",uselist=False)
     feedbacks = relationship("FeedbackTicket", back_populates="user", cascade="all, delete")

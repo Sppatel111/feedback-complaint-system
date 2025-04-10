@@ -3,42 +3,46 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="card shadow-lg">
-        <div class="card-header bg-warning text-white">
+    <div class="card shadow border-0 rounded-lg">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Edit User</h4>
+            <a href="{{ url_for('admin.manage_users') }}" class="btn btn-outline-light btn-sm">
+                <i class="fas fa-arrow-left"></i> Cancel
+            </a>
         </div>
         <form method="POST">
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label>First Name</label>
+                        <label class="form-label">First Name</label>
                         <input type="text" name="firstname" class="form-control" value="{{ user.user_detail.firstname }}">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label>Last Name</label>
+                        <label class="form-label">Last Name</label>
                         <input type="text" name="lastname" class="form-control" value="{{ user.user_detail.lastname }}">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label>Role</label>
+                        <label class="form-label">Role</label>
                         <select class="form-control" name="role">
                             <option value="admin" {% if user.role =='admin' %} selected {% endif %}>Admin</option>
                             <option value="employee" {% if user.role =='employee' %} selected {% endif %}>Employee</option>
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label>Department</label>
+                        <label class="form-label">Department</label>
                         <select class="form-control" name="department">
                             <option value="" {% if not user.department %}selected{% endif %}>-- Select --</option>
                             {% for dept in ['AI/ML', 'Python', 'QA', 'UI/UX', 'Frontend'] %}
-                            <option value="{{ dept }}" {% if user.department == dept %}selected{% endif %}>{{ dept }}</option>
+                                <option value="{{ dept }}" {% if user.department == dept %}selected{% endif %}>{{ dept }}</option>
                             {% endfor %}
                         </select>
                     </div>
                 </div>
-                <div class="text-end">
-                    <a href="{{ url_for('admin.manage_users') }}" class="btn btn-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-success">Update</button>
-                </div>
+            </div>
+            <div class="card-footer text-end bg-light">
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="fas fa-save"></i> Update
+                </button>
             </div>
         </form>
     </div>

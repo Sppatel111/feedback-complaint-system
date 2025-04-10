@@ -21,6 +21,7 @@ class User(UserMixin, db.Model):
         nullable=True)
     role: Mapped[str] = mapped_column(String, CheckConstraint("role IN ('admin', 'employee')"), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
 
     user_detail = relationship("Detail", back_populates="user_auth",uselist=False)
     feedbacks = relationship("FeedbackTicket", back_populates="user", cascade="all, delete")

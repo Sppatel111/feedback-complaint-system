@@ -25,6 +25,9 @@ def login():
         admin1 = User.query.filter_by(email=email, role='admin').first()
 
         if admin1 and admin1.password == password:
+            if not admin1.is_active:
+                flash("This account is disabled. Please contact admin.", "danger")
+                return redirect(url_for('user.login'))
             login_user(admin1)
             flash(f'Login successful for {email}', 'success')
             return redirect(url_for("admin.a_dashboard"))

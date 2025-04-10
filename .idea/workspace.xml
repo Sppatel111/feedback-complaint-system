@@ -5,16 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b4d8c6ce-d23f-4c17-85a8-452d09522676" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/admin/templates/admin_edit_user.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/templates/admin_manage_users.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admin/templates/admin_view_user.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/templates/admin_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_edit_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_edit_user.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_manage_users.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_manage_users.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_view_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_view_user.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/note.txt" beforeDir="false" afterPath="$PROJECT_DIR$/note.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/default-profile.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/user/static/assets/profiles/default-profile.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/download_1.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/user/static/assets/profiles/download_1.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/user/static/assets/profiles/logo.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/popolpo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/user/static/assets/profiles/popolpo.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/templates/user_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/user_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_dashboard.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -66,6 +69,7 @@
       <recent name="D:\8SEM\Alian Software\feedback-complaint-system\admin\templates" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\SNEHA1\feedback-complaint-system\user\static\assets\profiles" />
       <recent name="D:\8SEM\Alian Software\feedback-complaint-system" />
     </key>
   </component>

@@ -1,13 +1,13 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy import or_
-
 from .forms import LoginForm, UserDetailForm, ChangePasswordForm
 from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task
 from flask_login import login_user, current_user, logout_user
 from werkzeug.utils import secure_filename
 import os
+import uuid
 
-UPLOAD_FOLDER = 'user/static/assets/'
+UPLOAD_FOLDER = 'user/static/assets/profiles/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 # Flask Blueprint for user-related routes
@@ -26,6 +26,9 @@ def login():
         user1 = User.query.filter_by(email=email, role='employee').first()
 
         if user1 and user1.password == password:
+            if not user1.is_active:
+                flash("This account is disabled. Please contact admin.", "danger")
+                return redirect(url_for('user.login'))
             login_user(user1)
 
             flash(f'Login successful for {email}', 'success')
@@ -78,10 +81,17 @@ def u_details():
         user_detail.phone_number = form.phone.data
         file = form.profile_image.data
         print(file)
+        # if file and allowed_file(file.filename):
+        #     filename = secure_filename(file.filename)
+        #     file.save(os.path.join(UPLOAD_FOLDER, filename))
+        #     user_detail.profile_image = filename
+
+        # using uuid
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            user_detail.profile_image = filename
+            file_extension = file.filename.rsplit('.', 1)[1].lower()
+            unique_filename = f"{uuid.uuid4()}.{file_extension}"
+            file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
+            user_detail.profile_image = unique_filename
 
         db.session.commit()
         flash("Details updated successfully!", "success")

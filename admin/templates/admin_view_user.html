@@ -10,7 +10,7 @@
         <div class="card-body">
             <div class="row align-items-center mb-4">
                 <div class="col-md-2 text-center">
-                    <img src="{{ url_for('user.static', filename='assets/' + (user.user_detail.profile_image or 'default-profile.jpg')) }}"
+                    <img src="{{ url_for('user.static', filename='assets/profiles/' + (user.user_detail.profile_image or 'default-profile.jpg')) }}"
                          class="rounded-circle" width="80" height="80">
                 </div>
                 <div class="col-md-10">
@@ -35,4 +35,3 @@
     </div>
 </div>
 {% endblock %}
->

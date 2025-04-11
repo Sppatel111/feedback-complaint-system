@@ -1,95 +1,80 @@
 {% extends "admin_base.html" %}
 
-{% block title %}View Feedback Responses{% endblock %}
+{% block title %}Assign Tasks{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1> ALL TASK </h1>
-
-    {% if all_task %}
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Task ID</th>
-                    <th>Department</th>
-                    <th>Task </th>
-                    <th>Task Detail</th>
-                    <th>Created At</th>
-                    <th>Task Status</th>
-                    <th>Assign Task</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for task in all_task %}
-                    <tr>
-                        <td>{{ task.ticket_id }}</td>
-                        <td>{{ task.department_name }}</td>
-                        <td>{{ task.ticket_label }}</td>
-                        <td>{{ task.question }}</td>
-                        <td>{{ task.created_at }}</td>
-                        <td>
-                            <form action="{{ url_for('admin.update_ticket_status', ticket_id=task.ticket_id) }}" method="POST" class="status-form d-inline">
-                                <!-- Status Label -->
-                                <span class="status-label badge px-2 py-1"
-                                      style="cursor: pointer; background-color: {{ status_colors[task.ticket_status] }}; color: white;">
-                                    {{ task.ticket_status.replace('_', ' ').title() }}
-                                </span>
-
-                                <!-- Status Dropdown -->
-                                <select name="ticket_status" class="status-select form-control d-none" style="width: auto;">
-                                    <option value="open" data-color="#17a2b8" {% if task.ticket_status == 'open' %}selected{% endif %}>Open</option>
-                                    <option value="in_progress" data-color="#ffc107" {% if task.ticket_status == 'in_progress' %}selected{% endif %}>In Progress</option>
-                                    <option value="closed" data-color="#28a745" {% if task.ticket_status == 'closed' %}selected{% endif %}>Closed</option>
-                                </select>
-                            </form>
-                        </td>
-                        <td>
-                            <a href="{{ url_for('admin.assign_user',ticket_id=task.ticket_id) }}" class="btn btn-sm btn-primary">Assign </a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No feedback ticket available.</p>
-    {% endif %}
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-white">
+            <h4 class="mb-0 text-dark">📋 All Tasks</h4>
+        </div>
+        <div class="card-body">
+            {% if all_task %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Department</th>
+                                <th>Task</th>
+                                <th>Details</th>
+                                <th>Created At</th>
+                                <th>Status</th>
+                                <th>Assign</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in all_task %}
+                                <tr>
+                                    <td>{{ task.ticket_id }}</td>
+                                    <td>{{ task.department_name }}</td>
+                                    <td>{{ task.ticket_label }}</td>
+                                    <td>{{ task.question }}</td>
+                                    <td>{{ task.created_at }}</td>
+                                    <td>
+                                        <div class="dropdown d-inline">
+                                            <button class="btn btn-sm text-white dropdown-toggle"
+                                                    type="button"
+                                                    id="dropdownStatus{{ loop.index }}"
+                                                    data-toggle="dropdown"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false"
+                                                    style="background-color: {{ status_colors[task.ticket_status] }};">
+                                                {{ task.ticket_status.replace('_', ' ').title() }}
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownStatus{{ loop.index }}">
+                                                <form action="{{ url_for('admin.update_ticket_status', ticket_id=task.ticket_id) }}" method="POST" class="px-3 py-2">
+                                                    <select name="ticket_status" class="form-control form-control-sm mb-2" onchange="this.form.submit()">
+                                                        <option value="open" {% if task.ticket_status == 'open' %}selected{% endif %}>Open</option>
+                                                        <option value="in_progress" {% if task.ticket_status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                                        <option value="closed" {% if task.ticket_status == 'closed' %}selected{% endif %}>Closed</option>
+                                                    </select>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('admin.assign_user', ticket_id=task.ticket_id) }}"
+                                           class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1">
+                                            <i class="fas fa-user-plus text-primary"></i>
+                                            <span class="d-none d-md-inline">Assign</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No feedback tickets available.
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
-<!-- Scripts -->
+<!-- Bootstrap & jQuery (if not already included) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function () {
-    // Show dropdown on badge click
-    $('.status-label').on('click', function () {
-        const $form = $(this).closest('.status-form');
-        $(this).hide();
-        const $select = $form.find('.status-select');
-        $select.removeClass('d-none').focus();
-    });
-
-    // Submit form on change
-    $('.status-select').on('change', function () {
-        $(this).closest('form').submit();
-    });
-
-    // Hide dropdown if blurred
-    $('.status-select').on('blur', function () {
-        const $form = $(this).closest('.status-form');
-        $(this).addClass('d-none');
-        $form.find('.status-label').show();
-    });
-});
-</script>
-
-<style>
-    .status-label:hover {
-        opacity: 0.9;
-        box-shadow: 0 0 3px rgba(0,0,0,0.2);
-    }
-    .status-select {
-        padding: 3px 8px;
-        font-size: 0.95rem;
-        width: 160px !important;
-    }
-</style>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

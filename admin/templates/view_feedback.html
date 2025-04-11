@@ -4,50 +4,69 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Feedback Responses</h1>
-
-    <form method="GET" class="mb-4">
-        <div class="form-group">
-            <label for="department">Filter by Department:</label>
-            <select id="department" name="department" class="form-control">
-                <option value="">All Departments</option>
-                {% for department in department_names %}
-                    <option value="{{ department }}" {% if department == selected_department %}selected{% endif %}>{{ department }}</option>
-                {% endfor %}
-            </select>
+    <div class="card border-0 shadow">
+        <div class="card-header bg-white border-bottom">
+            <h4 class="mb-0 text-dark">📋 Feedback Responses</h4>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Filter</button>
-    </form>
+        <div class="card-body">
 
-    {% if feedback_responses %}
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Response ID</th>
-                    <th>Ticket ID</th>
-                    <th>User Email</th>
-                    <th>Response</th>
-                    <th>Created At</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for response in feedback_responses %}
-                    <tr>
-                        <td>{{ response.response_id }}</td>
-                        <td>
-                            <a href="{{ url_for('admin.view_ticket_details', ticket_id=response.ticket_id) }}">
-                                {{ response.ticket_id }}
-                            </a>
-                        </td>
-                        <td>{{ response.user_email }}</td>
-                        <td>{{ response.response }}</td>
-                        <td>{{ response.created_at }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No feedback responses available.</p>
-    {% endif %}
+            <!-- Filter Form -->
+            <form method="GET" class="row g-3 align-items-end mb-4">
+                <div class="col-md-6">
+                    <label for="department" class="form-label">Filter by Department</label>
+                    <select id="department" name="department" class="form-control">
+                        <option value="">All Departments</option>
+                        {% for department in department_names %}
+                            <option value="{{ department }}" {% if department == selected_department %}selected{% endif %}>
+                                {{ department }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button type="submit" class="btn btn-outline-dark px-4">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                </div>
+            </form>
+
+            <!-- Feedback Table -->
+            {% if feedback_responses %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border rounded shadow-sm">
+                        <thead class="thead-light">
+                            <tr class="table-secondary text-dark">
+                                <th scope="col">#</th>
+                                <th scope="col">Ticket ID</th>
+                                <th scope="col">User Email</th>
+                                <th scope="col">Response</th>
+                                <th scope="col">Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for response in feedback_responses %}
+                                <tr>
+                                    <td>{{ response.response_id }}</td>
+                                    <td>
+                                        <a href="{{ url_for('admin.view_ticket_details', ticket_id=response.ticket_id) }}"
+                                           class="text-decoration-none text-dark fw-semibold">
+                                           {{ response.ticket_id }}
+                                        </a>
+                                    </td>
+                                    <td>{{ response.user_email }}</td>
+                                    <td class="text-muted">{{ response.response }}</td>
+                                    <td>{{ response.created_at.strftime('%b %d, %Y %I:%M %p') }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-secondary text-center" role="alert">
+                    <i class="fas fa-info-circle me-2"></i> No feedback responses found.
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}

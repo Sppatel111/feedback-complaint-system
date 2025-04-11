@@ -1,50 +1,82 @@
 {% extends 'admin_base.html' %}
 
-{% block title %} Add New User {% endblock %}
+{% block title %}Add New User{% endblock %}
 
 {% block content %}
-
-<!-- Form Container -->
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-lg border-0 p-4">
-                <div class="card-body">
-                    <h2 class="text-center mb-4">Add New User</h2>
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0 rounded-3 animate__animated animate__fadeIn">
+                <div class="card-header bg-white border-bottom d-flex align-items-center">
+                    <h4 class="mb-0 text-primary">
+                        <i class="fas fa-user-plus me-2"></i> Add New User
+                    </h4>
+                </div>
+                <div class="card-body px-4 py-4">
                     <form method="POST">
                         {{ form.hidden_tag() }}
 
-                        <div class="mb-3">
-                            <label class="form-label">{{ form.email.label }}</label>
-                            {{ form.email(class="form-control", placeholder="Enter user email") }}
+                        <!-- Email -->
+                        <div class="form-group mb-3">
+                            <label class="form-label text-secondary">{{ form.email.label }}</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                </div>
+                                {{ form.email(class="form-control", placeholder="user@example.com") }}
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">{{ form.password.label }}</label>
-                            {{ form.password(class="form-control", placeholder="Enter password") }}
+                        <!-- Password -->
+                        <div class="form-group mb-3">
+                            <label class="form-label text-secondary">{{ form.password.label }}</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                </div>
+                                {{ form.password(class="form-control", placeholder="Enter a secure password") }}
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">{{ form.department.label }}</label>
-                            {{ form.department(class="form-control") }}
+                        <!-- Department -->
+                        <div class="form-group mb-3">
+                            <label class="form-label text-secondary">{{ form.department.label }}</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                </div>
+                                {{ form.department(class="form-control") }}
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">{{ form.role.label }}</label>
-                            {{ form.role(class="form-control") }}
+                        <!-- Role -->
+                        <div class="form-group mb-4">
+                            <label class="form-label text-secondary">{{ form.role.label }}</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                </div>
+                                {{ form.role(class="form-control") }}
+                            </div>
                         </div>
 
-                        <!-- Centered Submit Button -->
-                        <div class="text-center">
-                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                        <!-- Submit Button (Left Aligned) -->
+                        <div class="d-flex justify-content-start">
+                            <button type="submit" class="btn btn-outline-primary px-4">
+                                <i class="fas fa-check-circle me-1"></i> Add User
+                            </button>
                         </div>
-
                     </form>
                 </div>
             </div>
 
+            <!-- Back Button -->
+            <div class="text-center mt-4">
+                <a href="{{ url_for('admin.manage_users') }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Users
+                </a>
+            </div>
         </div>
     </div>
 </div>
-
 {% endblock %}

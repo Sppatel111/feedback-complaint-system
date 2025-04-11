@@ -4,26 +4,40 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">Raise a Ticket</h2>
-    <form method="POST" action="{{ url_for('admin.raise_tickets') }}">
-        {{ form.hidden_tag() }}  <!-- CSRF Token -->
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-white border-bottom">
+                    <h4 class="mb-0 text-dark">📝 Raise a Ticket</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.raise_tickets') }}">
+                        {{ form.hidden_tag() }}  <!-- CSRF Token -->
 
-        <div class="mb-3">
-            <label class="form-label">{{ form.ticket_label.label }}</label>
-                            {{ form.ticket_label(class="form-control", placeholder="eg. Development, Production ") }}
-        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.ticket_label.label }}</label>
+                            {{ form.ticket_label(class="form-control", placeholder="e.g. Development, Production") }}
+                        </div>
 
-        <div class="mb-3">
-            <label class="form-label">{{ form.ticket_question.label }}</label>
-                            {{ form.ticket_question(class="form-control", placeholder="Detailed explanation of the ticket...") }}
-        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.ticket_question.label }}</label>
+                            {{ form.ticket_question(class="form-control", rows="4", placeholder="Describe your issue or request in detail...") }}
+                        </div>
 
-        <div class="mb-3">
-            <label class="form-label">{{ form.department.label }}</label>
+                        <div class="mb-4">
+                            <label class="form-label">{{ form.department.label }}</label>
                             {{ form.department(class="form-control") }}
-        </div>
+                        </div>
 
-        <button type="submit" class="btn btn-primary">Raise Ticket</button>
-    </form>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-outline-primary px-4">
+                                <i class="fas fa-paper-plane me-1"></i> Submit Ticket
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

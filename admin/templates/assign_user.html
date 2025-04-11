@@ -4,55 +4,76 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4 text-center">Assign Task for Ticket #{{ ticket.ticket_id }}</h2>
-
-    <!-- Ticket Details -->
-    <div class="card shadow-sm mb-5">
-        <div class="card-header bg-dark text-white">Ticket Details</div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Department:</strong> {{ ticket.department_name }}</p>
-                    <p><strong>Label:</strong> {{ ticket.ticket_label }}</p>
-                    <p><strong>Status:</strong>
-                        <span class="badge
-                            {% if ticket.ticket_status == 'open' %} bg-success
-                            {% elif ticket.ticket_status == 'in_progress' %} bg-warning text-dark
-                            {% else %} bg-secondary {% endif %}">
-                            {{ ticket.ticket_status|capitalize }}
-                        </span>
-                    </p>
+    <div class="row">
+        <!-- Left: Ticket Details & Responses -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">🎫 Ticket #{{ ticket.ticket_id }}</h5>
+                    <span class="badge
+                        {% if ticket.ticket_status == 'open' %} bg-success
+                        {% elif ticket.ticket_status == 'in_progress' %} bg-warning text-dark
+                        {% else %} bg-secondary {% endif %}">
+                        {{ ticket.ticket_status|capitalize }}
+                    </span>
                 </div>
-                <div class="col-md-6">
-                    <p><strong>Created At:</strong> {{ ticket.created_at }}</p>
-                    <p><strong>Question:</strong><br>{{ ticket.question }}</p>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Label:</strong> {{ ticket.ticket_label }}</p>
+                        <p class="mb-1"><strong>Department:</strong> {{ ticket.department_name }}</p>
+                        <p class="mb-1"><strong>Created At:</strong> {{ ticket.created_at }}</p>
+                        <p class="mb-1"><strong>Question:</strong><br>{{ ticket.question }}</p>
+                    </div>
+                    <hr>
+                    <h6 class="text-muted mb-3">💬 Responses</h6>
+                    {% if ticket.responses %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Response</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for response in ticket.responses %}
+                                        <tr>
+                                            <td>{{ response.user_email }}</td>
+                                            <td>{{ response.response }}</td>
+                                            <td>{{ response.created_at }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No responses submitted for this ticket.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Department Filter Form (GET) -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">Filter Users by Department</div>
-        <div class="card-body">
-            <form method="GET">
-                <div class="mb-3">
-                    <label for="department" class="form-label">Select Department:</label>
-                    <select name="department" id="department" class="form-select" onchange="this.form.submit()">
-                        <option value="">-- Select Department --</option>
-                        {% for dept in departments %}
-                            <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </form>
+        <!-- Right: Assign User -->
+        <!-- Right: Assign User (Styled to match raise_ticket.html aesthetics) -->
+<div class="col-lg-4">
+    <div class="card border-0 shadow-lg mb-4">
+        <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0 text-dark">👤 Assign Task</h5>
         </div>
-    </div>
-
-    <!-- Task Assignment Form -->
-    <div class="card shadow-sm mb-5">
-        <div class="card-header bg-success text-white">Assign User to Task</div>
         <div class="card-body">
+            <!-- Department Filter -->
+            <form method="GET" class="mb-4">
+                <label for="department" class="form-label">Filter by Department:</label>
+                <select name="department" id="department" class="form-select" onchange="this.form.submit()">
+                    <option value="">-- Select Department --</option>
+                    {% for dept in departments %}
+                        <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+
+            <!-- Assign Task Form -->
             <form method="POST">
                 <div class="mb-3">
                     <label for="assigned_email" class="form-label">Select User:</label>
@@ -75,39 +96,15 @@
                 </div>
 
                 <div class="text-end">
-                    <button type="submit" class="btn btn-success" {% if not all_users %}disabled{% endif %}>Assign Task</button>
+                    <button type="submit" class="btn btn-outline-primary px-4 w-100" {% if not all_users %}disabled{% endif %}>
+                        <i class="fas fa-paper-plane me-1"></i> Assign Task
+                    </button>
                 </div>
             </form>
         </div>
     </div>
+</div>
 
-    <!-- Ticket Responses -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-info text-white">Ticket Responses</div>
-        <div class="card-body">
-            {% if ticket.responses %}
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>User Email</th>
-                            <th>Response</th>
-                            <th>Created At</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for response in ticket.responses %}
-                            <tr>
-                                <td>{{ response.user_email }}</td>
-                                <td>{{ response.response }}</td>
-                                <td>{{ response.created_at }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p class="text-muted">No responses submitted for this ticket.</p>
-            {% endif %}
-        </div>
     </div>
 </div>
 {% endblock %}

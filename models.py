@@ -94,7 +94,7 @@ class Task(db.Model):
     assigned_to_email: Mapped[str] = mapped_column(String, ForeignKey('user_auth.email', ondelete="SET NULL"), nullable=False)
     details: Mapped[str] = mapped_column(Text, nullable=False)
     deadline: Mapped[datetime] = mapped_column(DateTime, nullable=True)
-    task_status: Mapped[str] = mapped_column(String, CheckConstraint("task_status IN ('todo', 'in_progress','backlog','in_review','completed')"), default='todo')
+    task_status: Mapped[str] = mapped_column(String, CheckConstraint("task_status IN ('todo', 'in_progress','backlog','in_review','done','completed')"), default='todo')
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
 
     ticket = relationship("FeedbackTicket", back_populates="tasks")

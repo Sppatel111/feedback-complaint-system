@@ -42,8 +42,9 @@
                                     <option value="todo" data-color="orange" {% if task.task_status == 'todo' %}selected{% endif %}>To Do</option>
                                     <option value="in_progress" data-color="#007bff" {% if task.task_status == 'in_progress' %}selected{% endif %}>In Progress</option>
                                     <option value="in_review" data-color="#6f42c1" {% if task.task_status == 'in_review' %}selected{% endif %}>In Review - TL</option>
-                                    <option value="backlog" data-color="red" {% if task.task_status == 'backlog' %}selected{% endif %}>Backlog</option>
-                                    <option value="completed" data-color="#20c997" {% if task.task_status == 'completed' %}selected{% endif %}>Complete</option>
+                                    <option value="backlog" data-color="red" {% if task.task_status =='backlog' %}selected{% endif %}>Backlog</option>
+                                    <option value="done" data-color="#28a745" {% if task.task_status =='done' %}selected{% endif %}>Done</option>
+                                    <option value="completed" data-color="#20c997" {% if task.task_status =='completed' %}selected{% endif %}>Complete</option>
                                 </select>
                             </form>
                         </td>

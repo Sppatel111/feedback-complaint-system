@@ -45,9 +45,9 @@
                                             <div class="dropdown-menu" aria-labelledby="dropdownStatus{{ loop.index }}">
                                                 <form action="{{ url_for('admin.update_ticket_status', ticket_id=task.ticket_id) }}" method="POST" class="px-3 py-2">
                                                     <select name="ticket_status" class="form-control form-control-sm mb-2" onchange="this.form.submit()">
-                                                        <option value="open" {% if task.ticket_status == 'open' %}selected{% endif %}>Open</option>
-                                                        <option value="in_progress" {% if task.ticket_status == 'in_progress' %}selected{% endif %}>In Progress</option>
-                                                        <option value="closed" {% if task.ticket_status == 'closed' %}selected{% endif %}>Closed</option>
+                                                        <option value="open" {% if task.ticket_status =='open' %}selected{% endif %}>Open</option>
+                                                        <option value="in_progress" {% if task.ticket_status =='in_progress' %}selected{% endif %}>In Progress</option>
+                                                        <option value="closed" {% if task.ticket_status =='closed' %}selected{% endif %}>Closed</option>
                                                     </select>
                                                 </form>
                                             </div>
@@ -59,6 +59,11 @@
                                             <i class="fas fa-user-plus text-primary"></i>
                                             <span class="d-none d-md-inline">Assign</span>
                                         </a>
+                                         <a href="{{ url_for('admin.view_task_workers', ticket_id=task.ticket_id) }}"
+                                           class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 mt-1">
+                                            <i class="fas fa-users"></i>
+                                            <span class="d-none d-md-inline">View Workers</span>
+                                         </a>
                                     </td>
                                 </tr>
                             {% endfor %}

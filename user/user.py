@@ -170,6 +170,23 @@ def ticket_detail_response(ticket_id):
     return render_template("ticket_detail_response.html", ticket=ticket)
 
 
+# @user.route('/dashboard/feedback/task', methods=['GET'])
+# def assigned_task():
+#     tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
+#
+#     status_colors = {
+#         'todo': 'orange',
+#         'in_progress': '#007bff',
+#         'in_review': '#6f42c1',
+#         'backlog': 'red',
+#         'on_hold': '#ffc107',
+#         'done': '#28a745',
+#         'completed': '#20c997',
+#     }
+#
+#     return render_template("tasks.html", tasks=tasks, status_colors=status_colors)
+
+
 @user.route('/dashboard/feedback/task', methods=['GET'])
 def assigned_task():
     tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
@@ -184,8 +201,13 @@ def assigned_task():
         'completed': '#20c997',
     }
 
-    return render_template("tasks.html", tasks=tasks, status_colors=status_colors)
+    status_options = {
+        'high': ['todo', 'in_progress', 'backlog', 'in_review'],
+        'medium': ['todo', 'in_progress', 'backlog', 'in_review', 'done'],
+        'low': ['todo', 'in_progress', 'backlog', 'in_review', 'done', 'completed'],
+    }
 
+    return render_template("tasks.html", tasks=tasks, status_colors=status_colors, status_options=status_options)
 
 
 @user.route('/dashboard/feedback/task/update/<int:task_id>', methods=['POST'])

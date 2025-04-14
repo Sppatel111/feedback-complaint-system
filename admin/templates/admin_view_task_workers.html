@@ -1,0 +1,128 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Task Workers{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-white">
+            <h4 class="mb-0 text-dark">👥 Task Workers for Ticket #{{ ticket.ticket_id }}</h4>
+        </div>
+        <div class="card-body">
+            {% if task_workers %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Assigned Email</th>
+                                <th>Deadline</th>
+                                <th>Status</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in task_workers %}
+                                <tr>
+                                    <td>{{ task.task_id }}</td>
+                                    <td>{{ task.assigned_to_email }}</td>
+<!--                                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else 'No Deadline' }}</td>-->
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <span class="text-nowrap">
+                                                {{ task.deadline.strftime('%Y-%m-%d') if task.deadline else 'No Deadline' }}
+                                            </span>
+
+                                            <!-- Pure Calendar Icon Trigger -->
+                                            <div class="dropdown ml-2">
+                                                <a href="#" class="text-secondary" id="deadlineDropdown{{ loop.index }}"
+                                                   role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                                   title="Change Deadline">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-right p-2" aria-labelledby="deadlineDropdown{{ loop.index }}">
+                                                    <form action="{{ url_for('admin.update_task_status_priority', task_id=task.task_id) }}" method="POST">
+                                                        <input type="date"
+                                                               name="deadline"
+                                                               class="form-control form-control-sm"
+                                                               value="{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else '' }}"
+                                                               onchange="this.form.submit()">
+                                                        <input type="hidden" name="task_status" value="{{ task.task_status }}">
+                                                        <input type="hidden" name="priority" value="{{ task.priority }}">
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+
+                                    <!-- Task Status Dropdown -->
+                                    <td>
+                                        <div class="dropdown d-inline">
+                                            <button class="btn btn-sm text-white dropdown-toggle"
+                                                    type="button"
+                                                    id="dropdownStatus{{ loop.index }}"
+                                                    data-toggle="dropdown"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false"
+                                                    style="background-color: {{ status_colors[task.task_status] }}">
+                                                {{ task.task_status.replace('_', ' ').title() }}
+                                            </button>
+                                            <div class="dropdown-menu p-3" aria-labelledby="dropdownStatus{{ loop.index }}">
+                                                <form action="{{ url_for('admin.update_task_status_priority', task_id=task.task_id) }}" method="POST">
+                                                    <select name="task_status" class="form-control form-control-sm mb-2" onchange="this.form.submit()">
+                                                        {% for status in ['todo', 'in_progress', 'backlog', 'in_review', 'done', 'completed'] %}
+                                                            <option value="{{ status }}" {% if task.task_status == status %}selected{% endif %}>
+                                                                {{ status.replace('_', ' ').title() }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <input type="hidden" name="priority" value="{{ task.priority }}">
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <!-- Priority Dropdown -->
+                                    <td>
+                                        <div class="dropdown d-inline">
+                                            <button class="btn btn-sm btn-outline-dark dropdown-toggle"
+                                                    type="button"
+                                                    id="dropdownPriority{{ loop.index }}"
+                                                    data-toggle="dropdown"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false">
+                                                {{ task.priority.title() }}
+                                            </button>
+                                            <div class="dropdown-menu p-3" aria-labelledby="dropdownPriority{{ loop.index }}">
+                                                <form action="{{ url_for('admin.update_task_status_priority', task_id=task.task_id) }}" method="POST">
+                                                    <select name="priority" class="form-control form-control-sm mb-2" onchange="this.form.submit()">
+                                                        {% for level in ['low', 'medium', 'high'] %}
+                                                            <option value="{{ level }}" {% if task.priority == level %}selected{% endif %}>
+                                                                {{ level.title() }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                    <input type="hidden" name="task_status" value="{{ task.task_status }}">
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No users assigned to this ticket yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Optional if not already included -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

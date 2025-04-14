@@ -1,3 +1,4 @@
+from datetime import datetime
 import psycopg2
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm, RaiseTicket
@@ -86,11 +87,18 @@ def add_user():
         flash("User already registered!!! ", "danger")
     return render_template("add_user.html", form=form, current_user=current_user)
 
+# @admin.route('/user/<email>')
+# @login_required
+# def view_user(email):
+#     user = User.query.filter_by(email=email).first_or_404()
+#     return render_template('admin_view_user.html', user=user)
+
 @admin.route('/user/<email>')
 @login_required
 def view_user(email):
     user = User.query.filter_by(email=email).first_or_404()
-    return render_template('admin_view_user.html', user=user)
+    tasks = Task.query.filter_by(assigned_to_email=email).join(FeedbackTicket).order_by(Task.created_at.desc()).all()
+    return render_template('admin_view_user.html', user=user, tasks=tasks)
 
 @admin.route('/edit-user/<email>', methods=['GET', 'POST'])
 @login_required
@@ -185,7 +193,7 @@ def change_password():
     return render_template("change_password.html", form=form, current_user=current_user)
 
 
-# you have ti check logic pending
+# you have to check logic pending
 @admin.route('/dashboard/setting/view-profile', methods=['GET', 'POST'])
 def profile():
     return render_template("user_profile.html", current_user=current_user)
@@ -279,14 +287,14 @@ def assign_user(ticket_id):
         flash('Ticket not found.', 'danger')
         return redirect(url_for('admin.assign_tasks'))
 
-    # Get department from query param
+    #department from query param
     selected_department = request.args.get('department')
 
-    # Get all departments for the dropdown
+    #all departments for the dropdown
     departments = db.session.query(User.department).distinct().all()
     departments = [d[0] for d in departments if d[0]]
 
-    # Filter users by selected department
+    #Filter users by department
     if selected_department:
         all_users = User.query.filter_by(department=selected_department).all()
     else:
@@ -311,9 +319,36 @@ def assign_user(ticket_id):
     return render_template("assign_user.html", ticket=ticket1, all_users=all_users, departments=departments,
                            selected_department=selected_department)
 
-# @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>',methods=['GET','POST'])
-# def ticket_status(ticket_id):
-#     ticket = FeedbackTicket.query.get(ticket_id)
-#     if ticket is None:
-#         flash('Ticket not found.', 'danger')
-#     return render_template("",ticket=ticket)
+#assign task with view users
+@admin.route('/task_workers/<int:ticket_id>')
+def view_task_workers(ticket_id):
+    ticket = FeedbackTicket.query.get_or_404(ticket_id)
+    task_workers = Task.query.filter_by(ticket_id=ticket_id).all()
+    status_colors = {
+        'todo': 'orange',
+        'in_progress': '#007bff',
+        'in_review': '#6f42c1',
+        'backlog': 'red',
+        'on_hold': '#ffc107',
+        'done': '#28a745',
+        'completed': '#20c997',
+    }
+    return render_template('admin_view_task_workers.html', ticket=ticket, task_workers=task_workers, status_colors=status_colors)
+
+@admin.route('/update_task/<int:task_id>', methods=['POST'])
+def update_task_status_priority(task_id):
+    task = Task.query.get_or_404(task_id)
+    task.task_status = request.form.get('task_status', task.task_status)
+    task.priority = request.form.get('priority', task.priority)
+
+    deadline_str = request.form.get('deadline')
+    if deadline_str:
+        try:
+            task.deadline = datetime.strptime(deadline_str, "%Y-%m-%d")
+        except ValueError:
+            flash("Invalid date format", "danger")
+
+    db.session.commit()
+    flash("Task updated successfully.", "success")
+    return redirect(request.referrer or url_for('admin.dashboard'))
+

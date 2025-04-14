@@ -55,55 +55,53 @@
         </div>
 
         <!-- Right: Assign User -->
-        <!-- Right: Assign User (Styled to match raise_ticket.html aesthetics) -->
-<div class="col-lg-4">
-    <div class="card border-0 shadow-lg mb-4">
-        <div class="card-header bg-white border-bottom">
-            <h5 class="mb-0 text-dark">👤 Assign Task</h5>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-header bg-white border-bottom">
+                    <h5 class="mb-0 text-dark">👤 Assign Task</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Department Filter -->
+                    <form method="GET" class="mb-4">
+                        <label for="department" class="form-label">Filter by Department:</label>
+                        <select name="department" id="department" class="form-select" onchange="this.form.submit()">
+                            <option value="">-- Select Department --</option>
+                            {% for dept in departments %}
+                                <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                    <!-- Assign Task Form -->
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="assigned_email" class="form-label">Select User:</label>
+                            <select id="assigned_email" name="assigned_email" class="form-select" required {% if not all_users %}disabled{% endif %}>
+                                <option value="">-- Choose a user --</option>
+                                {% for user in all_users %}
+                                    <option value="{{ user.email }}">{{ user.email }} ({{ user.department }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="details" class="form-label">Task Details:</label>
+                            <textarea id="details" name="details" class="form-control" rows="4" placeholder="Describe the task..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="deadline" class="form-label">Deadline:</label>
+                            <input type="date" id="deadline" name="deadline" class="form-control" required>
+                        </div>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-outline-primary px-4 w-100" {% if not all_users %}disabled{% endif %}>
+                                <i class="fas fa-paper-plane me-1"></i> Assign Task
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <!-- Department Filter -->
-            <form method="GET" class="mb-4">
-                <label for="department" class="form-label">Filter by Department:</label>
-                <select name="department" id="department" class="form-select" onchange="this.form.submit()">
-                    <option value="">-- Select Department --</option>
-                    {% for dept in departments %}
-                        <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
-                    {% endfor %}
-                </select>
-            </form>
-
-            <!-- Assign Task Form -->
-            <form method="POST">
-                <div class="mb-3">
-                    <label for="assigned_email" class="form-label">Select User:</label>
-                    <select id="assigned_email" name="assigned_email" class="form-select" required {% if not all_users %}disabled{% endif %}>
-                        <option value="">-- Choose a user --</option>
-                        {% for user in all_users %}
-                            <option value="{{ user.email }}">{{ user.email }} ({{ user.department }})</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="details" class="form-label">Task Details:</label>
-                    <textarea id="details" name="details" class="form-control" rows="4" placeholder="Describe the task..." required></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label for="deadline" class="form-label">Deadline:</label>
-                    <input type="date" id="deadline" name="deadline" class="form-control" required>
-                </div>
-
-                <div class="text-end">
-                    <button type="submit" class="btn btn-outline-primary px-4 w-100" {% if not all_users %}disabled{% endif %}>
-                        <i class="fas fa-paper-plane me-1"></i> Assign Task
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
     </div>
 </div>

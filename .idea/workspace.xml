@@ -6,7 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="b4d8c6ce-d23f-4c17-85a8-452d09522676" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/profiles/bccb546e-259b-448d-9a51-f5a084596302.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/profiles/default-profile.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/profiles/download_1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/profiles/logo.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/profiles/popolpo.jpg" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,12 +51,13 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
-    "last_opened_file_path": "D:/SNEHA1/feedback-complaint-system/user/static/assets",
+    "last_opened_file_path": "D:/8SEM/Alian Software/feedback-complaint-system/user/static/assets",
     "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\8SEM\Alian Software\feedback-complaint-system\user\static\assets" />
       <recent name="D:\SNEHA1\feedback-complaint-system\user\static\assets" />
       <recent name="D:\8SEM\Alian Software\feedback-complaint-system\admin\templates" />
     </key>

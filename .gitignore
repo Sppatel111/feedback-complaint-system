@@ -9,4 +9,4 @@ virtual1env
 .venv
 
 migrations/
-/user/static/assets/profiles
+/user/static/assets/profiles/

@@ -5,8 +5,21 @@
 {% block content %}
 <div class="container mt-5">
     <div class="card shadow-lg border-0">
-        <div class="card-header bg-white">
+<!--        <div class="card-header bg-white">-->
+<!--            <h4 class="mb-0 text-dark">📋 All Tasks</h4>-->
+<!--        </div>-->
+<!--         <div class="card shadow-lg border-0">-->
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0 text-dark">📋 All Tasks</h4>
+            <form method="get" action="{{ url_for('admin.assign_tasks') }}" class="form-inline">
+                <label for="statusFilter" class="mr-2 font-weight-bold text-dark">Filter by Status:</label>
+                <select id="statusFilter" name="status" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <option value="">All</option>
+                    <option value="open" {% if selected_status =='open' %}selected{% endif %}>Open</option>
+                    <option value="in_progress" {% if selected_status =='in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="closed" {% if selected_status =='closed' %}selected{% endif %}>Closed</option>
+                </select>
+            </form>
         </div>
         <div class="card-body">
             {% if all_task %}

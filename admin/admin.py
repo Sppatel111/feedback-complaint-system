@@ -7,6 +7,7 @@ from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task
 from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.utils import secure_filename
 import os
+import uuid
 
 UPLOAD_FOLDER = 'user/static/assets/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -14,7 +15,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 load_dotenv()
 admin = Blueprint("admin", __name__, template_folder="templates", static_folder="static")
 
-
+# Login Route
 @admin.route('/', methods=['GET', 'POST'])
 @admin.route('/login', methods=['GET', 'POST'])
 def login():
@@ -38,8 +39,9 @@ def login():
 
     return render_template('admin_login.html', form=form, current_user=current_user)
 
-
+# Logout Route
 @admin.route('/logout', methods=['GET', 'POST'])
+@login_required
 def logout():
     logout_user()
     flash('You have been logged out.', 'info')
@@ -48,22 +50,23 @@ def logout():
 
 # Dashboard routes
 @admin.route('/dashboard')
+@login_required
 def a_dashboard():
     return render_template("admin_dashboard.html", current_user=current_user)
 
 
+# Manage User Route (add user,view user,edit user,active mode )
 @admin.route('/manage-user', methods=['GET', 'POST'])
 def manage_users():
     users = User.query.join(Detail).all()
     return render_template("admin_manage_users.html", users=users)
 
-
-@admin.route('/adduser', methods=['GET', 'POST'])
+# Add user Route
+@admin.route('/manage-user/adduser', methods=['GET', 'POST'])
+@login_required
 def add_user():
     form = AddUserForm()
-
     if form.validate_on_submit():
-
         new_user = User(
             email=form.email.data,
             password=form.password.data,
@@ -87,20 +90,16 @@ def add_user():
         flash("User already registered!!! ", "danger")
     return render_template("add_user.html", form=form, current_user=current_user)
 
-# @admin.route('/user/<email>')
-# @login_required
-# def view_user(email):
-#     user = User.query.filter_by(email=email).first_or_404()
-#     return render_template('admin_view_user.html', user=user)
-
-@admin.route('/user/<email>')
+# View user Route
+@admin.route('/manage-user/user/<email>')
 @login_required
 def view_user(email):
     user = User.query.filter_by(email=email).first_or_404()
     tasks = Task.query.filter_by(assigned_to_email=email).join(FeedbackTicket).order_by(Task.created_at.desc()).all()
     return render_template('admin_view_user.html', user=user, tasks=tasks)
 
-@admin.route('/edit-user/<email>', methods=['GET', 'POST'])
+# Edit User Route
+@admin.route('/manage-user/edit-user/<email>', methods=['GET', 'POST'])
 @login_required
 def edit_user(email):
     user = User.query.filter_by(email=email).first_or_404()
@@ -116,7 +115,8 @@ def edit_user(email):
 
     return render_template('admin_edit_user.html', user=user)
 
-@admin.route('/toggle-user/<email>')
+# User Status
+@admin.route('/manage-user/toggle-user/<email>')
 @login_required
 def toggle_user_status(email):
     user = User.query.filter_by(email=email).first_or_404()
@@ -126,23 +126,17 @@ def toggle_user_status(email):
     return redirect(url_for('admin.manage_users'))
 
 
-
-@admin.route('/dashboard/manage-feedback', methods=['GET', 'POST'])
-def manage_feedback():
-    return render_template("manage_feedback.html", current_user=current_user)
-
-
 # Settings Route
 @admin.route('/dashboard/settings', methods=['GET', 'POST'])
+@login_required
 def a_settings():
     return render_template("settings.html", current_user=current_user)
 
 
-# Admin detail Route
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
+# Admin detail Route
 @admin.route('/dashboard/settings/admindetails', methods=['GET', 'POST'])
 def a_details():
     form = UserDetailForm(obj=current_user.user_detail)
@@ -162,10 +156,12 @@ def a_details():
         file = form.profile_image.data
         print(file)
 
+        # using uuid
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            user_detail.profile_image = filename
+            file_extension = file.filename.rsplit('.', 1)[1].lower()
+            unique_filename = f"{uuid.uuid4()}.{file_extension}"
+            file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
+            user_detail.profile_image = unique_filename
 
         db.session.commit()
         flash("Details updated successfully!", "success")
@@ -173,7 +169,7 @@ def a_details():
 
     return render_template("user_details.html", form=form, current_user=current_user)
 
-
+# Change Password Route
 @admin.route('/dashboard/settings/change-password', methods=['GET', 'POST'])
 def change_password():
     form = ChangePasswordForm()
@@ -193,14 +189,20 @@ def change_password():
     return render_template("change_password.html", form=form, current_user=current_user)
 
 
-# you have to check logic pending
+# View Profile Route
 @admin.route('/dashboard/setting/view-profile', methods=['GET', 'POST'])
 def profile():
     return render_template("user_profile.html", current_user=current_user)
 
+# Manage Feedback Route(raise ticket,view feedback, assign task)
+@admin.route('/manage-feedback', methods=['GET', 'POST'])
+@login_required
+def manage_feedback():
+    return render_template("manage_feedback.html", current_user=current_user)
 
-# Feedback routes
-@admin.route('/dashboard/managefeedback/raisetickets', methods=['GET', 'POST'])
+
+# Raise ticket routes
+@admin.route('/manage-feedback/raise-tickets', methods=['GET', 'POST'])
 def raise_tickets():
     form = RaiseTicket()
     if form.validate_on_submit():
@@ -210,7 +212,6 @@ def raise_tickets():
             question=form.ticket_question.data,
             department_name=form.department.data
         )
-
         db.session.add(new_ticket)
         db.session.commit()
         flash('Successfully created ticket!!', 'success')
@@ -219,8 +220,8 @@ def raise_tickets():
     return render_template("raise_tickets.html", form=form, current_user=current_user)
 
 
-### user feedback
-@admin.route('/dashboard/managefeedback/viewfeedback', methods=['GET', 'POST'])
+# View feedback Response Route
+@admin.route('manage-feedback/view-feedback', methods=['GET', 'POST'])
 def view_feedback():
     departments = db.session.query(FeedbackTicket.department_name).distinct().all()
     department_names = [dept[0] for dept in departments]
@@ -236,10 +237,10 @@ def view_feedback():
     return render_template("view_feedback.html", feedback_responses=feedback_responses,
                            department_names=department_names, selected_department=selected_department)
 
-
+# View ticket and response detail Route
 ### need check below two function
 ###  ticket detail and user responses on it
-@admin.route('/dashboard/managefeedback/ticket/<int:ticket_id>', methods=['GET'])
+@admin.route('manage-feedback/ticket/<int:ticket_id>', methods=['GET'])
 def view_ticket_details(ticket_id):
     ticket = FeedbackTicket.query.get(ticket_id)
     if ticket is None:
@@ -249,25 +250,30 @@ def view_ticket_details(ticket_id):
     return render_template("ticket_details.html", ticket=ticket)
 
 
-@admin.route('/dashboard/managefeedback/ticket/<int:ticket_id>/respond', methods=['POST'])
-def respond_to_ticket(ticket_id):
-    return redirect(url_for('admin.view_ticket_details', ticket_id=ticket_id))
+# @admin.route('manage-feedback/ticket/<int:ticket_id>/respond', methods=['GET','POST'])
+# def respond_to_ticket(ticket_id):
+#     return redirect(url_for('admin.view_ticket_details', ticket_id=ticket_id))
 
 
-###Assign task
-@admin.route('/dashboard/managefeedback/assigntasks', methods=['GET', 'POST'])
+# Assign task Route (assign user,view task users)
+@admin.route('/manage-feedback/assign-tasks', methods=['GET', 'POST'])
 def assign_tasks():
-    all_task = FeedbackTicket.query.all()
+    selected_status = request.args.get('status')
+    if selected_status:
+        all_task = FeedbackTicket.query.filter_by(ticket_status=selected_status).all()
+    else:
+        all_task = FeedbackTicket.query.all()
 
     status_colors = {
         'open': '#17a2b8',
         'closed': '#28a745',
         'in_progress': '#ffc107'
     }
-    return render_template("assign_tasks.html", all_task=all_task, status_colors=status_colors)
+    return render_template("assign_tasks.html", all_task=all_task, status_colors=status_colors,
+                           selected_status=selected_status)
 
-
-@admin.route('/dashboard/managefeedback/assigntasks/status/<int:ticket_id>', methods=['POST'])
+# Ticket status change
+@admin.route('manage-feedback/assign-tasks/status/<int:ticket_id>', methods=['POST'])
 def update_ticket_status(ticket_id):
     ticket = FeedbackTicket.query.get(ticket_id)
     if ticket:
@@ -279,8 +285,8 @@ def update_ticket_status(ticket_id):
         flash('Ticket not found!', 'danger')
     return redirect(url_for('admin.assign_tasks'))
 
-
-@admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>', methods=['GET', 'POST'])
+# Assign User Route
+@admin.route('manage-feedback/assign-tasks/assign-user/<int:ticket_id>', methods=['GET', 'POST'])
 def assign_user(ticket_id):
     ticket1 = FeedbackTicket.query.get(ticket_id)
     if ticket1 is None:
@@ -319,8 +325,8 @@ def assign_user(ticket_id):
     return render_template("assign_user.html", ticket=ticket1, all_users=all_users, departments=departments,
                            selected_department=selected_department)
 
-#assign task with view users
-@admin.route('/task_workers/<int:ticket_id>')
+# View Task Users
+@admin.route('manage-feedback/assign-tasks/task-workers/<int:ticket_id>')
 def view_task_workers(ticket_id):
     ticket = FeedbackTicket.query.get_or_404(ticket_id)
     task_workers = Task.query.filter_by(ticket_id=ticket_id).all()
@@ -335,7 +341,8 @@ def view_task_workers(ticket_id):
     }
     return render_template('admin_view_task_workers.html', ticket=ticket, task_workers=task_workers, status_colors=status_colors)
 
-@admin.route('/update_task/<int:task_id>', methods=['POST'])
+# update task status and priority
+@admin.route('manage-feedback/assign-tasks/task-workers/update_task/<int:task_id>', methods=['POST'])
 def update_task_status_priority(task_id):
     task = Task.query.get_or_404(task_id)
     task.task_status = request.form.get('task_status', task.task_status)

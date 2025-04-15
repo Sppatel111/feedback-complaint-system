@@ -1,5 +1,5 @@
-from sqlalchemy import Integer, String, CheckConstraint, ForeignKeyConstraint,ForeignKey,Text,DateTime,Boolean
-from sqlalchemy.orm import mapped_column, Mapped, relationship,DeclarativeBase
+from sqlalchemy import Integer, String, CheckConstraint, ForeignKeyConstraint, ForeignKey, Text, DateTime, Boolean
+from sqlalchemy.orm import mapped_column, Mapped, relationship, DeclarativeBase
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -10,7 +10,6 @@ class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)
-
 
 class User(UserMixin, db.Model):
     __tablename__ = 'user_auth'

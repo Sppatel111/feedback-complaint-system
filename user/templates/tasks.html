@@ -1,77 +1,100 @@
 {% extends "user_base.html" %}
 
-{% block title %}View Feedback Responses{% endblock %}
+{% block title %}Assigned Tasks{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4">ASSIGNED TASKS</h1>
-
-    {% if tasks %}
-        <table class="table table-bordered">
-            <thead class="thead-light">
-                <tr>
-                    <th>Task ID</th>
-                    <th>Details</th>
-                    <th>Deadline</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for task in tasks %}
-                    <tr>
-                        <td>
-                            <a href="{{ url_for('user.ticket_detail_response', ticket_id=task.ticket_id) }}">
-                                {{ task.ticket_id }}
-                            </a>
-                        </td>
-                        <td>{{ task.details }}</td>
-                        <td>{{ task.deadline if task.deadline else 'No deadline' }}</td>
-                        <td>
-                            {% if task.ticket.ticket_status == 'closed' %}
-                                <div class="btn btn-sm text-white" style="background-color: {{ status_colors[task.task_status] }}; cursor: not-allowed;">
-                                    {{ task.task_status.replace('_', ' ').title() }}
-                                </div>
-                                <span class="text-danger">Ticket Closed</span>
-                            {% else %}
-                                <div class="dropdown d-inline">
-                                    <button class="btn btn-sm text-white dropdown-toggle"
-                                            type="button"
-                                            id="dropdownStatus{{ task.task_id }}"
-                                            data-toggle="dropdown"
-                                            aria-haspopup="true"
-                                            aria-expanded="false"
-                                            style="background-color: {{ status_colors[task.task_status] }};">
-                                        {{ task.task_status.replace('_', ' ').title() }}
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownStatus{{ task.task_id }}">
-                                        <form action="{{ url_for('user.update_task_status', task_id=task.task_id) }}" method="POST" class="px-3 py-2">
-                                            <select name="task_status" class="form-control form-control-sm mb-2" onchange="this.form.submit()">
-                                                {% set available_statuses = status_options[task.priority] %}
-                                                {% for status in available_statuses %}
-                                                    <option value="{{ status }}" {% if task.task_status == status %}selected{% endif %}>
-                                                        {{ status.replace('_', ' ').title() }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                        </form>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </td>
-
-
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No Task available.</p>
-    {% endif %}
+    <div class="card shadow-lg border-0">
+<!--        <div class="card-header bg-white d-flex justify-content-between align-items-center">-->
+<!--            <h4 class="mb-0 text-dark">📝 Assigned Tasks</h4>-->
+<!--        </div>-->
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <h4 class="mb-0 text-dark">📝 Assigned Tasks</h4>
+    <form method="get" action="{{ url_for('user.assigned_task') }}" class="form-inline">
+        <label for="statusFilter" class="mr-2 font-weight-bold text-dark">Filter by Status:</label>
+        <select id="statusFilter" name="status" class="form-control form-control-sm" onchange="this.form.submit()">
+            <option value="">All</option>
+            <option value="todo" {% if selected_status == 'todo' %}selected{% endif %}>To Do</option>
+            <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>In Progress</option>
+            <option value="backlog" {% if selected_status == 'backlog' %}selected{% endif %}>Backlog</option>
+            <option value="in_review" {% if selected_status == 'in_review' %}selected{% endif %}>In Review</option>
+            <option value="done" {% if selected_status == 'done' %}selected{% endif %}>Done</option>
+            <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+        </select>
+    </form>
 </div>
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Bootstrap JS -->
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <div class="card-body">
+            {% if tasks %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Task ID</th>
+                                <th>Details</th>
+                                <th>Deadline</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('user.ticket_detail_response', ticket_id=task.ticket_id) }}"
+                                           class="text-decoration-none text-primary font-weight-bold">
+                                            {{ task.ticket_id }}
+                                        </a>
+                                    </td>
+                                    <td style="max-width: 400px;">{{ task.details }}</td>
+                                    <td>{{ task.deadline if task.deadline else 'No deadline' }}</td>
+                                    <td>
+                                        {% if task.ticket.ticket_status == 'closed' %}
+                                            <span class="badge text-white px-3 py-2"
+                                                  style="background-color: {{ status_colors[task.task_status] }}; border-radius: 5px;">
+                                                {{ task.task_status.replace('_', ' ').title() }}
+                                            </span>
+                                            <div class="text-danger small mt-1">Ticket Closed</div>
+                                        {% else %}
+                                            <div class="dropdown d-inline">
+                                                <button class="btn btn-sm text-white dropdown-toggle"
+                                                        type="button"
+                                                        id="dropdownStatus{{ task.task_id }}"
+                                                        data-toggle="dropdown"
+                                                        aria-haspopup="true"
+                                                        aria-expanded="false"
+                                                        style="background-color: {{ status_colors[task.task_status] }};">
+                                                    {{ task.task_status.replace('_', ' ').title() }}
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownStatus{{ task.task_id }}">
+                                                    <form action="{{ url_for('user.update_task_status', task_id=task.task_id) }}" method="POST" class="px-3 py-2">
+                                                        <select name="task_status" class="form-control form-control-sm mb-2" onchange="this.form.submit()">
+                                                            {% set available_statuses = status_options[task.priority] %}
+                                                            {% for status in available_statuses %}
+                                                                <option value="{{ status }}" {% if task.task_status == status %}selected{% endif %}>
+                                                                    {{ status.replace('_', ' ').title() }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No tasks assigned to you currently.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
+<!-- jQuery & Bootstrap -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

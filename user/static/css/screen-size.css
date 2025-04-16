@@ -1,0 +1,13 @@
+/* Default for laptops and smaller screens */
+body {
+  font-size: 16px;
+  zoom: 1;
+}
+
+/* Bigger screen (PCs, large monitors) */
+@media screen and (min-width: 1600px) {
+  body {
+    font-size: 18px;
+    zoom: 1.1; /* Zooms entire page slightly */
+  }
+}

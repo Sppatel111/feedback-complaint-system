@@ -196,3 +196,163 @@ admin
                 </div>
             </div>
         </div>
+
+admin_login.html
+{% extends 'admin_base.html' %}
+
+{% block title %} Admin Login {% endblock %}
+
+{% set show_navbar = False %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="row shadow-lg rounded bg-white overflow-hidden" style="max-width: 900px; width: 100%;">
+        <!-- Left Side: Image -->
+        <div class="col-md-6 d-none d-md-block p-0">
+            <div class="left-side h-100">
+                <img src="{{ url_for('user.static', filename='assets/login_image2.png') }}" alt="Login Image" class="img-fluid h-100 w-100" style="object-fit: cover;">
+            </div>
+        </div>
+
+        <!-- Right Side: Login Card -->
+        <div class="col-md-6 p-5 d-flex align-items-center">
+            <div class="card w-100 shadow-sm p-4">
+                <h2 class="text-center mb-4">Admin Login</h2>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control", placeholder="Enter your email") }}
+                        {% for error in form.email.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control", placeholder="Enter your password") }}
+                        {% for error in form.password.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Centered Button -->
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+
+screen size change
+     <style>
+        body {
+        color: #626e78;
+        }
+      .table {
+        color: #4d575e
+        }
+        .text-muted
+        {
+        color: #737d85 !important;
+        }
+        .text-dark {
+            color: #060606 !important;
+        }
+        .text-secondary {
+        color: #646d75;
+        }
+    </style>
+    orginal
+    .text-dark {
+    color: #343a40 !important;
+}
+
+f_ticket.html
+        <!--        flash -->
+<!--           <div class="container mt-3">-->
+<!--                {% with messages = get_flashed_messages(with_categories=true) %}-->
+<!--                    {% if messages %}-->
+<!--                        <div class="alert alert-dismissible alert-success">-->
+<!--                            <button type="button" class="close" data-dismiss="alert">&times;</button>-->
+<!--                            <a href="#" class="alert-link">-->
+<!--                                <ul class="flashes">-->
+<!--                                    {% for category, message in messages %}-->
+<!--                                        <li class="{{ category }}">{{ message }}</li>-->
+<!--                                    {% endfor %}-->
+<!--                                </ul>-->
+<!--                            </a>-->
+<!--                        </div>-->
+<!--                    {% endif %}-->
+<!--                {% endwith %}-->
+<!--            </div>-->
+{% extends "user_base.html" %}
+
+{% block title %}Feedback Tickets{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-start py-5">
+    <div class="card shadow-lg border-0 rounded-4 px-4 py-4 w-100" style="max-width: 1300px;">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-dark">📬 All Feedback Tickets</h5>
+        </div>
+        <div class="card-body">
+            {% if tickets %}
+                <div class="table-responsive">
+                    <table class="table text-center align-middle" style="font-size: 14px;">
+                        <thead style="background-color: #f9f9f9;">
+                            <tr class="text-uppercase fw-bold text-secondary small" style="letter-spacing: 0.05em;">
+                                <th class="border-0 py-3">Ticket ID</th>
+                                <th class="border-0 py-3">Department</th>
+                                <th class="border-0 py-3">Label</th>
+                                <th class="border-0 py-3 text-start">Question</th>
+                                <th class="border-0 py-3">Status</th>
+                                <th class="border-0 py-3">Created At</th>
+                                <th class="border-0 py-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ticket in tickets %}
+                            <tr>
+                                <td>{{ ticket.ticket_id }}</td>
+                                <td>{{ ticket.department_name }}</td>
+                                <td>{{ ticket.ticket_label }}</td>
+                                <td class="text-start">{{ ticket.question }}</td>
+                                <td>
+                                    <span class="badge text-uppercase fw-semibold px-3 py-2"
+                                          style="border-radius: 5px;
+                                            {% if ticket.ticket_status == 'open' %}background-color: #17a2b8; color: white;
+                                            {% elif ticket.ticket_status == 'in_progress' %}background-color: #ffc107; color: black;
+                                            {% elif ticket.ticket_status == 'closed' %}background-color: #28a745; color: white;
+                                            {% else %}background-color: #6c757d; color: white;{% endif %}">
+                                        {{ ticket.ticket_status.replace('_', ' ') }}
+                                    </span>
+                                </td>
+                                <td>{{ ticket.created_at }}</td>
+                                <td>
+                                    <a href="{{ url_for('user.ticket_detail_response', ticket_id=ticket.ticket_id) }}"
+                                       class="btn btn-outline-dark btn-sm w-100">
+                                        <i class="fas fa-eye me-1"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center mb-0">
+                    No tickets available for your department.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

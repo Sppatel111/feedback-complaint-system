@@ -5,13 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b4d8c6ce-d23f-4c17-85a8-452d09522676" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ref.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user/static/css/screen-size.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user/templates/edit_details.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user/templates/profile.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/templates/admin_view_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_view_user.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_login.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_login.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/templates/assign_tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/assign_tasks.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/note.txt" beforeDir="false" afterPath="$PROJECT_DIR$/note.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/profiles/bccb546e-259b-448d-9a51-f5a084596302.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/profiles/default-profile.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/profiles/download_1.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/profiles/logo.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/profiles/popolpo.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/change_password.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/change_password.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/f_tickets.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/f_tickets.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/settings.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/settings.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/tasks.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/ticket_detail_response.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/ticket_detail_response.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/user_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/user_details.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/user_profile.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

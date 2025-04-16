@@ -167,7 +167,7 @@ def a_details():
         flash("Details updated successfully!", "success")
         return redirect(url_for("admin.a_settings"))
 
-    return render_template("user_details.html", form=form, current_user=current_user)
+    return render_template("edit_details.html", form=form, current_user=current_user)
 
 # Change Password Route
 @admin.route('/dashboard/settings/change-password', methods=['GET', 'POST'])
@@ -192,7 +192,7 @@ def change_password():
 # View Profile Route
 @admin.route('/dashboard/setting/view-profile', methods=['GET', 'POST'])
 def profile():
-    return render_template("user_profile.html", current_user=current_user)
+    return render_template("profile.html", current_user=current_user)
 
 # Manage Feedback Route(raise ticket,view feedback, assign task)
 @admin.route('/manage-feedback', methods=['GET', 'POST'])

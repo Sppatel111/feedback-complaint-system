@@ -1,34 +1,75 @@
 {% extends "user_base.html" %}
 
-{% block title %}Ticket Details{% endblock %}
+{% block title %}Ticket #{{ ticket.ticket_id }} Details{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Ticket Details - ID: {{ ticket.ticket_id }}</h1>
-    <p><strong>Department:</strong> {{ ticket.department_name }}</p>
-    <p><strong>Label:</strong> {{ ticket.ticket_label }}</p>
-    <p><strong>Question:</strong> {{ ticket.question }}</p>
-    <p><strong>Status:</strong> {{ ticket.ticket_status }}</p>
-    <p><strong>Created At:</strong> {{ ticket.created_at }}</p>
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-dark">🎫 Ticket #{{ ticket.ticket_id }}</h4>
+            <span class="badge
+                {% if ticket.ticket_status == 'open' %} bg-info
+                {% elif ticket.ticket_status == 'in_progress' %} bg-warning
+                {% elif ticket.ticket_status == 'closed' %} bg-success
+                {% else %} bg-secondary {% endif %}" style="color:#FFFFFF">
+                {{ ticket.ticket_status.replace('_', ' ').title() }}
+            </span>
+        </div>
+        <div class="card-body">
+            <!-- Ticket Info -->
+            <div class="mb-4">
+                <p class="mb-1"><strong>Department:</strong> {{ ticket.department_name }}</p>
+                <p class="mb-1"><strong>Label:</strong> {{ ticket.ticket_label }}</p>
+                <p class="mb-1"><strong>Created At:</strong> {{ ticket.created_at }}</p>
+            </div>
 
-    <h2>Responses</h2>
-    {% if ticket.responses %}
-        <ul class="list-unstyled">
-            {% for response in ticket.responses %}
-                <li>→ {{ response.response }} <br>
-                    <small><em>by {{ response.user_email }} on {{ response.created_at }}</em></small>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No responses yet.</p>
-    {% endif %}
-    {% if ticket.ticket_status == 'open': %}
-    <h2>Add a Response</h2>
-    <form action="{{ url_for('user.respond_to_ticket', ticket_id=ticket.ticket_id) }}" method="POST">
-        <textarea class="form-control" name="response" rows="2" required></textarea>
-        <button type="submit" class="btn btn-primary mt-2">Submit</button>
-    </form>
-    {% endif %}
+            <!-- Question (Initial Message) -->
+            <div class="mb-4">
+                <div class="bg-light rounded p-3 border">
+                    <strong class="text-primary">Question:</strong>
+                    <p class="mb-1">{{ ticket.question }}</p>
+                    <small class="text-muted">by {{ ticket.user_email if ticket.user_email else 'System' }}</small>
+                </div>
+            </div>
+
+            <!-- Responses Chat Format -->
+            <h5 class="text-muted mb-3">💬 Responses</h5>
+            <div class="mb-4" style="max-height: 400px; overflow-y: auto;">
+                {% if ticket.responses %}
+                    {% for response in ticket.responses %}
+                        <div class="mb-3 d-flex flex-column">
+                            <div class="bg-white border rounded p-3 shadow-sm">
+                                <p class="mb-1">{{ response.response }}</p>
+                                <div class="text-muted small">
+                                    by {{ response.user_email }} | {{ response.created_at }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">No responses yet.</div>
+                {% endif %}
+            </div>
+
+            <!-- Response Form -->
+            {% if ticket.ticket_status == 'open' %}
+                <h5 class="text-muted">✍️ Add a Response</h5>
+                <form action="{{ url_for('user.respond_to_ticket', ticket_id=ticket.ticket_id) }}" method="POST">
+                    <div class="mb-3">
+                        <textarea class="form-control" name="response" rows="3" placeholder="Type your response..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-paper-plane"></i> Submit
+                    </button>
+                </form>
+            {% else %}
+                <div class="alert alert-secondary">This ticket is closed. Responses are disabled.</div>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
+<!-- jQuery & Bootstrap -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

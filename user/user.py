@@ -3,7 +3,6 @@ from sqlalchemy import or_
 from .forms import LoginForm, UserDetailForm, ChangePasswordForm
 from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task
 from flask_login import login_user, current_user, logout_user
-from werkzeug.utils import secure_filename
 import os
 import uuid
 
@@ -38,7 +37,8 @@ def login():
 
     return render_template('user_login.html', form=form, current_user=current_user)
 
-#logout Route
+
+# logout Route
 @user.route('/logout', methods=['GET', 'POST'])
 def logout():
     logout_user()
@@ -62,19 +62,42 @@ def u_settings():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+@user.route('/settings/profile')
+def profile():
+    return render_template('profile.html', user=current_user)
+
+
+# @user.route('/settings/edit', methods=['GET', 'POST'])
+# def edit_details():
+#     form = UserDetailForm(obj=current_user.user_detail)
+#     if form.validate_on_submit():
+#         current_user.user_detail.firstname = form.f_name.data
+#         current_user.user_detail.lastname = form.l_name.data
+#         current_user.user_detail.phone_number = form.phone.data
+#         # Optional: handle image upload here
+#         db.session.commit()
+#         flash("Details updated successfully!", "success")
+#         return redirect(url_for('user.profile'))
+#     return render_template('edit_details.html', form=form)
+
 @user.route('/dashboard/settings/userdetails', methods=['GET', 'POST'])
 def u_details():
     form = UserDetailForm(obj=current_user.user_detail)
     form.email.data = current_user.email
     form.department.data = current_user.department
+    if request.method == 'GET':
+        form.f_name.data = current_user.user_detail.firstname
+        form.l_name.data = current_user.user_detail.lastname
+        form.phone.data = current_user.user_detail.phone_number
 
     if form.validate_on_submit():
+        print("yes")
         if not current_user.user_detail:
             user_detail = Detail(email=current_user.email)
             db.session.add(user_detail)
         else:
             user_detail = current_user.user_detail
-
 
         user_detail.firstname = form.f_name.data
         user_detail.lastname = form.l_name.data
@@ -97,17 +120,7 @@ def u_details():
         flash("Details updated successfully!", "success")
         return redirect(url_for("user.u_details"))
 
-    return render_template("user_details.html", form=form, current_user=current_user)
-
-
-# you have to check
-@user.route('/dashboard/setting/view-profile', methods=['GET', 'POST'])
-def profile():
-    profile = db.session.execute(db.select(User).where(User.email == current_user.email))
-    profile_detail = db.session.execute(db.select(Detail).where(Detail.email == current_user.email))
-    result = profile.scalars().all()
-    print(result)
-    return render_template("user_profile.html", current_user=current_user)
+    return render_template("edit_details.html", form=form, current_user=current_user)
 
 
 @user.route('/dashboard/settings/change-password', methods=['GET', 'POST'])
@@ -136,11 +149,28 @@ def manage_feedback():
 
 @user.route('dashboard/feedback/view-tickets', methods=['GET', 'POST'])
 def view_tickets():
+    selected_status = request.args.get('status')
+
     if current_user.department:
-        tickets = FeedbackTicket.query.filter(or_(FeedbackTicket.department_name == current_user.department,FeedbackTicket.department_name =='ALL')).all()
+        query = FeedbackTicket.query.filter(
+            or_(
+                FeedbackTicket.department_name == current_user.department,
+                FeedbackTicket.department_name == 'ALL'
+            )
+        )
+        if selected_status:
+            query = query.filter(FeedbackTicket.ticket_status == selected_status)
+        tickets = query.order_by(FeedbackTicket.created_at.desc()).all()
     else:
-        tickets=[]
-    return render_template('f_tickets.html', tickets=tickets, current_user=current_user)
+        tickets = []
+
+    return render_template(
+        'f_tickets.html',
+        tickets=tickets,
+        selected_status=selected_status,
+        current_user=current_user
+    )
+
 
 # for the response in view tickets
 @user.route('dashboard/respond/<int:ticket_id>', methods=['POST'])
@@ -159,6 +189,7 @@ def respond_to_ticket(ticket_id):
         flash('Response cannot be empty.', 'danger')
 
     return redirect(url_for('user.view_tickets'))
+
 
 @user.route('/dashboard/ticket/<int:ticket_id>', methods=['GET'])
 def ticket_detail_response(ticket_id):
@@ -187,9 +218,37 @@ def ticket_detail_response(ticket_id):
 #     return render_template("tasks.html", tasks=tasks, status_colors=status_colors)
 
 
+# @user.route('/dashboard/feedback/task', methods=['GET'])
+# def assigned_task():
+#     tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
+#
+#     status_colors = {
+#         'todo': 'orange',
+#         'in_progress': '#007bff',
+#         'in_review': '#6f42c1',
+#         'backlog': 'red',
+#         'on_hold': '#ffc107',
+#         'done': '#28a745',
+#         'completed': '#20c997',
+#     }
+#
+#     status_options = {
+#         'high': ['todo', 'in_progress', 'backlog', 'in_review'],
+#         'medium': ['todo', 'in_progress', 'backlog', 'in_review', 'done'],
+#         'low': ['todo', 'in_progress', 'backlog', 'in_review', 'done', 'completed'],
+#     }
+#
+#     return render_template("tasks.html", tasks=tasks, status_colors=status_colors, status_options=status_options)
 @user.route('/dashboard/feedback/task', methods=['GET'])
 def assigned_task():
-    tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
+    selected_status = request.args.get('status', '')
+
+    query = Task.query.filter_by(assigned_to_email=current_user.email)
+
+    if selected_status:
+        query = query.filter_by(task_status=selected_status)
+
+    tasks = query.all()
 
     status_colors = {
         'todo': 'orange',
@@ -207,7 +266,13 @@ def assigned_task():
         'low': ['todo', 'in_progress', 'backlog', 'in_review', 'done', 'completed'],
     }
 
-    return render_template("tasks.html", tasks=tasks, status_colors=status_colors, status_options=status_options)
+    return render_template(
+        "tasks.html",
+        tasks=tasks,
+        status_colors=status_colors,
+        status_options=status_options,
+        selected_status=selected_status
+    )
 
 
 @user.route('/dashboard/feedback/task/update/<int:task_id>', methods=['POST'])

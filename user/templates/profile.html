@@ -2,165 +2,101 @@
 {% set active_tab = 'profile' %}
 
 {% block settings_content %}
-<style>
-    .card-custom {
-        border: 1px solid #e9ecef;
-        border-radius: 14px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-        background-color: #ffffff;
-        padding: 1.8rem;
-        margin-bottom: 2rem;
-        transition: box-shadow 0.3s ease;
-    }
 
-    .card-custom:hover {
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-    }
+<div class="container mt-5">
+    <!-- Flash Messages -->
+    <div id="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-toast {{ category }}">
+                    <span class="icon">
+                        {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>
+                        {% elif category == 'danger' %}	<i class="fas fa-times-circle icon"></i>
+                        {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle icon"></i>
+                        {% elif category == 'info' %}<i class="fas fa-circle-info icon"></i>
+                        {% else %}🔔
+                        {% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+    <!-- Profile Summary -->
+    <div class="card shadow-lg border-0 mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between ">
+                <!-- Left: Profile image + details -->
+                <div class="d-flex align-items-center">
+                    <img src="{{ url_for('user.static', filename='assets/profiles/' + (current_user.user_detail.profile_image or 'default-profile.jpg')) }}"
+                         class="rounded-circle" style="width: 90px; height: 90px; object-fit: cover;" alt="Profile Picture">
 
-    .edit-btn {
-        background-color: #f8f9fc;
-        border: 1px solid #dee2e6;
-        color: #5a5c69;
-        border-radius: 8px;
-        font-size: 14px;
-        padding: 6px 14px;
-        text-decoration: none;
-        transition: background-color 0.2s ease;
-    }
+                    <div class="ml-4">
+                        <h5 class="mb-1 font-weight-bold text-uppercase">
+                            {{ current_user.user_detail.firstname }} {{ current_user.user_detail.lastname }}
+                        </h5>
+                        <p class="mb-0 text-muted">{{ current_user.role|capitalize }}</p>
+                        <p class="mb-0 text-muted">{{ current_user.user_detail.email }}</p>
+                    </div>
+                </div>
 
-    .edit-btn:hover {
-        background-color: #e2e6ea;
-        color: #343a40;
-    }
-
-    .profile-img-wrapper {
-        position: relative;
-        display: inline-block;
-    }
-
-    .profile-img {
-        width: 90px;
-        height: 90px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid #f1f3f5;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .info-block p {
-        margin-bottom: 0.25rem;
-        color: #6c757d;
-        font-size: 13px;
-    }
-
-    .info-block h6 {
-        font-size: 15px;
-        font-weight: 500;
-        color: #212529;
-    }
-
-    .card-header-area {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.2rem;
-    }
-
-    .name-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin-bottom: 2px;
-    }
-
-    .sub-info {
-        font-size: 14px;
-        color: #6c757d;
-    }
-    .profile-img-wrapper {
-        margin-right: 2rem; /* You can increase/decrease as needed */
-    }
-
-    @media (max-width: 576px) {
-        .profile-img {
-            width: 70px;
-            height: 70px;
-        }
-
-        .name-title {
-            font-size: 1rem;
-        }
-    }
-</style>
-
-<!-- Profile Summary -->
-<div class="card-custom">
-    <div class="d-flex justify-content-between align-items-center flex-wrap">
-        <div class="d-flex align-items-center mb-3 mb-md-0">
-            <div class="profile-img-wrapper me-3">
-                <img src="{{ url_for('user.static', filename='assets/profiles/' + (current_user.user_detail.profile_image or 'default-profile.jpg')) }}"
-                     class="profile-img" alt="Profile Picture">
-
-
-
-            </div>
-            <div>
-                <div class="name-title">{{ current_user.user_detail.firstname }} {{ current_user.user_detail.lastname }} </div>
-                <div class="sub-info">{{ current_user.role|capitalize }} </div>
-                <div class="sub-info">{{ current_user.user_detail.email  }}</div>
+                <!-- Right: Edit button -->
+                <div class="mt-3 mt-md-0">
+                    <a href="{{ url_for('user.u_details') }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-pen mr-1"></i> Edit
+                    </a>
+                </div>
             </div>
         </div>
-        <a href="{{ url_for('user.u_details') }}" class="edit-btn mt-2 mt-md-0">
-            <i class="fas fa-pen me-1"></i> Edit
-        </a>
+    </div>
+
+    <!-- Personal Info -->
+    <div class="card shadow-lg border-0 mb-4">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0 text-uppercase">Personal Information</h5>
+                <a href="{{ url_for('user.u_details') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-pen mr-1"></i> Edit
+                </a>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <small class="text-muted">First Name</small>
+                    <div class="text-dark font-weight-medium">{{ current_user.user_detail.firstname }}</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <small class="text-muted">Last Name</small>
+                    <div class="text-dark font-weight-medium">{{ current_user.user_detail.lastname }}</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <small class="text-muted">Email</small>
+                    <div class="text-dark font-weight-medium">{{ current_user.email }}</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <small class="text-muted">Phone</small>
+                    <div class="text-dark font-weight-medium">{{ current_user.user_detail.phone_number or '—' }}</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <small class="text-muted">Department</small>
+                    <div class="text-dark font-weight-medium">{{ current_user.department or '—' }}</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <small class="text-muted">Status</small>
+                    <div>
+                        {% if current_user.is_active %}
+                            <span class="badge badge-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-secondary">Disabled</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Personal Info -->
-<div class="card-custom">
-    <div class="card-header-area">
-        <h5 class="mb-0">Personal Information</h5>
-        <a href="{{ url_for('user.u_details') }}" class="edit-btn">
-            <i class="fas fa-pen me-1"></i> Edit
-        </a>
-    </div>
-    <div class="info-grid">
-        <div class="info-block">
-            <p>First Name</p>
-            <h6>{{ current_user.user_detail.firstname }}</h6>
-        </div>
-        <div class="info-block">
-            <p>Last Name</p>
-            <h6>{{ current_user.user_detail.lastname }}</h6>
-        </div>
-        <div class="info-block">
-            <p>Email</p>
-            <h6>{{ current_user.email }}</h6>
-        </div>
-        <div class="info-block">
-            <p>Phone</p>
-            <h6>{{ current_user.user_detail.phone_number or '—' }}</h6>
-        </div>
-        <div class="info-block">
-            <p>Department</p>
-            <h6>{{ current_user.department or '—' }}</h6>
-        </div>
-        <div class="info-block">
-            <p>Status</p>
-            <h6>
-                {% if current_user.is_active %}
-                    <span class="badge bg-success">Active</span>
-                {% else %}
-                    <span class="badge bg-secondary">Disabled</span>
-                {% endif %}
-            </h6>
-        </div>
-    </div>
-</div>
-{% endblock %}
+<!-- jQuery & Bootstrap -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+{%endblock%}

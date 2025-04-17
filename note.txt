@@ -6,6 +6,7 @@ pip install -r requirements.txt
 https://www.datacamp.com/blog/what-is-python-used-for
 ##setting design
 https://www.behance.net/gallery/184520011/User-Page?tracking_source=search_projects|settings+page+design&l=21
+https://www.twilio.com/en-us/blog/a-phone-number-input-field-for-flask-forms
 
 ##manage users
 https://www.phpkb.com/kb/article/managing-user-accounts-97.html

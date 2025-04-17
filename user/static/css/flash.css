@@ -1,0 +1,56 @@
+.flash-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1055;
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    font-size: 0.95rem;
+    font-weight: 500;
+    animation: slideIn 0.4s ease-out;
+    max-width: 360px;
+    min-width: 320px;
+    color: #212529;
+}
+
+.flash-toast .icon {
+    margin-right: 0.5rem;   /* Slightly tighter spacing */
+    font-size: 1.1rem;      /* Smaller icon size */
+    vertical-align: middle; /* Align icon vertically with text */
+    opacity: 0.9;           /* Slight transparency for soft feel */
+}
+
+.flash-toast.success {
+    background-color: #e6ffed; /* soft green */
+    color: #1e4620;
+}
+
+.flash-toast.danger {
+    background-color: #fdecea; /* soft red */
+    color: #611a15;
+}
+
+.flash-toast.warning {
+    background-color: #fff9e6; /* soft yellow */
+    color: #664d03;
+}
+
+.flash-toast.info {
+    background-color: #e7f5ff; /* soft blue */
+    color: #084298;
+}
+
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,25 +1,63 @@
-{% extends "user_base.html" %}
-{% set side_panel =False %}
+{% if current_user.role == 'employee' %}
+    {% set side_panel = False %}
+    {% extends "user_base.html" %}
+{% elif current_user.role == 'admin' %}
+    {% extends "admin_base.html" %}
+{% endif %}
+
 {% block title %}My Settings{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-3">
-            <div class="list-group">
-                <a href="{{ url_for('user.profile') }}" class="list-group-item list-group-item-action {% if active_tab == 'profile' %}active{% endif %}">My Profile</a>
-                <a href="{{ url_for('user.u_details') }}" class="list-group-item list-group-item-action {% if active_tab == 'edit' %}active{% endif %}">Edit Details</a>
-                <a href="{{ url_for('user.change_password') }}" class="list-group-item list-group-item-action {% if active_tab == 'password' %}active{% endif %}">Change Password</a>
-                <a href="{{ url_for('user.logout') }}" class="list-group-item list-group-item-action text-danger">Logout</a>
-            </div>
-        </div>
+<div class="d-flex w-100" style="min-height: 85vh;">
+    <!-- Sidebar -->
+    <div class="bg-light p-4" style="width: 280px; border-radius: 12px;">
+        <div class="list-group list-group-flush">
+            {% if current_user.role == 'employee' %}
+                <a href="{{ url_for('user.profile') }}" class="list-group-item list-group-item-action {% if active_tab == 'profile' %}active{% endif %}">
+                    <i class="fas fa-user mr-2"></i> My Profile
+                </a>
+                <a href="{{ url_for('user.u_details') }}" class="list-group-item list-group-item-action {% if active_tab == 'edit' %}active{% endif %}">
+                    <i class="fas fa-edit mr-2"></i> Edit Details
+                </a>
+                <a href="{{ url_for('user.change_password') }}" class="list-group-item list-group-item-action {% if active_tab == 'password' %}active{% endif %}">
+                    <i class="fas fa-key mr-2"></i> Change Password
+                </a>
+                <a href="{{ url_for('user.logout') }}" class="list-group-item list-group-item-action text-danger">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                </a>
+            {% elif current_user.role == 'admin' %}
+                <a href="{{ url_for('admin.profile') }}" class="list-group-item list-group-item-action {% if active_tab == 'profile' %}active{% endif %}">
+                    <i class="fas fa-user mr-2"></i> My Profile
+                </a>
+                <a href="{{ url_for('admin.a_details') }}" class="list-group-item list-group-item-action {% if active_tab == 'edit' %}active{% endif %}">
+                    <i class="fas fa-edit mr-2"></i> Edit Details
+                </a>
+                <a href="{{ url_for('admin.change_password') }}" class="list-group-item list-group-item-action {% if active_tab == 'password' %}active{% endif %}">
+                    <i class="fas fa-key mr-2"></i> Change Password
+                </a>
+                <a href="{{ url_for('admin.logout') }}" class="list-group-item list-group-item-action text-danger">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                </a>
+            {% endif %}
 
-        <!-- Content -->
-        <div class="col-md-9">
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-fill d-flex justify-content-center p-4">
+        <div class="w-100" style="max-width: 950px;">
             {% block settings_content %}
+            <h3>Welcome to Settings</h3>
+            <p>Select an option on the left to manage your preferences.</p>
             {% endblock %}
         </div>
     </div>
 </div>
+<<!-- Include intlTelInput -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/css/intlTelInput.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/js/intlTelInput.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/js/utils.js"></script>
+
+
+
 {% endblock %}

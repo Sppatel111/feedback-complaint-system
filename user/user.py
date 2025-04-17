@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy import or_
 from .forms import LoginForm, UserDetailForm, ChangePasswordForm
 from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user, login_required
 import os
 import uuid
 
@@ -40,6 +40,7 @@ def login():
 
 # logout Route
 @user.route('/logout', methods=['GET', 'POST'])
+@login_required
 def logout():
     logout_user()
     flash('You have been logged out.', 'info')
@@ -48,40 +49,28 @@ def logout():
 
 # Dashboard Route
 @user.route('/dashboard')
+@login_required
 def u_dashboard():
     return render_template("user_dashboard.html", current_user=current_user)
 
 
 # Settings Route
 @user.route('/dashboard/settings')
+@login_required
 def u_settings():
     return render_template("settings.html", current_user=current_user)
-
 
 # User Details Route
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
-@user.route('/settings/profile')
+@user.route('dashboard/settings/profile')
+@login_required
 def profile():
     return render_template('profile.html', user=current_user)
 
-
-# @user.route('/settings/edit', methods=['GET', 'POST'])
-# def edit_details():
-#     form = UserDetailForm(obj=current_user.user_detail)
-#     if form.validate_on_submit():
-#         current_user.user_detail.firstname = form.f_name.data
-#         current_user.user_detail.lastname = form.l_name.data
-#         current_user.user_detail.phone_number = form.phone.data
-#         # Optional: handle image upload here
-#         db.session.commit()
-#         flash("Details updated successfully!", "success")
-#         return redirect(url_for('user.profile'))
-#     return render_template('edit_details.html', form=form)
-
-@user.route('/dashboard/settings/userdetails', methods=['GET', 'POST'])
+@user.route('/dashboard/settings/user-details', methods=['GET', 'POST'])
+@login_required
 def u_details():
     form = UserDetailForm(obj=current_user.user_detail)
     form.email.data = current_user.email
@@ -90,9 +79,9 @@ def u_details():
         form.f_name.data = current_user.user_detail.firstname
         form.l_name.data = current_user.user_detail.lastname
         form.phone.data = current_user.user_detail.phone_number
-
+    # print("no")
     if form.validate_on_submit():
-        print("yes")
+        # print("yes")
         if not current_user.user_detail:
             user_detail = Detail(email=current_user.email)
             db.session.add(user_detail)
@@ -102,28 +91,33 @@ def u_details():
         user_detail.firstname = form.f_name.data
         user_detail.lastname = form.l_name.data
         user_detail.phone_number = form.phone.data
+        # print(form.phone.data)
         file = form.profile_image.data
-        print(file)
-        # if file and allowed_file(file.filename):
-        #     filename = secure_filename(file.filename)
-        #     file.save(os.path.join(UPLOAD_FOLDER, filename))
-        #     user_detail.profile_image = filename
+        # print(file)
 
         # using uuid
-        if file and allowed_file(file.filename):
-            file_extension = file.filename.rsplit('.', 1)[1].lower()
-            unique_filename = f"{uuid.uuid4()}.{file_extension}"
-            file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
-            user_detail.profile_image = unique_filename
+        if file or allowed_file(file.filename):
+            if allowed_file(file.filename):
+                file_extension = file.filename.rsplit('.', 1)[1].lower()
+                unique_filename = f"{uuid.uuid4()}.{file_extension}"
+                file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
+                user_detail.profile_image = unique_filename
+            else:
+                flash("Unsupported file type. Please upload an image (png, jpg, jpeg, gif).","danger")
+                return render_template("edit_details.html", form=form, current_user=current_user)
 
         db.session.commit()
         flash("Details updated successfully!", "success")
-        return redirect(url_for("user.u_details"))
+        return redirect(url_for("user.profile"))
 
+    elif request.method == 'POST':
+        flash("Invalid phone number.","danger")
+        print(form.errors)
     return render_template("edit_details.html", form=form, current_user=current_user)
 
 
 @user.route('/dashboard/settings/change-password', methods=['GET', 'POST'])
+@login_required
 def change_password():
     form = ChangePasswordForm()
 
@@ -142,12 +136,14 @@ def change_password():
     return render_template("change_password.html", form=form, current_user=current_user)
 
 
-@user.route('dashboard/feedback', methods=['GET', 'POST'])
+@user.route('dashboard/manage-feedback', methods=['GET', 'POST'])
+@login_required
 def manage_feedback():
     return render_template("feedback_management.html", current_user=current_user)
 
 
-@user.route('dashboard/feedback/view-tickets', methods=['GET', 'POST'])
+@user.route('dashboard/manage-feedback/view-tickets', methods=['GET', 'POST'])
+@login_required
 def view_tickets():
     selected_status = request.args.get('status')
 
@@ -173,7 +169,8 @@ def view_tickets():
 
 
 # for the response in view tickets
-@user.route('dashboard/respond/<int:ticket_id>', methods=['POST'])
+@user.route('dashboard/manage-feedback/view-tickets/respond/<int:ticket_id>', methods=['POST'])
+@login_required
 def respond_to_ticket(ticket_id):
     response_text = request.form.get('response')
     if response_text:
@@ -191,7 +188,8 @@ def respond_to_ticket(ticket_id):
     return redirect(url_for('user.view_tickets'))
 
 
-@user.route('/dashboard/ticket/<int:ticket_id>', methods=['GET'])
+@user.route('/dashboard/manage-feedback/view-tickets/ticket/<int:ticket_id>', methods=['GET'])
+@login_required
 def ticket_detail_response(ticket_id):
     ticket = FeedbackTicket.query.get(ticket_id)
     if ticket is None:
@@ -200,46 +198,8 @@ def ticket_detail_response(ticket_id):
 
     return render_template("ticket_detail_response.html", ticket=ticket)
 
-
-# @user.route('/dashboard/feedback/task', methods=['GET'])
-# def assigned_task():
-#     tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
-#
-#     status_colors = {
-#         'todo': 'orange',
-#         'in_progress': '#007bff',
-#         'in_review': '#6f42c1',
-#         'backlog': 'red',
-#         'on_hold': '#ffc107',
-#         'done': '#28a745',
-#         'completed': '#20c997',
-#     }
-#
-#     return render_template("tasks.html", tasks=tasks, status_colors=status_colors)
-
-
-# @user.route('/dashboard/feedback/task', methods=['GET'])
-# def assigned_task():
-#     tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
-#
-#     status_colors = {
-#         'todo': 'orange',
-#         'in_progress': '#007bff',
-#         'in_review': '#6f42c1',
-#         'backlog': 'red',
-#         'on_hold': '#ffc107',
-#         'done': '#28a745',
-#         'completed': '#20c997',
-#     }
-#
-#     status_options = {
-#         'high': ['todo', 'in_progress', 'backlog', 'in_review'],
-#         'medium': ['todo', 'in_progress', 'backlog', 'in_review', 'done'],
-#         'low': ['todo', 'in_progress', 'backlog', 'in_review', 'done', 'completed'],
-#     }
-#
-#     return render_template("tasks.html", tasks=tasks, status_colors=status_colors, status_options=status_options)
-@user.route('/dashboard/feedback/task', methods=['GET'])
+@user.route('/dashboard/manage-feedback/task', methods=['GET'])
+@login_required
 def assigned_task():
     selected_status = request.args.get('status', '')
 
@@ -275,7 +235,8 @@ def assigned_task():
     )
 
 
-@user.route('/dashboard/feedback/task/update/<int:task_id>', methods=['POST'])
+@user.route('/dashboard/manage-feedback/task/update/<int:task_id>', methods=['POST'])
+@login_required
 def update_task_status(task_id):
     task = Task.query.get(task_id)
     if not task:

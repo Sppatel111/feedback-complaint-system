@@ -29,7 +29,7 @@ def login():
         if admin1 and admin1.password == password:
             if not admin1.is_active:
                 flash("This account is disabled. Please contact admin.", "danger")
-                return redirect(url_for('user.login'))
+                return redirect(url_for('admin.login'))
             login_user(admin1)
             flash(f'Login successful for {email}', 'success')
             return redirect(url_for("admin.a_dashboard"))
@@ -85,8 +85,8 @@ def add_user():
             db.session.commit()
 
             flash("User registered successfully!", "success")
-            return redirect(url_for("admin.a_dashboard"))
-        print("nope")
+            return redirect(url_for("admin.manage_users"))
+        # print("nope")
         flash("User already registered!!! ", "danger")
     return render_template("add_user.html", form=form, current_user=current_user)
 
@@ -138,10 +138,15 @@ def allowed_file(filename):
 
 # Admin detail Route
 @admin.route('/dashboard/settings/admindetails', methods=['GET', 'POST'])
+@login_required
 def a_details():
     form = UserDetailForm(obj=current_user.user_detail)
     form.email.data = current_user.email
     form.department.data = current_user.department
+    if request.method == 'GET':
+        form.f_name.data = current_user.user_detail.firstname
+        form.l_name.data = current_user.user_detail.lastname
+        form.phone.data = current_user.user_detail.phone_number
 
     if form.validate_on_submit():
         if not current_user.user_detail:
@@ -154,23 +159,30 @@ def a_details():
         user_detail.lastname = form.l_name.data
         user_detail.phone_number = form.phone.data
         file = form.profile_image.data
-        print(file)
+        # print(file)
 
         # using uuid
-        if file and allowed_file(file.filename):
-            file_extension = file.filename.rsplit('.', 1)[1].lower()
-            unique_filename = f"{uuid.uuid4()}.{file_extension}"
-            file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
-            user_detail.profile_image = unique_filename
+        if file or allowed_file(file.filename):
+            if allowed_file(file.filename):
+                file_extension = file.filename.rsplit('.', 1)[1].lower()
+                unique_filename = f"{uuid.uuid4()}.{file_extension}"
+                file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
+                user_detail.profile_image = unique_filename
+            else:
+                flash("Unsupported file type. Please upload an image (png, jpg, jpeg, gif).", "danger")
+                return render_template("edit_details.html", form=form, current_user=current_user)
 
         db.session.commit()
         flash("Details updated successfully!", "success")
-        return redirect(url_for("admin.a_settings"))
-
+        return redirect(url_for("admin.profile"))
+    elif request.method == 'POST':
+        flash("Invalid phone number.","danger")
+        # print(form.errors)
     return render_template("edit_details.html", form=form, current_user=current_user)
 
 # Change Password Route
 @admin.route('/dashboard/settings/change-password', methods=['GET', 'POST'])
+@login_required
 def change_password():
     form = ChangePasswordForm()
 
@@ -182,7 +194,7 @@ def change_password():
             current_user.password = new_password
             db.session.commit()
             flash('Password changed successfully!', 'success')
-            return redirect(url_for('admin.a_settings'))
+            return redirect(url_for('admin.a_dashboard'))
         else:
             flash('Incorrect current password.', 'danger')
 
@@ -191,8 +203,9 @@ def change_password():
 
 # View Profile Route
 @admin.route('/dashboard/setting/view-profile', methods=['GET', 'POST'])
+@login_required
 def profile():
-    return render_template("profile.html", current_user=current_user)
+    return render_template("profile.html", user=current_user)
 
 # Manage Feedback Route(raise ticket,view feedback, assign task)
 @admin.route('/manage-feedback', methods=['GET', 'POST'])
@@ -203,6 +216,7 @@ def manage_feedback():
 
 # Raise ticket routes
 @admin.route('/manage-feedback/raise-tickets', methods=['GET', 'POST'])
+@login_required
 def raise_tickets():
     form = RaiseTicket()
     if form.validate_on_submit():
@@ -222,6 +236,7 @@ def raise_tickets():
 
 # View feedback Response Route
 @admin.route('manage-feedback/view-feedback', methods=['GET', 'POST'])
+@login_required
 def view_feedback():
     departments = db.session.query(FeedbackTicket.department_name).distinct().all()
     department_names = [dept[0] for dept in departments]
@@ -241,6 +256,7 @@ def view_feedback():
 ### need check below two function
 ###  ticket detail and user responses on it
 @admin.route('manage-feedback/ticket/<int:ticket_id>', methods=['GET'])
+@login_required
 def view_ticket_details(ticket_id):
     ticket = FeedbackTicket.query.get(ticket_id)
     if ticket is None:
@@ -257,6 +273,7 @@ def view_ticket_details(ticket_id):
 
 # Assign task Route (assign user,view task users)
 @admin.route('/manage-feedback/assign-tasks', methods=['GET', 'POST'])
+@login_required
 def assign_tasks():
     selected_status = request.args.get('status')
     if selected_status:
@@ -274,6 +291,7 @@ def assign_tasks():
 
 # Ticket status change
 @admin.route('manage-feedback/assign-tasks/status/<int:ticket_id>', methods=['POST'])
+@login_required
 def update_ticket_status(ticket_id):
     ticket = FeedbackTicket.query.get(ticket_id)
     if ticket:
@@ -287,6 +305,7 @@ def update_ticket_status(ticket_id):
 
 # Assign User Route
 @admin.route('manage-feedback/assign-tasks/assign-user/<int:ticket_id>', methods=['GET', 'POST'])
+@login_required
 def assign_user(ticket_id):
     ticket1 = FeedbackTicket.query.get(ticket_id)
     if ticket1 is None:
@@ -327,9 +346,18 @@ def assign_user(ticket_id):
 
 # View Task Users
 @admin.route('manage-feedback/assign-tasks/task-workers/<int:ticket_id>')
+@login_required
 def view_task_workers(ticket_id):
     ticket = FeedbackTicket.query.get_or_404(ticket_id)
-    task_workers = Task.query.filter_by(ticket_id=ticket_id).all()
+
+    selected_status = request.args.get('status', '')
+    query = Task.query.filter_by(ticket_id=ticket_id)
+
+    if selected_status:
+        query = query.filter_by(task_status=selected_status)
+
+    task_workers=query.all()
+
     status_colors = {
         'todo': 'orange',
         'in_progress': '#007bff',
@@ -339,23 +367,32 @@ def view_task_workers(ticket_id):
         'done': '#28a745',
         'completed': '#20c997',
     }
-    return render_template('admin_view_task_workers.html', ticket=ticket, task_workers=task_workers, status_colors=status_colors)
+    return render_template('admin_view_task_workers.html', ticket=ticket, task_workers=task_workers, status_colors=status_colors, selected_status=selected_status)
 
 # update task status and priority
 @admin.route('manage-feedback/assign-tasks/task-workers/update_task/<int:task_id>', methods=['POST'])
+@login_required
 def update_task_status_priority(task_id):
     task = Task.query.get_or_404(task_id)
-    task.task_status = request.form.get('task_status', task.task_status)
-    task.priority = request.form.get('priority', task.priority)
+
+    new_status = request.form.get('task_status')
+    new_priority = request.form.get('priority')
+
+    if new_status and new_status != task.task_status:
+        task.task_status = new_status
+        flash("Task status updated successfully.", "info")
+
+    if new_priority and new_priority != task.priority:
+        task.priority = new_priority
+        flash("Task priority updated successfully.", "info")
 
     deadline_str = request.form.get('deadline')
     if deadline_str:
         try:
             task.deadline = datetime.strptime(deadline_str, "%Y-%m-%d")
+            flash("Deadline updated successfully.", "info")
         except ValueError:
             flash("Invalid date format", "danger")
 
     db.session.commit()
-    flash("Task updated successfully.", "success")
     return redirect(request.referrer or url_for('admin.dashboard'))
-

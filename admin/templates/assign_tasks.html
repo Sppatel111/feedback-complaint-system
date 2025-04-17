@@ -4,6 +4,24 @@
 
 {% block content %}
 <div class="container mt-5">
+    <!-- Flash Messages -->
+    <div id="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-toast {{ category }}">
+                    <span class="icon">
+                        {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>
+                        {% elif category == 'danger' %}	<i class="fas fa-times-circle icon"></i>
+                        {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle icon"></i>
+                        {% elif category == 'info' %}<i class="fas fa-circle-info icon"></i>
+                        {% else %}🔔
+                        {% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
     <div class="card shadow-lg border-0">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0 text-dark">📋 All Tasks</h4>

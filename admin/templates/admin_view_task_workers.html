@@ -4,9 +4,39 @@
 
 {% block content %}
 <div class="container mt-5">
+    <!-- Flash Messages -->
+    <div id="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-toast {{ category }}">
+                    <span class="icon">
+                        {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>
+                        {% elif category == 'danger' %}	<i class="fas fa-times-circle icon"></i>
+                        {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle icon"></i>
+                        {% elif category == 'info' %}<i class="fas fa-circle-info icon"></i>
+                        {% else %}🔔
+                        {% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
     <div class="card shadow-lg border-0">
-        <div class="card-header bg-white">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0 text-dark">👥 Task Workers for Ticket #{{ ticket.ticket_id }}</h4>
+            <form method="get" action="{{ url_for('admin.view_task_workers',ticket_id=ticket.ticket_id) }}" class="form-inline">
+                <label for="statusFilter" class="mr-2 font-weight-bold text-dark">Filter by Status:</label>
+                <select id="statusFilter" name="status" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <option value="">All</option>
+                    <option value="todo" {% if selected_status =='todo' %}selected{% endif %}>To Do</option>
+                    <option value="in_progress" {% if selected_status =='in_progress' %}selected{% endif %}>In Progress</option>
+                    <option value="backlog" {% if selected_status =='backlog' %}selected{% endif %}>Backlog</option>
+                    <option value="in_review" {% if selected_status =='in_review' %}selected{% endif %}>In Review</option>
+                    <option value="done" {% if selected_status =='done' %}selected{% endif %}>Done</option>
+                    <option value="completed" {% if selected_status =='completed' %}selected{% endif %}>Completed</option>
+                </select>
+            </form>
         </div>
         <div class="card-body">
             {% if task_workers %}

@@ -2,6 +2,7 @@
 {% set active_tab = 'edit' %}
 
 {% block settings_content %}
+<!-- Custom styles for profile image and form adjustments -->
 <style>
     .profile-pic-wrapper {
         position: relative;
@@ -38,58 +39,117 @@
         display: none;
     }
 </style>
+<!-- Flash Messages -->
+<div id="flash-wrapper">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash-toast {{ category }}">
+                <span class="icon">
+                    {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>
+                    {% elif category == 'danger' %}	<i class="fas fa-times-circle icon"></i>
+                    {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle icon"></i>
+                    {% elif category == 'info' %}<i class="fas fa-circle-info icon"></i>
+                    {% else %}🔔
+                    {% endif %}
+                </span>
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    {% endwith %}
+</div>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+            <h4 class="card-title mb-4 ">Edit Your Details</h4>
 
-<div class="card shadow border-0">
-    <div class="card-body">
-        <h4 class="card-title mb-4">Edit Your Details</h4>
-        <form method="POST" enctype="multipart/form-data">
-            {{ form.hidden_tag() }}
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
 
-            <div class="text-center mb-3">
-                <div class="profile-pic-wrapper">
-                    <img id="profile-preview"
-                         src="{{ url_for('user.static', filename='assets/profiles/' + (current_user.user_detail.profile_image or 'default-profile.jpg')) }}"
-                         alt="Profile Image">
-                    <label for="profileImage" class="upload-icon border">
-                        <i class="fas fa-camera"></i>
-                    </label>
-                    {{ form.profile_image(id='profileImage') }}
+                <div class="text-center mb-3">
+                    <div class="profile-pic-wrapper">
+                        <img id="profile-preview"
+                             src="{{ url_for('user.static', filename='assets/profiles/' + (current_user.user_detail.profile_image or 'default-profile.jpg')) }}"
+                             alt="Profile Image">
+                        <label for="profileImage" class="upload-icon border">
+                            <i class="fas fa-camera"></i>
+                        </label>
+                        {{ form.profile_image(id='profileImage') }}
+                    </div>
+                    <small class="text-muted">Click the icon to change profile picture</small>
                 </div>
-                <small class="text-muted">Click the icon to change profile picture</small>
-            </div>
 
-            <div class="form-group">
-                {{ form.email.label(class="form-label") }}
-                {{ form.email(class="form-control", readonly=True) }}
-            </div>
-
-            <div class="form-group">
-                {{ form.department.label(class="form-label") }}
-                {{ form.department(class="form-control", readonly=True) }}
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    {{ form.f_name.label(class="form-label") }}
-                    {{ form.f_name(class="form-control") }}
+                <!-- Email and Department (readonly) -->
+                <div class="form-group">
+                    {{ form.email.label(class="form-label") }}
+                    {{ form.email(class="form-control", readonly=True) }}
                 </div>
-                <div class="form-group col-md-6">
-                    {{ form.l_name.label(class="form-label") }}
-                    {{ form.l_name(class="form-control") }}
-                </div>
-            </div>
 
-            <div class="form-group">
-                {{ form.phone.label(class="form-label") }}
-                {{ form.phone(class="form-control") }}
-            </div>
-            <button type="submit" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 mt-1">Update Details</button>
-        </form>
+                <div class="form-group">
+                    {{ form.department.label(class="form-label") }}
+                    {{ form.department(class="form-control", readonly=True) }}
+                </div>
+
+                <!-- Name Fields (First Name and Last Name) -->
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.f_name.label(class="form-label") }}
+                        {{ form.f_name(class="form-control") }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.l_name.label(class="form-label") }}
+                        {{ form.l_name(class="form-control") }}
+                    </div>
+                </div>
+                <!-- Phone Number Field -->
+                <!-- Phone Number with Country Code Dropdown -->
+                <div class="form-group">
+                    {{ form.phone.label(class="form-label") }}
+                    {{ form.phone(id='phone', class="form-control", type="hidden") }}
+                    <input type="tel" id="phone_input" class="form-control" />
+                    {% for error in form.phone.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                </div>
+
+                <br>
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-lg btn-outline-primary d-flex align-items-center mt-2
+                        shadow-sm hover-shadow-lg transition-all duration-300 px-4 py-2 rounded-3">
+                    <i class="fas fa-save fa-lg"></i>
+                    <span class="ml-2" style="font-weight: bold;">Update Details</span>
+                </button>
+
+            </form>
+        </div>
     </div>
 </div>
-
+<!-- phone number with country code selected -->
 <script>
-    // Preview selected image
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.querySelector("#phone_input");
+        const hiddenInput = document.querySelector("#phone");
+
+        const iti = window.intlTelInput(input, {
+            separateDialCode: true,
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/js/utils.js"
+        });
+
+        // Populate the visible input if there's already a value
+        if (hiddenInput.value) {
+            iti.setNumber(hiddenInput.value);
+        }
+
+        // On form submit, update hidden field before sending
+        const form = input.closest("form");
+        form.addEventListener("submit", function () {
+            const fullNumber = iti.getNumber(); // Gets full international format
+            hiddenInput.value = fullNumber;
+        });
+    });
+</script>
+
+<!-- Preview the profile picture when selected -->
+<script>
     const input = document.getElementById('profileImage');
     const preview = document.getElementById('profile-preview');
 
@@ -100,4 +160,5 @@
         }
     });
 </script>
+
 {% endblock %}

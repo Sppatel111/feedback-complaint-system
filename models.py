@@ -26,6 +26,7 @@ class User(UserMixin, db.Model):
     feedbacks = relationship("FeedbackTicket", back_populates="user", cascade="all, delete")
     responses = relationship("FeedbackResponse", back_populates="user", cascade="all, delete")
     tasks = relationship("Task", back_populates="assigned_user", cascade="all, delete")
+    complaints = relationship("Complaint", back_populates="user",cascade="all, delete")
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -103,3 +104,28 @@ class Task(db.Model):
     def __repr__(self):
         return f'<Task {self.task_id} - {self.task_status}>'
 
+# Complaint Model
+class Complaint(db.Model):
+    __tablename__ = 'complaints'
+
+    complaint_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_email: Mapped[str] = mapped_column(String, ForeignKey('user_auth.email', ondelete="CASCADE"), nullable=False)
+    title: Mapped[str] = mapped_column(String(100), nullable=False)
+    department: Mapped[str] = mapped_column(String(50), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    attachment: Mapped[str] = mapped_column(String(255), nullable=True)
+    status: Mapped[str] = mapped_column(
+        String(20),
+        CheckConstraint("status IN ('Submitted', 'In Progress', 'Closed')"),
+        default='Submitted',
+        nullable=False
+    )
+    admin_response: Mapped[str] = mapped_column(Text, nullable=True)
+    # notification: Mapped[str] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=datetime.now())
+
+    user = relationship("User", back_populates="complaints")
+
+    def __repr__(self):
+        return f"<Complaint {self.complaint_id} - {self.status}>"

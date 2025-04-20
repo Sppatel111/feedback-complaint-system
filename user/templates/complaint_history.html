@@ -1,0 +1,120 @@
+{% extends 'user_base.html' %}
+{% set active_tab = 'complaint' %}
+{% block title %}Complaint History{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-4 text-center font-weight-bold">Complaint History</h3>
+
+    <!-- Complaint Summary Boxes -->
+    <div class="row text-center mb-4">
+        <div class="col-md-3">
+            <div class="p-3 border rounded shadow-sm bg-white">
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="bg-info text-white rounded p-3 mr-2">
+                        <i class="fas fa-file-alt fa-lg"></i>
+                    </div>
+                    <div>
+                        <strong>Total Complaints</strong><br>
+                        <span class="h5">{{ complaints|length }}</span>
+                    </div>
+                </div>
+                <a href="#submitted" class="text-primary" data-toggle="tab">View Details</a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 border rounded shadow-sm bg-white">
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="bg-warning text-white rounded p-3 mr-2">
+                        <i class="fas fa-exclamation-circle fa-lg"></i>
+                    </div>
+                    <div>
+                        <strong>Submitted</strong><br>
+                        <span class="h5">{{ complaints | selectattr("status", "equalto", "Submitted") | list | length }}</span>
+                    </div>
+                </div>
+                <a href="#submitted" class="text-primary" data-toggle="tab">View Details</a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 border rounded shadow-sm bg-white">
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="bg-danger text-white rounded p-3 mr-2">
+                        <i class="fas fa-spinner fa-lg"></i>
+                    </div>
+                    <div>
+                        <strong>In Progress</strong><br>
+                        <span class="h5">{{ complaints | selectattr("status", "equalto", "In Progress") | list | length }}</span>
+                    </div>
+                </div>
+                <a href="#inprogress" class="text-primary" data-toggle="tab">View Details</a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 border rounded shadow-sm bg-white">
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                    <div class="bg-success text-white rounded p-3 mr-2">
+                        <i class="fas fa-check-circle fa-lg"></i>
+                    </div>
+                    <div>
+                        <strong>Closed</strong><br>
+                        <span class="h5">{{ complaints | selectattr("status", "equalto", "Closed") | list | length }}</span>
+                    </div>
+                </div>
+                <a href="#closed" class="text-primary" data-toggle="tab">View Details</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content p-4 shadow-sm bg-white" id="complaintTabsContent">
+        <!-- Submitted Complaints Tab -->
+        <div class="tab-pane fade show active" id="submitted" role="tabpanel">
+            {% set filtered = complaints | selectattr("status", "equalto", "Submitted") | list %}
+            {% if filtered %}
+                {% for complaint in filtered %}
+                    <div class="border-bottom py-2">
+                        <strong>{{ complaint.title }}</strong>
+                        <span class="badge badge-warning">{{ complaint.status }}</span><br>
+                        <small>{{ complaint.created_at.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No submitted complaints.</p>
+            {% endif %}
+        </div>
+
+        <!-- In Progress Complaints Tab -->
+        <div class="tab-pane fade" id="inprogress" role="tabpanel">
+            {% set filtered = complaints | selectattr("status", "equalto", "In Progress") | list %}
+            {% if filtered %}
+                {% for complaint in filtered %}
+                    <div class="border-bottom py-2">
+                        <strong>{{ complaint.title }}</strong>
+                        <span class="badge badge-danger">{{ complaint.status }}</span><br>
+                        <small>{{ complaint.created_at.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No in-progress complaints.</p>
+            {% endif %}
+        </div>
+
+        <!-- Closed Complaints Tab -->
+        <div class="tab-pane fade" id="closed" role="tabpanel">
+            {% set filtered = complaints | selectattr("status", "equalto", "Closed") | list %}
+            {% if filtered %}
+                {% for complaint in filtered %}
+                    <div class="border-bottom py-2">
+                        <strong>{{ complaint.title }}</strong>
+                        <span class="badge badge-success">{{ complaint.status }}</span><br>
+                        <small>{{ complaint.created_at.strftime('%Y-%m-%d') }}</small>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No closed complaints.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

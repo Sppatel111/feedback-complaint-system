@@ -1,13 +1,21 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from sqlalchemy import or_
-from .forms import LoginForm, UserDetailForm, ChangePasswordForm
-from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task
+from .forms import LoginForm, UserDetailForm, ChangePasswordForm, ComplaintForm
+from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task, Complaint
 from flask_login import login_user, current_user, logout_user, login_required
 import os
 import uuid
 
 UPLOAD_FOLDER = 'user/static/assets/profiles/'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ATTACHMENT_FOLDER='user/static/assets/attachments/'
+ALLOWED_EXTENSIONS = {
+    'profile':['png', 'jpg', 'jpeg', 'gif'],
+    'attachment':['pdf','jpg','jpeg']
+    }
+
+def allowed_file(filename,category):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS[category]
+
 
 # Flask Blueprint for user-related routes
 user = Blueprint("user", __name__, template_folder="templates", static_folder="static")
@@ -60,15 +68,12 @@ def u_dashboard():
 def u_settings():
     return render_template("settings.html", current_user=current_user)
 
-# User Details Route
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 @user.route('dashboard/settings/profile')
 @login_required
 def profile():
     return render_template('profile.html', user=current_user)
 
+# User Details Route
 @user.route('/dashboard/settings/user-details', methods=['GET', 'POST'])
 @login_required
 def u_details():
@@ -96,8 +101,8 @@ def u_details():
         # print(file)
 
         # using uuid
-        if file or allowed_file(file.filename):
-            if allowed_file(file.filename):
+        if file or allowed_file(file.filename,'profile'):
+            if allowed_file(file.filename,'profile'):
                 file_extension = file.filename.rsplit('.', 1)[1].lower()
                 unique_filename = f"{uuid.uuid4()}.{file_extension}"
                 file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
@@ -252,3 +257,54 @@ def update_task_status(task_id):
     db.session.commit()
     flash('Task status updated successfully!', 'success')
     return redirect(url_for('user.assigned_task'))
+
+# Complaint management system
+
+@user.route('dashboard/complaint-center', methods=['GET', 'POST'])
+@login_required
+def manage_complaint():
+    return render_template("complaint_management.html", current_user=current_user)
+
+@user.route('/dashboard/complaint-center/file-complaint', methods=['GET', 'POST'])
+@login_required
+def file_complaint():
+    form = ComplaintForm()
+    if form.validate_on_submit():
+        attachment_filename = None
+
+        if form.attachment.data:
+            file = form.attachment.data
+
+            if file.filename and allowed_file(file.filename, 'attachment'):
+                file_extension = file.filename.rsplit('.', 1)[1].lower()
+                unique_filename = f"{uuid.uuid4()}.{file_extension}"
+                os.makedirs(ATTACHMENT_FOLDER, exist_ok=True)
+                file_path = os.path.join(ATTACHMENT_FOLDER, unique_filename)
+                file.save(file_path)
+                attachment_filename = unique_filename  # Save just the filename
+            elif file.filename:
+                flash("Unsupported file type. Please upload a PDF or image (jpg, jpeg).", "danger")
+                return render_template("file_complaint.html", form=form)
+
+        complaint = Complaint(
+            user_email=current_user.email,
+            title=form.title.data,
+            department=form.department.data,
+            description=form.description.data,
+            attachment=attachment_filename,
+            status='Submitted',
+            notification='Your complaint has been submitted and is awaiting review.'
+        )
+        db.session.add(complaint)
+        db.session.commit()
+        flash('Complaint submitted successfully.', 'success')
+        return redirect(url_for('user.manage_complaint'))
+
+    return render_template("file_complaint.html", form=form)
+
+
+@user.route('dashboard/complaint-center/complaint-history', methods=['GET', 'POST'])
+@login_required
+def complaint_history():
+    return render_template("complaint_history.html")
+

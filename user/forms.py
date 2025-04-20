@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, EmailField, StringField, SubmitField, FileField
+from wtforms import PasswordField, EmailField, StringField, SubmitField, FileField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length, Regexp, EqualTo, ValidationError
 import phonenumbers
 
@@ -42,3 +42,16 @@ class ChangePasswordForm(FlaskForm):
     confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password',
                                                                                                  message="Passwords must match")])
     submit = SubmitField('Change Password')
+
+class ComplaintForm(FlaskForm):
+    title = StringField('Complaint Title', validators=[DataRequired(), Length(min=5, max=100)])
+    department = SelectField('Department', choices=[
+        ('hr', 'Human Resources'),
+        ('it', 'IT'),
+        ('finance', 'Finance'),
+        ('procurement', 'Procurement'),
+        ('tech','Tech'),
+        ('admin', 'Administration')
+    ])
+    description = TextAreaField('Description', validators=[DataRequired(), Length(min=10)])
+    attachment = FileField('Attach File (optional)')

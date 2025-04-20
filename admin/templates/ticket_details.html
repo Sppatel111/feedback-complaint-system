@@ -21,8 +21,8 @@
                         <div class="col-md-6 mb-3">
                             <p><strong>📌 Status:</strong>
                                 <span class="badge
-                                    {% if ticket.ticket_status == 'open' %} bg-success
-                                    {% elif ticket.ticket_status == 'in_progress' %} bg-warning text-dark
+                                    {% if ticket.ticket_status == 'open' %} bg-success text-white
+                                    {% elif ticket.ticket_status == 'in_progress' %} bg-warning text-white
                                     {% else %} bg-secondary {% endif %}">
                                     {{ ticket.ticket_status|capitalize }}
                                 </span>

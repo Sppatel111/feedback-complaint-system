@@ -1,0 +1,65 @@
+{% extends 'user_base.html' %}
+{% set active_tab = 'complaint' %}
+{% block title %}File a Complaint{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-white border-bottom">
+                    <h4 class="mb-0 text-dark">📢 File a Complaint</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+
+                        <!-- Title -->
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.title.label }}</label>
+                            {{ form.title(class="form-control", placeholder="Enter complaint title") }}
+                            {% for error in form.title.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Department -->
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.department.label }}</label>
+                            {{ form.department(class="form-control") }}
+                            {% for error in form.department.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.description.label }}</label>
+                            {{ form.description(class="form-control", rows="4", placeholder="Describe your complaint...") }}
+                            {% for error in form.description.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Attachment -->
+                        <div class="mb-4">
+                            <label class="form-label">{{ form.attachment.label }}</label>
+                            {{ form.attachment(class="form-control") }}
+                            {% for error in form.attachment.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-outline-danger px-4">
+                                <i class="fas fa-paper-plane me-1"></i> Submit Complaint
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

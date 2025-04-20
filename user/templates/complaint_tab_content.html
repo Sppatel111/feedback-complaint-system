@@ -1,0 +1,13 @@
+
+
+{% if complaints %}
+    {% for complaint in complaints %}
+        <div class="border-bottom py-2">
+            <strong>{{ complaint.subject }}</strong> — <em>{{ complaint.status }}</em><br>
+            <small>{{ complaint.date_created.strftime('%Y-%m-%d') }}</small>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No complaints in this category.</p>
+{% endif %}
+

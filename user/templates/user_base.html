@@ -5,87 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %} {% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('user.static', filename='css/flash.css') }}">
-
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/lux/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-<!--    <script src="{{ url_for('user.static', filename='js/scale-adjust.js') }}"></script>-->
 
 </head>
-<body >
+<body>
 
-    {% if show_navbar is not defined or show_navbar %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="{{ url_for('user.u_dashboard') }}">User Panel</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+{% if show_navbar is not defined or show_navbar %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="{{ url_for('user.u_dashboard') }}">User Panel</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-      <div class="collapse navbar-collapse" id="navbarColor02">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('user.manage_feedback') }}">Feedback</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Complaint</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('user.profile') }}">Settings</a>
+  <div class="collapse navbar-collapse" id="navbarColor02">
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('user.manage_feedback') }}">Feedback</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('user.manage_complaint') }}">Complaint</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('user.profile') }}">Settings</a>
+        </li>
+    </ul>
+    <div class="d-flex">
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item dropdown ms-auto">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{{ url_for('user.static', filename='assets/profiles/'+current_user.user_detail.profile_image)
+                    if current_user.user_detail.profile_image and current_user.user_detail.profile_image != 'assets/profiles/default-profile.jpg'
+                    else url_for('user.static', filename='assets/profiles/default-profile.jpg') }}"
+                         alt="Profile" class="rounded-circle" width="30" height="30">
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="{{ url_for('user.profile') }}">View Profile</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('user.u_settings') }}">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ url_for('user.logout') }}">Logout</a></li>
+                </ul>
             </li>
         </ul>
-        <div class="d-flex">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item dropdown ms-auto" >
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-<!--                            <img src="{{ url_for('user.static', filename='assets/default-profile.jpg') }}"-->
-<!--                                 alt="Profile" class="rounded-circle" width="30" height="30">-->
-                            <img src="{{ url_for('user.static', filename='assets/profiles/'+current_user.user_detail.profile_image)
-                            if current_user.user_detail.profile_image and current_user.user_detail.profile_image != 'assets/profiles/default-profile.jpg'
-                            else url_for('user.static', filename='assets/profiles/default-profile.jpg') }}"
-                                 alt="Profile" class="rounded-circle" width="30" height="30">
+    </div>
+  </div>
+</nav>
+{% endif %}
 
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{{ url_for('user.profile') }}">View Profile</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('user.u_settings') }}">Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ url_for('user.logout') }}">Logout</a></li>
-                        </ul>
-                </li>
-            </ul>
-        </div>
-      </div>
-    </nav>
-
-    {% endif %}
-
-
-
-        <div class="row">
-            {% if side_panel is not defined or side_panel %}
-            <div class="col-md-3 bg-light p-4" style="height:87.5vh">
-                <h4>User Dashboard</h4>
-
-                <div class="mb-4">
-                    <a href="{{ url_for('user.manage_feedback') }}" class="btn btn-primary w-100">Feedback Management</a>
-                </div>
-
-                <div class="mb-4">
-                    <a href="#" class="btn btn-primary w-100">Raise Complaint</a>
-                </div>
-
-
+<div class="container-fluid">
+    <div class="row">
+        {% if side_panel is not defined or side_panel %}
+        <!-- Sidebar -->
+       <!-- Sidebar -->
+        <div class="col-md-4 col-lg-3 bg-light p-4" style="border-radius: 12px; min-height: 90vh; overflow-y: auto;">
+            <div class="list-group list-group-flush">
+                <a href="{{ url_for('user.manage_feedback') }}" class="list-group-item list-group-item-action {% if active_tab == 'feedback' %}active{% endif %}">
+                    <i class="fas fa-comments mr-2"></i> Feedback Management
+                </a>
+                <a href="{{ url_for('user.manage_complaint') }}" class="list-group-item list-group-item-action {% if active_tab == 'complaint' %}active{% endif %}">
+                    <i class="fas fa-exclamation-circle mr-2"></i> Complaint Center
+                </a>
             </div>
-            {% endif %}
-
-
-                {% block content %}{% endblock %}
-
         </div>
+
+
+        {% endif %}
+
+        <!-- Main Content -->
+        <div class="col">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
 
 <script>
     setTimeout(() => {
@@ -97,7 +93,6 @@
         });
     }, 10000); // 10 seconds
 </script>
-
 
 </body>
 </html>

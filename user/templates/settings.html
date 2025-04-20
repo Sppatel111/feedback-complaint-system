@@ -8,9 +8,11 @@
 {% block title %}My Settings{% endblock %}
 
 {% block content %}
-<div class="d-flex w-100" style="min-height: 85vh;">
+<div class="d-flex w-100" style="min-height: 87vh;">
     <!-- Sidebar -->
-    <div class="bg-light p-4" style="width: 280px; border-radius: 12px;">
+    <div class="bg-light p-4" style="width: 270px; border-radius: 12px;">
+
+
         <div class="list-group list-group-flush">
             {% if current_user.role == 'employee' %}
                 <a href="{{ url_for('user.profile') }}" class="list-group-item list-group-item-action {% if active_tab == 'profile' %}active{% endif %}">
@@ -41,6 +43,7 @@
             {% endif %}
 
         </div>
+
     </div>
 
     <!-- Main Content -->

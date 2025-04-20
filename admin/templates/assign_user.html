@@ -29,7 +29,7 @@
                 <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">🎫 Ticket #{{ ticket.ticket_id }}</h5>
                     <span class="badge
-                        {% if ticket.ticket_status == 'open' %} bg-success
+                        {% if ticket.ticket_status == 'open' %} bg-success text-white
                         {% elif ticket.ticket_status == 'in_progress' %} bg-warning text-dark
                         {% else %} bg-secondary {% endif %}">
                         {{ ticket.ticket_status|capitalize }}

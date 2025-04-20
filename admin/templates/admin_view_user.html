@@ -23,9 +23,9 @@
                         <p><i class="fas fa-phone"></i> <strong>Phone:</strong> {{ user.user_detail.phone_number or '—' }}</p>
                         <p><i class="fas fa-lock"></i> <strong>Status:</strong>
                             {% if user.is_active %}
-                                <span class="badge bg-success">Active</span>
+                                <span class="badge bg-success text-white">Active</span>
                             {% else %}
-                                <span class="badge bg-secondary">Disabled</span>
+                                <span class="badge bg-secondary text-white">Disabled</span>
                             {% endif %}
                         </p>
                     </div>

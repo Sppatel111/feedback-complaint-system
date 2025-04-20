@@ -357,3 +357,112 @@ f_ticket.html
     </div>
 </div>
 {% endblock %}
+
+change_password.html
+{% extends "settings.html" %}
+{% set active_tab = 'password' %}
+
+{% block settings_content %}
+<!-- Flash Messages -->
+<div id="flash-wrapper">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash-toast {{ category }}">
+                <span class="icon">
+                    {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>
+                    {% elif category == 'danger' %}	<i class="fas fa-times-circle icon"></i>
+                    {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle icon"></i>
+                    {% elif category == 'info' %}<i class="fas fa-circle-info icon"></i>
+                    {% else %}🔔
+                    {% endif %}
+                </span>
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    {% endwith %}
+</div>
+<div class="container mt-5">
+<div class="card shadow border-0">
+    <div class="card-body">
+        <h4 class="card-title mb-4">Change Your Password</h4>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <!-- Current Password -->
+            <div class="form-group">
+                {{ form.current_password.label(class="form-label font-weight-bold") }}
+                <div class="input-group">
+                    {{ form.current_password(class="form-control", id="currentPassword") }}
+                    <div class="input-group-append">
+                        <span class="input-group-text toggle-password" data-target="currentPassword" style="cursor: pointer;">
+                            <i class="fa fa-eye-slash"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Password -->
+            <div class="form-group">
+                {{ form.new_password.label(class="form-label font-weight-bold") }}
+                <div class="input-group">
+                    {{ form.new_password(class="form-control", id="newPassword") }}
+                    <div class="input-group-append">
+                        <span class="input-group-text toggle-password" data-target="newPassword" style="cursor: pointer;">
+                            <i class="fa fa-eye-slash"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group mb-4">
+                {{ form.confirm_password.label(class="form-label font-weight-bold") }}
+                <div class="input-group">
+                    {{ form.confirm_password(class="form-control", id="confirmPassword") }}
+                    <div class="input-group-append">
+                        <span class="input-group-text toggle-password" data-target="confirmPassword" style="cursor: pointer;">
+                            <i class="fa fa-eye-slash"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-lg btn-outline-primary d-flex align-items-center mt-2
+                    shadow-sm px-4 py-2 rounded-3">
+                <i class="fas fa-key fa-lg"></i>
+                <span class="ml-2 font-weight-bold">Change Password</span>
+            </button>
+        </form>
+    </div>
+</div>
+</div>
+<!-- jQuery and Bootstrap Bundle -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+<!-- Add the Bootstrap Show Password plugin -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-show-password@1.2.1/dist/bootstrap-show-password.min.js"></script>
+
+<!-- Toggle Password Visibility Script -->
+<!--<script>-->
+<!--    document.querySelectorAll('.toggle-password').forEach(item => {-->
+<!--        item.addEventListener('click', function () {-->
+<!--            const inputId = this.getAttribute('data-target');-->
+<!--            const input = document.getElementById(inputId);-->
+<!--            const icon = this.querySelector('i');-->
+
+<!--            if (input.type === 'password') {-->
+<!--                input.type = 'text';-->
+<!--                icon.classList.remove('fa-eye-slash');-->
+<!--                icon.classList.add('fa-eye');-->
+<!--            } else {-->
+<!--                input.type = 'password';-->
+<!--                icon.classList.remove('fa-eye');-->
+<!--                icon.classList.add('fa-eye-slash');-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
+{% endblock %}
+

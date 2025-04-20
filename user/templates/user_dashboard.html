@@ -3,33 +3,39 @@
 {% block title %} User Dashboard {% endblock %}
 
 {% block content %}
+<!-- Main Content Area -->
+<div class="p-4" style="flex: 1;">
 
-    <div class="col-md-9 p-4">
-        <!-- Flash Messages -->
-        <div id="flash-wrapper">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% for category, message in messages %}
-                    <div class="flash-toast {{ category }}">
-                        <span class="icon">
-                            {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>
-                            {% elif category == 'danger' %}	<i class="fas fa-times-circle icon"></i>
-                            {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle icon"></i>
-                            {% elif category == 'info' %}<i class="fas fa-circle-info icon"></i>
-                            {% else %}🔔
-                            {% endif %}
-                        </span>
-                        <span>{{ message }}</span>
-                    </div>
-                {% endfor %}
-            {% endwith %}
-        </div>
-
-        <!-- Dashboard Image -->
-        <div class="text-center mt-4">
-            <img src="{{ url_for('user.static', filename='assets/complaints-management.png') }}"
-                 alt="Dashboard Image" class="img-fluid" style="max-width: 50%; height: auto; object-fit: cover;  ">
-        </div>
-
+    <!-- Flash Messages -->
+    <div id="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-toast {{ category }}">
+                    <span class="icon">
+                        {% if category == 'success' %}
+                            <i class="fas fa-check-circle icon"></i>
+                        {% elif category == 'danger' %}
+                            <i class="fas fa-times-circle icon"></i>
+                        {% elif category == 'warning' %}
+                            <i class="fas fa-exclamation-triangle icon"></i>
+                        {% elif category == 'info' %}
+                            <i class="fas fa-circle-info icon"></i>
+                        {% else %}
+                            🔔
+                        {% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endwith %}
     </div>
 
+    <!-- Dashboard Image -->
+    <div class="text-center mt-4">
+        <img src="{{ url_for('user.static', filename='assets/complaints-management.png') }}"
+             alt="Dashboard Image" class="img-fluid"
+             style="max-width: 50%; height: auto; object-fit: cover;">
+    </div>
+
+</div>
 {% endblock %}

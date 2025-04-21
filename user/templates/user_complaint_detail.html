@@ -1,0 +1,77 @@
+{% extends "user_base.html" %}
+{% block title %}Complaint #{{ complaint.complaint_id }} Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 text-dark">📢 Complaint #{{ complaint.complaint_id }}</h4>
+            <span class="badge
+                {% if complaint.status == 'Submitted' %} bg-info
+                {% elif complaint.status == 'In Progress' %} bg-warning
+                {% elif complaint.status == 'Closed' %} bg-success
+                {% else %} bg-secondary {% endif %}" style="color:#FFFFFF">
+                {{ complaint.status }}
+            </span>
+        </div>
+        <div class="card-body">
+            <!-- Complaint Info -->
+            <div class="mb-4">
+                <p class="mb-1"><strong>Title:</strong> {{ complaint.title }}</p>
+                <p class="mb-1"><strong>Department:</strong> {{ complaint.department }}</p>
+                <p class="mb-1"><strong>Created At:</strong> {{ complaint.created_at.strftime('%d %B %Y, %I:%M %p') }}</p>
+                <p class="mb-1"><strong>Last Updated:</strong>
+                    {% if complaint.updated_at %}
+                        {{ complaint.updated_at.strftime('%d %B %Y, %I:%M %p') }}
+                    {% else %}
+                        Not yet updated
+                    {% endif %}
+                </p>
+                {% if complaint.attachment %}
+                    <p class="mb-1">
+                        <strong>Attachment:</strong>
+                        <a href="{{ url_for('user.static', filename='assets/attachments/' ~ complaint.attachment) }}" target="_blank"><b>View Attachment</b></a>
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Complaint Description -->
+            <div class="mb-4">
+                <div class="bg-light rounded p-3 border">
+                    <strong class="text-primary">Complaint:</strong>
+                    <p class="mb-1">{{ complaint.description }}</p>
+                    <small class="text-muted">by {{ complaint.user_email if complaint.user_email else 'System' }}</small>
+                </div>
+            </div>
+
+            {% if complaint.admin_response %}
+                <div class="mt-4">
+                    <h5><strong>Admin Response:</strong></h5>
+                    <div class="bg-light p-3 border rounded">
+                        {{ complaint.admin_response }}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Previous Responses -->
+            <h5 class="text-muted mt-5 mb-3">💬 Previous Responses</h5>
+            <div class="mb-4" style="max-height: 400px; overflow-y: auto;">
+                {% if complaint.responses %}
+                    {% for res in complaint.responses %}
+                        <div class="mb-3 d-flex flex-column">
+                            <div class="bg-white border rounded p-3 shadow-sm">
+                                <p class="mb-1">{{ res.response }}</p>
+                                <div class="text-muted small">
+                                    by {{ res.user_email }} | {{ res.created_at.strftime('%d %b %Y, %I:%M %p') }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">No responses yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

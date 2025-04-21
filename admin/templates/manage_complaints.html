@@ -1,0 +1,81 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Complaint Center{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Flash Messages -->
+<!--    <div id="flash-wrapper">-->
+<!--        {% with messages = get_flashed_messages(with_categories=true) %}-->
+<!--            {% for category, message in messages %}-->
+<!--                <div class="flash-toast {{ category }}">-->
+<!--                    <span class="icon">-->
+<!--                        {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>-->
+<!--                        {% elif category == 'danger' %}<i class="fas fa-times-circle icon"></i>-->
+<!--                        {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle icon"></i>-->
+<!--                        {% elif category == 'info' %}<i class="fas fa-circle-info icon"></i>-->
+<!--                        {% else %}🔔-->
+<!--                        {% endif %}-->
+<!--                    </span>-->
+<!--                    <span>{{ message }}</span>-->
+<!--                </div>-->
+<!--            {% endfor %}-->
+<!--        {% endwith %}-->
+<!--    </div>-->
+
+    <!-- Page Header -->
+    <div class="text-center mb-5">
+        <h1 class="mb-3">📂 Complaint Center</h1>
+        <p class="lead text-muted">Manage, track, and respond to employee complaints for smoother operations.</p>
+    </div>
+
+    <!-- Complaint Summary Cards -->
+    <div class="row text-center">
+
+
+        <!-- New Complaints -->
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-lg p-4">
+                <div class="text-warning mb-3"><i class="fas fa-file-alt fa-3x"></i></div>
+                <h6 class="text-uppercase font-weight-bold">New Complaints</h6>
+                <h4 class="font-weight-bold">{{ status_data.submitted }}</h4>
+                <p class="text-muted small">Recently submitted and pending review.</p>
+                <a href="{{ url_for('admin.view_complaints', status='Submitted') }}" class="btn btn-warning btn-sm mt-2 text-white">View Details</a>
+            </div>
+        </div>
+
+        <!-- In Progress Complaints -->
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-lg p-4">
+                <div class="text-danger mb-3"><i class="fas fa-file-alt fa-3x"></i></div>
+                <h6 class="text-uppercase font-weight-bold">In Progress</h6>
+                <h4 class="font-weight-bold">{{ status_data.in_progress }}</h4>
+                <p class="text-muted small">Currently being addressed by the team.</p>
+                <a href="{{ url_for('admin.view_complaints', status='In Progress') }}" class="btn btn-danger btn-sm mt-2">View Details</a>
+            </div>
+        </div>
+
+        <!-- Closed Complaints -->
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-lg p-4">
+                <div class="text-success mb-3"><i class="fas fa-file-alt fa-3x"></i></div>
+                <h6 class="text-uppercase font-weight-bold">Closed Complaints</h6>
+                <h4 class="font-weight-bold">{{ status_data.closed }}</h4>
+                <p class="text-muted small">Complaints that have been resolved and closed.</p>
+                <a href="{{ url_for('admin.view_complaints', status='Closed') }}" class="btn btn-success btn-sm mt-2">View Details</a>
+            </div>
+        </div>
+
+        <!-- Total Complaints -->
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-lg p-4">
+                <div class="text-info mb-3"><i class="fas fa-file-alt fa-3x"></i></div>
+                <h6 class="text-uppercase font-weight-bold">Total Complaints</h6>
+                <h4 class="font-weight-bold">{{ status_data.total }}</h4>
+                <p class="text-muted small">Overall complaints received so far.</p>
+                <a href="{{ url_for('admin.view_complaints') }}" class="btn btn-info btn-sm mt-2">View Details</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

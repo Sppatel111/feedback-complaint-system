@@ -5,25 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b4d8c6ce-d23f-4c17-85a8-452d09522676" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/user/templates/complaint_history.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user/templates/complaint_management.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user/templates/complaint_tab_content.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user/templates/file_complaint.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/admin/templates/admin_complaints.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/admin/templates/admin_response_complaints.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/admin/templates/manage_complaints.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user/templates/user_complaint_detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/templates/admin_view_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_view_user.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/templates/assign_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/assign_user.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/templates/ticket_details.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/ticket_details.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/view_feedback.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/view_feedback.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/note.txt" beforeDir="false" afterPath="$PROJECT_DIR$/note.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/change_password.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/change_password.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/f_tickets.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/f_tickets.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/feedback_management.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/feedback_management.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/settings.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/settings.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/complaint_history.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/complaint_history.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/complaint_management.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/complaint_management.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/file_complaint.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/file_complaint.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/templates/tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/tasks.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/ticket_detail_response.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/ticket_detail_response.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/templates/user_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/user_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_dashboard.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -64,7 +62,7 @@
     &quot;Python.user.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Rebasing master&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/SNEHA1/feedback-complaint-system/user/static/assets&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   }
@@ -82,7 +80,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-d7ad00fb9fc3-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23726.102" />
+        <option value="bundled-python-sdk-50da183f06c8-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.13135.95" />
       </set>
     </attachedChunks>
   </component>

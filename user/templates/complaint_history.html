@@ -3,118 +3,154 @@
 {% block title %}Complaint History{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h3 class="mb-4 text-center font-weight-bold">Complaint History</h3>
+<div class="container mt-5">
+    <!-- Flash Messages -->
+    <div id="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-toast {{ category }}">
+                    <span class="icon">
+                        {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>
+                        {% elif category == 'danger' %}<i class="fas fa-times-circle icon"></i>
+                        {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle icon"></i>
+                        {% elif category == 'info' %}<i class="fas fa-circle-info icon"></i>
+                        {% else %}🔔
+                        {% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
 
-    <!-- Complaint Summary Boxes -->
+    <!-- Summary Cards -->
     <div class="row text-center mb-4">
+        <!-- Total Complaints -->
         <div class="col-md-3">
-            <div class="p-3 border rounded shadow-sm bg-white">
+            <div class="p-3 border rounded shadow-lg bg-white">
                 <div class="d-flex align-items-center justify-content-center mb-2">
                     <div class="bg-info text-white rounded p-3 mr-2">
                         <i class="fas fa-file-alt fa-lg"></i>
                     </div>
                     <div>
                         <strong>Total Complaints</strong><br>
-                        <span class="h5">{{ complaints|length }}</span>
+                        <span class="h5">{{ complaints | length }}</span>
                     </div>
                 </div>
-                <a href="#submitted" class="text-primary" data-toggle="tab">View Details</a>
+<!--                <a href="#all" class="text-primary" data-toggle="tab">View Details</a>-->
             </div>
         </div>
+
+        <!-- Status Cards -->
+        {% for status, color, icon in status_data %}
         <div class="col-md-3">
-            <div class="p-3 border rounded shadow-sm bg-white">
+            <div class="p-3 border rounded shadow-lg bg-white">
                 <div class="d-flex align-items-center justify-content-center mb-2">
-                    <div class="bg-warning text-white rounded p-3 mr-2">
-                        <i class="fas fa-exclamation-circle fa-lg"></i>
+                    <div class="bg-{{ color }} text-white rounded p-3 mr-2">
+                        <i class="{{ icon }} fa-lg"></i>
                     </div>
                     <div>
-                        <strong>Submitted</strong><br>
-                        <span class="h5">{{ complaints | selectattr("status", "equalto", "Submitted") | list | length }}</span>
+                        <strong>{{ status }}</strong><br>
+                        <span class="h5">
+                            {{ complaints | selectattr("status", "equalto", status) | list | length }}
+                        </span>
                     </div>
                 </div>
-                <a href="#submitted" class="text-primary" data-toggle="tab">View Details</a>
+<!--                <a href="#{{ status|lower|replace(' ', '') }}" class="text-primary" data-toggle="tab">View Details</a>-->
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="p-3 border rounded shadow-sm bg-white">
-                <div class="d-flex align-items-center justify-content-center mb-2">
-                    <div class="bg-danger text-white rounded p-3 mr-2">
-                        <i class="fas fa-spinner fa-lg"></i>
-                    </div>
-                    <div>
-                        <strong>In Progress</strong><br>
-                        <span class="h5">{{ complaints | selectattr("status", "equalto", "In Progress") | list | length }}</span>
-                    </div>
-                </div>
-                <a href="#inprogress" class="text-primary" data-toggle="tab">View Details</a>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="p-3 border rounded shadow-sm bg-white">
-                <div class="d-flex align-items-center justify-content-center mb-2">
-                    <div class="bg-success text-white rounded p-3 mr-2">
-                        <i class="fas fa-check-circle fa-lg"></i>
-                    </div>
-                    <div>
-                        <strong>Closed</strong><br>
-                        <span class="h5">{{ complaints | selectattr("status", "equalto", "Closed") | list | length }}</span>
-                    </div>
-                </div>
-                <a href="#closed" class="text-primary" data-toggle="tab">View Details</a>
-            </div>
-        </div>
+        {% endfor %}
     </div>
+
+    <!-- Tabs -->
+<!--    <ul class="nav nav-tabs mb-3" id="complaintTabs" role="tablist">-->
+<!--        {% for status, _ in tab_data %}-->
+<!--        <li class="nav-item">-->
+<!--            <a class="nav-link {% if loop.first %}active{% endif %}" id="{{ status|lower|replace(' ', '') }}-tab"-->
+<!--               data-toggle="tab" href="#{{ status|lower|replace(' ', '') }}" role="tab">-->
+<!--                {{ status }}-->
+<!--            </a>-->
+<!--        </li>-->
+<!--        {% endfor %}-->
+<!--    </ul>-->
+    <!-- Styled Tabs -->
+<ul class="nav nav-tabs mb-4 shadow-sm rounded bg-light px-3 py-2" id="complaintTabs" role="tablist" style="font-weight: 500;">
+    {% for status, _ in tab_data %}
+    <li class="nav-item">
+        <a class="nav-link {% if loop.first %}active{% endif %}"
+           id="{{ status|lower|replace(' ', '') }}-tab"
+           data-toggle="tab"
+           href="#{{ status|lower|replace(' ', '') }}"
+           role="tab"
+           style="margin-right: 5px; border-radius: 8px;">
+            <i class="fas fa-folder-open mr-1 d-none d-md-inline"></i> {{ status }}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+
 
     <!-- Tab Content -->
-    <div class="tab-content p-4 shadow-sm bg-white" id="complaintTabsContent">
-        <!-- Submitted Complaints Tab -->
-        <div class="tab-pane fade show active" id="submitted" role="tabpanel">
-            {% set filtered = complaints | selectattr("status", "equalto", "Submitted") | list %}
-            {% if filtered %}
-                {% for complaint in filtered %}
-                    <div class="border-bottom py-2">
-                        <strong>{{ complaint.title }}</strong>
-                        <span class="badge badge-warning">{{ complaint.status }}</span><br>
-                        <small>{{ complaint.created_at.strftime('%Y-%m-%d') }}</small>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No submitted complaints.</p>
-            {% endif %}
+    <div class="tab-content" id="complaintTabsContent">
+        {% for status, items in tab_data %}
+        <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="{{ status|lower|replace(' ', '') }}" role="tabpanel">
+            <div class="border rounded shadow-lg bg-white p-4">
+                {% if items %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle mb-0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Department</th>
+                                <th>Created At</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for complaint in items %}
+                            <tr>
+                                <td>{{ complaint.complaint_id }}</td>
+                                <td>{{ complaint.title }}</td>
+                                <td>{{ complaint.department }}</td>
+                                <td>{{ complaint.created_at.strftime('%d %B %Y, %I:%M %p') }}</td>
+                                <td>
+                                    <span class="badge text-white px-3 py-2"
+                                          style="background-color:
+                                            {% if complaint.status == 'Submitted' %}#17a2b8; color: #212529
+                                            {% elif complaint.status == 'In Progress' %}#ffc107
+                                            {% elif complaint.status == 'Closed' %}#28a745
+                                            {% else %}#6c757d
+                                            {% endif %}; border-radius: 5px;">
+                                        {{ complaint.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('user.view_complaint', complaint_id=complaint.complaint_id) }}"
+                                       class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1">
+                                        <i class="fas fa-eye"></i>
+                                        <span class="d-none d-md-inline">View</span>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">No complaints in this category.</div>
+                {% endif %}
+            </div>
         </div>
-
-        <!-- In Progress Complaints Tab -->
-        <div class="tab-pane fade" id="inprogress" role="tabpanel">
-            {% set filtered = complaints | selectattr("status", "equalto", "In Progress") | list %}
-            {% if filtered %}
-                {% for complaint in filtered %}
-                    <div class="border-bottom py-2">
-                        <strong>{{ complaint.title }}</strong>
-                        <span class="badge badge-danger">{{ complaint.status }}</span><br>
-                        <small>{{ complaint.created_at.strftime('%Y-%m-%d') }}</small>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No in-progress complaints.</p>
-            {% endif %}
-        </div>
-
-        <!-- Closed Complaints Tab -->
-        <div class="tab-pane fade" id="closed" role="tabpanel">
-            {% set filtered = complaints | selectattr("status", "equalto", "Closed") | list %}
-            {% if filtered %}
-                {% for complaint in filtered %}
-                    <div class="border-bottom py-2">
-                        <strong>{{ complaint.title }}</strong>
-                        <span class="badge badge-success">{{ complaint.status }}</span><br>
-                        <small>{{ complaint.created_at.strftime('%Y-%m-%d') }}</small>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No closed complaints.</p>
-            {% endif %}
-        </div>
+        {% endfor %}
     </div>
 </div>
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- FontAwesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 {% endblock %}

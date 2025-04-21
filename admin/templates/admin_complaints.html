@@ -1,0 +1,131 @@
+{% extends "admin_base.html" %}
+{% block title %}Manage Complaints{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Flash Messages -->
+    <div id="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-toast {{ category }}">
+                    <span class="icon">
+                        {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>
+                        {% elif category == 'danger' %}<i class="fas fa-times-circle icon"></i>
+                        {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle icon"></i>
+                        {% elif category == 'info' %}<i class="fas fa-circle-info icon"></i>
+                        {% else %}🔔
+                        {% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+    <div class="card shadow-lg border-0">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white">
+            <h4 class="mb-0 text-dark">📢 Complaints</h4>
+            <form class="form-inline" method="get" action="{{ url_for('admin.view_complaints') }}">
+                <label class="mr-2 text-dark">Department:</label>
+                <select name="department" class="form-control form-control-sm mr-3" onchange="this.form.submit()">
+                    <option value="">All</option>
+                    {% for dept in departments %}
+                        <option value="{{ dept }}" {% if selected_department == dept %}selected{% endif %}>{{ dept }}</option>
+                    {% endfor %}
+                </select>
+
+                <label class="mr-2 text-dark">Status:</label>
+                <select name="status" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <option value="">All</option>
+                    <option value="Submitted" {% if selected_status == 'Submitted' %}selected{% endif %}>Submitted</option>
+                    <option value="In Progress" {% if selected_status == 'In progress' %}selected{% endif %}>In Progress</option>
+                    <option value="Closed" {% if selected_status == 'Closed' %}selected{% endif %}>Closed</option>
+                </select>
+            </form>
+        </div>
+
+        <div class="card-body">
+            {% if complaints %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Department</th>
+                                <th>Created At</th>
+                                <th>Updated At</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in complaints %}
+                                <tr>
+                                    <td>{{ c.complaint_id }}</td>
+                                    <td>{{ c.title }}</td>
+                                    <td>{{ c.department }}</td>
+                                    <td>{{ c.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
+                                    <td>
+                                        {% if c.updated_at %}
+                                            {{ c.updated_at.strftime('%d %B %Y, %I:%M %p') }}
+                                        {% else %}
+                                            Not yet updated
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="dropdown d-inline">
+                                            <button class="btn btn-sm text-white dropdown-toggle"
+                                                    type="button"
+                                                    id="dropdownStatus{{ loop.index }}"
+                                                    data-toggle="dropdown"
+                                                    aria-haspopup="true"
+                                                    aria-expanded="false"
+                                                    style="background-color: {{ status_colors[c.status] }};">
+                                                {{ c.status.replace('_', ' ').title() }}
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownStatus{{ loop.index }}">
+                                                <form action="{{ url_for('admin.update_complaint_status', complaint_id=c.complaint_id) }}" method="POST" class="px-3 py-2">
+                                                    <select name="status" class="form-control form-control-sm mb-2" onchange="this.form.submit()">
+                                                        <option value="Submitted" {% if c.status =='Submitted' %}selected{% endif %}>Submitted</option>
+                                                        <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                                        <option value="Closed" {% if c.status == 'Closed' %}selected{% endif %}>Closed</option>
+                                                    </select>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </td>
+<!--                                    <td>-->
+<!--                                        <form action="{{ url_for('admin.update_complaint_status', complaint_id=c.complaint_id) }}" method="POST">-->
+<!--                                            <select name="status" class="form-control form-control-sm" onchange="this.form.submit()">-->
+<!--                                                <option value="Submitted" {% if c.status =='Submitted' %}selected{% endif %}>Submitted</option>-->
+<!--                                                <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>-->
+<!--                                                <option value="Closed" {% if c.status == 'Closed' %}selected{% endif %}>Closed</option>-->
+<!--                                            </select>-->
+<!--                                        </form>-->
+<!--                                    </td>-->
+                                    <td>
+                                        <a href="{{ url_for('admin.complaint_detail', complaint_id=c.complaint_id) }}"
+                                            class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1">
+                                           <i class="fas fa-reply"></i> Respond
+                                        </a>
+
+                                        <a href="{{ url_for('admin.view_user', email=c.user_email) }}"
+                                           class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 mt-1">
+                                           <i class="fas fa-user"></i> View User
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">No complaints found.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- Bootstrap & jQuery (if not already included) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

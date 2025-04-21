@@ -59,6 +59,7 @@
                                 <th scope="col">User Email</th>
                                 <th scope="col">Response</th>
                                 <th scope="col">Created At</th>
+                                <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,14 +67,22 @@
                                 <tr>
                                     <td>{{ response.response_id }}</td>
                                     <td>
-                                        <a href="{{ url_for('admin.view_ticket_details', ticket_id=response.ticket_id) }}"
-                                           class="text-decoration-none text-dark fw-semibold">
-                                           {{ response.ticket_id }}
-                                        </a>
+<!--                                        <a href="{{ url_for('admin.view_ticket_details', ticket_id=response.ticket_id) }}"-->
+<!--                                           class="text-decoration-none text-dark fw-semibold">-->
+<!--                                           {{ response.ticket_id }}-->
+<!--                                        </a>-->
+                                        {{ response.ticket_id }}
                                     </td>
                                     <td>{{ response.user_email }}</td>
                                     <td class="text-muted">{{ response.response }}</td>
                                     <td>{{ response.created_at.strftime('%b %d, %Y %I:%M %p') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('admin.view_ticket_details', ticket_id=response.ticket_id) }}"
+                                           class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1">
+                                            <i class="fas fa-eye"></i>
+                                            <span class="d-none d-md-inline">View</span>
+                                        </a>
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>

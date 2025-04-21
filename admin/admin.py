@@ -3,14 +3,24 @@ import psycopg2
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm, RaiseTicket
 from dotenv import load_dotenv
-from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task
+from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task,Complaint,ComplaintResponse
 from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.utils import secure_filename
 import os
 import uuid
+from sqlalchemy import func
 
-UPLOAD_FOLDER = 'user/static/assets/'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+# UPLOAD_FOLDER = 'user/static/assets/'
+# ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+UPLOAD_FOLDER = 'user/static/assets/profiles/'
+ATTACHMENT_FOLDER='user/static/assets/attachments/'
+ALLOWED_EXTENSIONS = {
+    'profile':['png', 'jpg', 'jpeg', 'gif'],
+    'attachment':['pdf','jpg','jpeg']
+    }
+
+def allowed_file(filename,category):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS[category]
 
 load_dotenv()
 admin = Blueprint("admin", __name__, template_folder="templates", static_folder="static")
@@ -133,8 +143,8 @@ def a_settings():
     return render_template("settings.html", current_user=current_user)
 
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+# def allowed_file(filename):
+#     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Admin detail Route
 @admin.route('/dashboard/settings/admindetails', methods=['GET', 'POST'])
@@ -162,8 +172,8 @@ def a_details():
         # print(file)
 
         # using uuid
-        if file or allowed_file(file.filename):
-            if allowed_file(file.filename):
+        if file or allowed_file(file.filename,'profile'):
+            if allowed_file(file.filename,'profile'):
                 file_extension = file.filename.rsplit('.', 1)[1].lower()
                 unique_filename = f"{uuid.uuid4()}.{file_extension}"
                 file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
@@ -396,3 +406,92 @@ def update_task_status_priority(task_id):
 
     db.session.commit()
     return redirect(request.referrer or url_for('admin.dashboard'))
+
+
+# compliant Routes
+@admin.route('/complaint-center', methods=['GET', 'POST'])
+@login_required
+def manage_complaint():
+    complaint_counts = db.session.query(
+        Complaint.status, func.count(Complaint.complaint_id)
+    ).group_by(Complaint.status).all()
+
+    #default counts
+    status_data = {
+        "total": 0,
+        "submitted": 0,
+        "in_progress": 0,
+        "closed": 0
+    }
+
+    for status, count in complaint_counts:
+        status_data["total"] += count
+        if status == 'Submitted':
+            status_data["submitted"] = count
+        elif status == 'In Progress':
+            status_data["in_progress"] = count
+        elif status == 'Closed':
+            status_data["closed"] = count
+
+    return render_template("manage_complaints.html", current_user=current_user, status_data=status_data)
+
+#View complaints Route
+@admin.route('/complaint-centre/compliants')
+def view_complaints():
+    department = request.args.get('department')
+    status = request.args.get('status')
+
+    query = Complaint.query
+
+    if department:
+        query = query.filter_by(department=department)
+    if status:
+        query = query.filter_by(status=status)
+
+    complaints = query.order_by(Complaint.created_at.desc()).all()
+    # departments = db.session.query(Complaint.department).distinct().all()
+    departments = [dept[0] for dept in db.session.query(Complaint.department.distinct()).all()]
+
+    statuses = ['Submitted', 'In Progress', 'Closed']
+    status_colors = {
+        'Submitted': '#17a2b8',
+        'Closed': '#28a745',
+        'In Progress': '#ffc107'
+    }
+    return render_template('admin_complaints.html', complaints=complaints, departments=departments, statuses=statuses, selected_department=department, selected_status=status,status_colors=status_colors)
+
+@admin.route('/complaint-centre/complaints/<int:complaint_id>/update_status', methods=['POST'])
+def update_complaint_status(complaint_id):
+    new_status = request.form.get('status')
+    complaint = Complaint.query.get_or_404(complaint_id)
+    complaint.status = new_status
+    complaint.updated_at = datetime.now()
+    db.session.commit()
+    flash('Complaint status updated.', 'success')
+    return redirect(url_for('admin.view_complaints'))
+
+@admin.route('/complaint-centre/complaints/<int:complaint_id>', methods=['GET', 'POST'])
+def complaint_detail(complaint_id):
+    complaint = Complaint.query.get_or_404(complaint_id)
+
+    if request.method == 'POST':
+        admin_response = request.form.get('admin_response')
+
+        complaint.admin_response = admin_response
+        complaint.status =request.form.get('status') or complaint.status
+        complaint.updated_at = datetime.now()
+
+
+        response_entry = ComplaintResponse(
+            complaint_id=complaint.complaint_id,
+            user_email=current_user.email,
+            response=admin_response,
+            created_at=datetime.now()
+        )
+        db.session.add(response_entry)
+
+        db.session.commit()
+        flash('Response added successfully.', 'success')
+        return redirect(url_for('admin.view_complaints', complaint_id=complaint_id))
+
+    return render_template('admin_response_complaints.html', complaint=complaint)

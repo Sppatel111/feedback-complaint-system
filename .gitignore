@@ -10,3 +10,4 @@ virtual1env
 
 migrations/
 /user/static/assets/profiles
+/user/static/assets/attachments

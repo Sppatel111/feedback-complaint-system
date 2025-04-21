@@ -53,16 +53,18 @@
                                 <th>Details</th>
                                 <th>Deadline</th>
                                 <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for task in tasks %}
                                 <tr>
                                     <td>
-                                        <a href="{{ url_for('user.ticket_detail_response', ticket_id=task.ticket_id) }}"
-                                           class="text-decoration-none text-primary font-weight-bold">
-                                            {{ task.ticket_id }}
-                                        </a>
+<!--                                        <a href="{{ url_for('user.ticket_detail_response', ticket_id=task.ticket_id) }}"-->
+<!--                                           class="text-decoration-none text-primary font-weight-bold">-->
+<!--                                            {{ task.ticket_id }}-->
+<!--                                        </a>-->
+                                        {{task.ticket_id }}
                                     </td>
                                     <td style="max-width: 400px;">{{ task.details }}</td>
                                     <td>{{ task.deadline if task.deadline else 'No deadline' }}</td>
@@ -98,6 +100,13 @@
                                                 </div>
                                             </div>
                                         {% endif %}
+                                    </td>
+                                     <td>
+                                        <a href="{{ url_for('user.ticket_detail_response', ticket_id=task.ticket_id) }}"
+                                           class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1">
+                                            <i class="fas fa-eye"></i>
+                                            <span class="d-none d-md-inline">View</span>
+                                        </a>
                                     </td>
                                 </tr>
                             {% endfor %}

@@ -258,6 +258,7 @@ def update_task_status(task_id):
     flash('Task status updated successfully!', 'success')
     return redirect(url_for('user.assigned_task'))
 
+
 # Complaint management system
 
 @user.route('dashboard/complaint-center', methods=['GET', 'POST'])
@@ -281,7 +282,8 @@ def file_complaint():
                 os.makedirs(ATTACHMENT_FOLDER, exist_ok=True)
                 file_path = os.path.join(ATTACHMENT_FOLDER, unique_filename)
                 file.save(file_path)
-                attachment_filename = unique_filename  # Save just the filename
+                attachment_filename = unique_filename
+
             elif file.filename:
                 flash("Unsupported file type. Please upload a PDF or image (jpg, jpeg).", "danger")
                 return render_template("file_complaint.html", form=form)
@@ -293,7 +295,7 @@ def file_complaint():
             description=form.description.data,
             attachment=attachment_filename,
             status='Submitted',
-            notification='Your complaint has been submitted and is awaiting review.'
+            # notification='Your complaint has been submitted and is awaiting review.'
         )
         db.session.add(complaint)
         db.session.commit()
@@ -303,8 +305,28 @@ def file_complaint():
     return render_template("file_complaint.html", form=form)
 
 
-@user.route('dashboard/complaint-center/complaint-history', methods=['GET', 'POST'])
+@user.route('/dashboard/complaint-center/complaint-history', methods=['GET'])
 @login_required
 def complaint_history():
-    return render_template("complaint_history.html")
+    user_email = current_user.email
+    complaints = Complaint.query.filter_by(user_email=user_email).order_by(Complaint.created_at.desc()).all()
 
+    statuses = ['Submitted', 'In Progress', 'Closed']
+    colors = ['warning', 'danger', 'success']
+    icons = ['fas fa-exclamation-circle', 'fas fa-spinner', 'fas fa-check-circle']
+    status_data = list(zip(statuses, colors, icons))
+
+    #Tab data includes 'All' + each status tab
+    tab_data = [('All', complaints)]
+    for status in statuses:
+        filtered = [c for c in complaints if c.status == status]
+        tab_data.append((status, filtered))
+
+    return render_template("complaint_history.html", complaints=complaints, tab_data=tab_data, status_data=status_data)
+
+
+@user.route('/dashboard/complaint-center/complaint/<int:complaint_id>', methods=['GET'])
+@login_required
+def view_complaint(complaint_id):
+    complaint = Complaint.query.filter_by(complaint_id=complaint_id, user_email=current_user.email).first_or_404()
+    return render_template("user_complaint_detail.html", complaint=complaint)

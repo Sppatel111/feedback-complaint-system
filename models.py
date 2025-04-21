@@ -3,6 +3,7 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship, DeclarativeBase
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from typing import List
 
 
 # create database
@@ -27,6 +28,7 @@ class User(UserMixin, db.Model):
     responses = relationship("FeedbackResponse", back_populates="user", cascade="all, delete")
     tasks = relationship("Task", back_populates="assigned_user", cascade="all, delete")
     complaints = relationship("Complaint", back_populates="user",cascade="all, delete")
+    # complaint_response=relationship("ComplaintResponse",back_populates="user",cascade="all, delete")
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -123,9 +125,26 @@ class Complaint(db.Model):
     admin_response: Mapped[str] = mapped_column(Text, nullable=True)
     # notification: Mapped[str] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=datetime.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, onupdate=datetime.now(), nullable=True)
 
+    responses: Mapped[List["ComplaintResponse"]] = relationship("ComplaintResponse", back_populates="complaint",
+                                                                cascade="all, delete-orphan")
     user = relationship("User", back_populates="complaints")
 
     def __repr__(self):
         return f"<Complaint {self.complaint_id} - {self.status}>"
+
+
+class ComplaintResponse(db.Model):
+    __tablename__ = 'complaint_responses'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    complaint_id: Mapped[int] = mapped_column(Integer, ForeignKey('complaints.complaint_id', ondelete="CASCADE"), nullable=False)
+    user_email: Mapped[str] = mapped_column(String, nullable=False)
+    response: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())
+
+    complaint = relationship("Complaint", back_populates="responses")
+
+    def __repr__(self):
+        return f"<Response #{self.id} by {self.user_email} on complaint {self.complaint_id}>"

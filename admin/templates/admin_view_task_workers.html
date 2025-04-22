@@ -4,6 +4,17 @@
 
 {% block content %}
 <div class="container mt-5">
+     <!-- Filter Bar: Date Range -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <input type="date" id="startDate" class="form-control shadow-sm">
+    </div>
+    <div class="col-md-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <input type="date" id="endDate" class="form-control shadow-sm">
+    </div>
+</div>
     <!-- Flash Messages -->
     <div id="flash-wrapper">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -57,10 +68,10 @@
                                     <td>{{ task.task_id }}</td>
                                     <td>{{ task.assigned_to_email }}</td>
 <!--                                    <td>{{ task.deadline.strftime('%Y-%m-%d') if task.deadline else 'No Deadline' }}</td>-->
-                                    <td>
+                                    <td data-date="{{ task.deadline.strftime('%Y-%m-%dT%H:%M:%S') }}">
                                         <div class="d-flex align-items-center justify-content-between">
                                             <span class="text-nowrap">
-                                                {{ task.deadline.strftime('%Y-%m-%d') if task.deadline else 'No Deadline' }}
+                                                {{ task.deadline.strftime('%d %b %Y, %I:%M %p') if task.deadline else 'No Deadline' }}
                                             </span>
 
                                             <!-- Pure Calendar Icon Trigger -->
@@ -155,4 +166,5 @@
 <!-- Optional if not already included -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
 {% endblock %}

@@ -20,7 +20,7 @@
             <div class="mb-4">
                 <p class="mb-1"><strong>Department:</strong> {{ ticket.department_name }}</p>
                 <p class="mb-1"><strong>Label:</strong> {{ ticket.ticket_label }}</p>
-                <p class="mb-1"><strong>Created At:</strong> {{ ticket.created_at }}</p>
+                <p class="mb-1"><strong>Created At:</strong> {{ ticket.created_at.strftime('%d %b %Y, %I:%M %p') }}</p>
             </div>
 
             <!-- Question (Initial Message) -->
@@ -41,7 +41,7 @@
                             <div class="bg-white border rounded p-3 shadow-sm">
                                 <p class="mb-1">{{ response.response }}</p>
                                 <div class="text-muted small">
-                                    by {{ response.user_email }} | {{ response.created_at }}
+                                    by {{ response.user_email }} | {{ response.created_at.strftime('%d %b %Y, %I:%M %p') }}
                                 </div>
                             </div>
                         </div>

@@ -108,6 +108,21 @@ def view_user(email):
     tasks = Task.query.filter_by(assigned_to_email=email).join(FeedbackTicket).order_by(Task.created_at.desc()).all()
     return render_template('admin_view_user.html', user=user, tasks=tasks)
 
+@admin.route('/manage-user/user/assign-user/<int:ticket_id>/<email>', methods=['GET', 'POST'])
+@login_required
+def manage_user_assign_detail(ticket_id,email):
+    ticket1 = FeedbackTicket.query.get(ticket_id)
+    user_tasks = Task.query.filter_by(ticket_id=ticket_id, assigned_to_email=email).all()
+
+    if not user_tasks:
+        flash('No tasks found for this user on this ticket.', 'warning')
+
+    if ticket1 is None:
+        flash('Ticket not found.', 'danger')
+        return redirect(url_for('admin.manage_user_assign_detail'))
+
+    return render_template("manage_user_assign_task_detail.html", ticket=ticket1,tasks=user_tasks)
+
 # Edit User Route
 @admin.route('/manage-user/edit-user/<email>', methods=['GET', 'POST'])
 @login_required
@@ -255,9 +270,10 @@ def view_feedback():
     if selected_department:
         feedback_responses = FeedbackResponse.query.join(FeedbackTicket).filter(
             FeedbackTicket.department_name == selected_department
-        ).all()
+        ).order_by(FeedbackResponse.created_at.desc()).all()
     else:
-        feedback_responses = FeedbackResponse.query.all()
+        query= FeedbackResponse.query
+        feedback_responses=query.order_by(FeedbackResponse.created_at.desc()).all()
 
     return render_template("view_feedback.html", feedback_responses=feedback_responses,
                            department_names=department_names, selected_department=selected_department)
@@ -274,11 +290,6 @@ def view_ticket_details(ticket_id):
         return redirect(url_for('admin.view_feedback'))
 
     return render_template("ticket_details.html", ticket=ticket)
-
-
-# @admin.route('manage-feedback/ticket/<int:ticket_id>/respond', methods=['GET','POST'])
-# def respond_to_ticket(ticket_id):
-#     return redirect(url_for('admin.view_ticket_details', ticket_id=ticket_id))
 
 
 # Assign task Route (assign user,view task users)

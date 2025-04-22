@@ -4,6 +4,8 @@ from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from typing import List
+from flask import current_app
+from itsdangerous import URLSafeTimedSerializer
 
 
 # create database
@@ -28,7 +30,20 @@ class User(UserMixin, db.Model):
     responses = relationship("FeedbackResponse", back_populates="user", cascade="all, delete")
     tasks = relationship("Task", back_populates="assigned_user", cascade="all, delete")
     complaints = relationship("Complaint", back_populates="user",cascade="all, delete")
-    # complaint_response=relationship("ComplaintResponse",back_populates="user",cascade="all, delete")
+
+    # Inside your User model (optional helper method)
+    def get_reset_token(self):
+        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        return s.dumps(self.email, salt='password-reset')
+
+    @staticmethod
+    def verify_reset_token(token, expires_sec=3600):
+        s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        try:
+            email = s.loads(token, salt='password-reset', max_age=expires_sec)
+        except Exception:
+            return None
+        return User.query.get(email)
 
     def __repr__(self):
         return f'<User {self.email}>'

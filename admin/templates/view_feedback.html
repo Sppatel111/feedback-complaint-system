@@ -4,6 +4,17 @@
 
 {% block content %}
 <div class="container mt-5">
+     <!-- Filter Bar: Date Range -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <input type="date" id="startDate" class="form-control shadow-sm">
+    </div>
+    <div class="col-md-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <input type="date" id="endDate" class="form-control shadow-sm">
+    </div>
+</div>
     <!-- Flash Messages -->
     <div id="flash-wrapper">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -67,15 +78,11 @@
                                 <tr>
                                     <td>{{ response.response_id }}</td>
                                     <td>
-<!--                                        <a href="{{ url_for('admin.view_ticket_details', ticket_id=response.ticket_id) }}"-->
-<!--                                           class="text-decoration-none text-dark fw-semibold">-->
-<!--                                           {{ response.ticket_id }}-->
-<!--                                        </a>-->
                                         {{ response.ticket_id }}
                                     </td>
                                     <td>{{ response.user_email }}</td>
                                     <td class="text-muted">{{ response.response }}</td>
-                                    <td>{{ response.created_at.strftime('%b %d, %Y %I:%M %p') }}</td>
+                                    <td data-date="{{ response.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}">{{ response.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
                                     <td>
                                         <a href="{{ url_for('admin.view_ticket_details', ticket_id=response.ticket_id) }}"
                                            class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1">
@@ -96,4 +103,5 @@
         </div>
     </div>
 </div>
+<script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
 {% endblock %}

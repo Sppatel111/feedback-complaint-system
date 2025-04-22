@@ -89,7 +89,17 @@
     {% endfor %}
 </ul>
 
-
+     <!-- Filter Bar: Date Range -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <input type="date" id="startDate" class="form-control shadow-sm">
+    </div>
+    <div class="col-md-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <input type="date" id="endDate" class="form-control shadow-sm">
+    </div>
+</div>
     <!-- Tab Content -->
     <div class="tab-content" id="complaintTabsContent">
         {% for status, items in tab_data %}
@@ -114,7 +124,7 @@
                                 <td>{{ complaint.complaint_id }}</td>
                                 <td>{{ complaint.title }}</td>
                                 <td>{{ complaint.department }}</td>
-                                <td>{{ complaint.created_at.strftime('%d %B %Y, %I:%M %p') }}</td>
+                                <td data-date="{{ complaint.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}">{{ complaint.created_at.strftime('%d %B %Y, %I:%M %p') }}</td>
                                 <td>
                                     <span class="badge text-white px-3 py-2"
                                           style="background-color:
@@ -153,4 +163,5 @@
 
 <!-- FontAwesome -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
 {% endblock %}

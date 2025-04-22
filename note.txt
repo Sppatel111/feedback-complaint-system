@@ -13,10 +13,12 @@ https://www.phpkb.com/kb/article/managing-user-accounts-97.html
 https://support.monday.com/hc/en-us/articles/360002426980-How-to-manage-users-on-your-account
 https://docs.wavemaker.com/learn/v10.15/teams/manage-users/
 
-{{ url_for('user.view_tickets') }}
-{{ url_for('user.assign_task') }}
-{{ url_for('user.a_settings') }}
+##
+image
+https://alisonstech.ae/wp-content/uploads/2022/09/complaints-management-food-beverage.png
 
+
+## two different login manager for admin and user
 # user_login_manager = LoginManager()
 # user_login_manager.init_app(app)
 # user_login_manager.login_view = "user.login"
@@ -41,164 +43,14 @@ https://docs.wavemaker.com/learn/v10.15/teams/manage-users/
 # admin_login_manager.session_cookie_name = 'admin_session'
 
 
-  # response_text = request.form.get('response')
-    # # if response_text:
-    # #     new_response = FeedbackResponse(
-    # #         ticket_id=ticket_id,
-    # #         user_email=current_user.email,
-    # #         response=response_text
-    # #     )
-    # #     db.session.add(new_response)
-    # #     db.session.commit()
-    # #     flash('Your response has been submitted!', 'success')
-    # # else:
-    # #     flash('Response cannot be empty.', 'danger')
-
-
-{% extends 'admin_base.html' %}
-
-{% block title %}Settings{% endblock %}
-
-{% block content %}
-<!-- Settings Content -->
-<div class="container mt-5">
-    <div class="text-center">
-        <h1 class="mb-3">⚙️ Admin Settings</h1>
-        <p class="lead">Manage your account settings and security.</p>
-    </div>
-
-    <div class="container my-5">
-       <hr>
-        <div class="row">
-            <div class="col-md-3">
-                <div class="list-group">
-                    <a href="{{ url_for('admin.a_details') }}" class="list-group-item list-group-item-action">Details</a>
-                    <a href="{{ url_for('admin.change_password') }}" class="list-group-item list-group-item-action">Change Password</a>
-                    <!-- Add more settings options here -->
-                </div>
-            </div>
-            <div class="col-md-9">
-                {% block settings_content %}{% endblock %}
-            </div>
-        </div>
-    </div>
-</div>
-
-{% endblock %}
-
-# @admin.route('/dashboard/managefeedback/assigntasks/<int:ticket_id>',methods=['GET','POST'])
-# def ticket_status(ticket_id):
-#     ticket = FeedbackTicket.query.get(ticket_id)
-#     if ticket is None:
-#         flash('Ticket not found.', 'danger')
-#     return render_template("",ticket=ticket)
-
-<div class="settings-content">
-             <img src="{{ url_for('user.static', filename='assets/setting_image.jpg') }}"
-                 alt="setting Image" class="img-fluid h-20 w-20" style="object-fit: cover; align:center;">
-            {% block settings_content %}
-
-            {% endblock %}
-        </div>
-
-https://alisonstech.ae/wp-content/uploads/2022/09/complaints-management-food-beverage.png
-
-
-@user.route('/dashboard/settings/userdetails', methods=['GET', 'POST'])
-def u_details():
-    form = UserDetailForm(obj=current_user.user_detail)
-    form.email.data = current_user.email
-    form.department.data = current_user.department
-
-    if form.validate_on_submit():
-        if not current_user.user_detail:
-            user_detail = Detail(email=current_user.email)
-            db.session.add(user_detail)
-        else:
-            user_detail = current_user.user_detail
-        # Update details
-        user_detail.firstname = form.f_name.data
-        user_detail.lastname = form.l_name.data
-        user_detail.phone_number = form.phone.data
-
-        db.session.commit()
-        flash("Details updated successfully!", "success")
-        return redirect(url_for("user.u_details"))
-
-    return render_template("user_details.html", form=form, current_user=current_user)
-
-def a_details():
-    form = UserDetailForm(obj=current_user.user_detail)
-
-    form.email.data = current_user.email
-    form.department.data = current_user.department
-
-    if form.validate_on_submit():
-        print("Form Submitted!")
-        print(f"First Name: {form.f_name.data}, Last Name: {form.l_name.data}, Phone: {form.phone.data}")
-        if not current_user.user_detail:
-            user_detail = Detail(email=current_user.email)
-            db.session.add(user_detail)
-        else:
-            user_detail = current_user.user_detail
-
-        print(f"Before update: {user_detail.firstname}, {user_detail.lastname}, {user_detail.phone_number}")
-
-        # Update details
-        user_detail.firstname = form.f_name.data
-        user_detail.lastname = form.l_name.data
-        user_detail.phone_number = form.phone.data
-
-        print(f"After update: {user_detail.firstname}, {user_detail.lastname}, {user_detail.phone_number}")
-
-        db.session.commit()
-        flash("Details updated successfully!", "success")
-        return redirect(url_for("admin.a_settings"))
-    else:
-        print("Else form not submitted")
-    return render_template("user_details.html", form=form, current_user=current_user)
-
-
-# priority: Mapped[str] = mapped_column(String, CheckConstraint("priority IN ('low', 'medium', 'high')"),
-                                       default='medium')
+###for constraint check
 
 SELECT conname, pg_get_constraintdef(oid) AS constraint_definition
 FROM pg_constraint
 WHERE conname = 'tasks_task_status_check';
 
-admin
-<!-- User Info Panel -->
-<div class="col-lg-4 mb-4">
-            <div class="card border-0 shadow-lg">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0 text-dark">👤 User Profile</h5>
-                </div>
-                <div class="card-body text-center">
-                    <img src="{{ url_for('user.static', filename='assets/profiles/' + (user.user_detail.profile_image or 'default-profile.jpg')) }}"
-                         class="rounded-circle border mb-3 shadow-sm" width="120" height="120">
-                    <h5 class="fw-bold">{{ user.user_detail.firstname }} {{ user.user_detail.lastname }}</h5>
-                    <p class="text-muted mb-1">{{ user.email }}</p>
-                    <hr>
-                    <div class="text-start">
-                        <p><strong>📌 Role:</strong> {{ user.role|capitalize }}</p>
-                        <p><strong>🏢 Department:</strong> {{ user.department or '—' }}</p>
-                        <p><strong>📞 Phone:</strong> {{ user.user_detail.phone_number or '—' }}</p>
-                        <p><strong>🔒 Status:</strong>
-                            {% if user.is_active %}
-                                <span class="badge bg-success">Active</span>
-                            {% else %}
-                                <span class="badge bg-secondary">Disabled</span>
-                            {% endif %}
-                        </p>
-                    </div>
-                    <a href="{{ url_for('admin.manage_users') }}" class="btn btn-outline-secondary w-100 mt-3">
-                        <i class="fas fa-arrow-left"></i> Back to Users
-                    </a>
-                </div>
-            </div>
-        </div>
 
-admin_login.html
+####admin_login.html
 {% extends 'admin_base.html' %}
 
 {% block title %} Admin Login {% endblock %}
@@ -252,7 +104,7 @@ admin_login.html
 
 {% endblock %}
 
-screen size change
+####screen size change
      <style>
         body {
         color: #626e78;
@@ -276,98 +128,226 @@ screen size change
     color: #343a40 !important;
 }
 
-f_ticket.html
-        <!--        flash -->
-<!--           <div class="container mt-3">-->
-<!--                {% with messages = get_flashed_messages(with_categories=true) %}-->
-<!--                    {% if messages %}-->
-<!--                        <div class="alert alert-dismissible alert-success">-->
-<!--                            <button type="button" class="close" data-dismiss="alert">&times;</button>-->
-<!--                            <a href="#" class="alert-link">-->
-<!--                                <ul class="flashes">-->
-<!--                                    {% for category, message in messages %}-->
-<!--                                        <li class="{{ category }}">{{ message }}</li>-->
-<!--                                    {% endfor %}-->
-<!--                                </ul>-->
-<!--                            </a>-->
-<!--                        </div>-->
-<!--                    {% endif %}-->
-<!--                {% endwith %}-->
-<!--            </div>-->
-{% extends "user_base.html" %}
 
-{% block title %}Feedback Tickets{% endblock %}
 
+<td data-date>{{ user.created_at.strftime('%d %b %Y, %I:%M %p') if user.created_at else 'N/A' }}</td>
+
+function parseCustomDate(dateStr) {
+    // Expects format: "10 Apr 2025, 04:43 PM"
+    const months = {
+        Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+        Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+    };
+
+    const match = dateStr.match(/(\d{1,2}) (\w{3}) (\d{4}), (\d{1,2}):(\d{2}) (AM|PM)/);
+    if (!match) {
+        console.warn("Date parse failed for:", dateStr);
+        return null;
+    }
+
+    let [_, day, month, year, hour, minute, meridian] = match;
+    hour = parseInt(hour);
+    minute = parseInt(minute);
+    if (meridian === "PM" && hour < 12) hour += 12;
+    if (meridian === "AM" && hour === 12) hour = 0;
+
+    return new Date(parseInt(year), months[month], parseInt(day), hour, minute);
+}
+
+function filterRows() {
+    const startDateInput = document.getElementById("startDate");
+    const endDateInput = document.getElementById("endDate");
+
+    const startDate = startDateInput.value ? new Date(startDateInput.value) : null;
+    const endDate = endDateInput.value ? new Date(endDateInput.value) : null;
+
+    const rows = document.querySelectorAll("table tbody tr");
+
+    rows.forEach(row => {
+        const cell = row.querySelector("td[data-date]");
+        if (!cell) return;
+
+        const rawDateText = cell.textContent.replace(/\s+/g, ' ').trim();
+        const cellDate = parseCustomDate(rawDateText);
+
+        if (!cellDate) {
+            row.style.display = "";
+            return;
+        }
+
+        console.log(`Checking: ${rawDateText} -> ${cellDate}, Range: ${startDate} - ${endDate}`);
+
+        if (
+            (!startDate || cellDate >= startDate) &&
+            (!endDate || cellDate <= endDate)
+        ) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
+
+//document.addEventListener("DOMContentLoaded", () => {
+//    const startDateInput = document.getElementById("startDate");
+//    const endDateInput = document.getElementById("endDate");
+//
+//    if (startDateInput && endDateInput) {
+//        startDateInput.addEventListener("change", filterRows);
+//        endDateInput.addEventListener("change", filterRows);
+//        filterRows(); // Initial run
+//    } else {
+//        console.error("Date filter inputs not found!");
+//    }
+//});
+document.addEventListener('DOMContentLoaded', function () {
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    const rows = document.querySelectorAll('#userTable tr');
+
+    function filterByDate() {
+        const start = startDate.value ? new Date(startDate.value) : null;
+        const end = endDate.value ? new Date(endDate.value) : null;
+
+        rows.forEach(row => {
+            const dateCell = row.querySelector('td[data-date]');
+            if (!dateCell) return;
+
+            const rowDateStr = dateCell.getAttribute('data-date');
+            const rowDate = new Date(rowDateStr);
+
+            let show = true;
+            if (start && rowDate < start) show = false;
+            if (end && rowDate > end) show = false;
+
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    startDate.addEventListener('change', filterByDate);
+    endDate.addEventListener('change', filterByDate);
+});
+{% extends "admin_base.html" %}
+{% block title %}Manage Users{% endblock %}
 {% block content %}
-<div class="container d-flex justify-content-center align-items-start py-5">
-    <div class="card shadow-lg border-0 rounded-4 px-4 py-4 w-100" style="max-width: 1300px;">
-        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 text-dark">📬 All Feedback Tickets</h5>
+
+<div class="container mt-5">
+ <!-- Filter Bar: Date Range -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <input type="date" id="startDate" class="form-control shadow-sm">
+    </div>
+    <div class="col-md-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <input type="date" id="endDate" class="form-control shadow-sm">
+    </div>
+</div>
+
+
+
+   <!-- Flash Messages -->
+    <div id="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-toast {{ category }}">
+                    <span class="icon">
+                        {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>
+                        {% elif category == 'danger' %}	<i class="fas fa-times-circle icon"></i>
+                        {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle icon"></i>
+                        {% elif category == 'info' %}<i class="fas fa-circle-info icon"></i>
+                        {% else %}🔔
+                        {% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-primary">Manage Users</h3>
+        <a href="{{ url_for('admin.add_user') }}" class="btn btn-outline-primary">
+            <i class="fas fa-user-plus"></i> Add User
+        </a>
+    </div>
+
+    <!-- Search Input -->
+    <div class="input-group mb-3 shadow-sm">
+        <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
+        <div class="input-group-append">
+            <span class="input-group-text"><i class="fas fa-search"></i></span>
         </div>
-        <div class="card-body">
-            {% if tickets %}
-                <div class="table-responsive">
-                    <table class="table text-center align-middle" style="font-size: 14px;">
-                        <thead style="background-color: #f9f9f9;">
-                            <tr class="text-uppercase fw-bold text-secondary small" style="letter-spacing: 0.05em;">
-                                <th class="border-0 py-3">Ticket ID</th>
-                                <th class="border-0 py-3">Department</th>
-                                <th class="border-0 py-3">Label</th>
-                                <th class="border-0 py-3 text-start">Question</th>
-                                <th class="border-0 py-3">Status</th>
-                                <th class="border-0 py-3">Created At</th>
-                                <th class="border-0 py-3">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for ticket in tickets %}
-                            <tr>
-                                <td>{{ ticket.ticket_id }}</td>
-                                <td>{{ ticket.department_name }}</td>
-                                <td>{{ ticket.ticket_label }}</td>
-                                <td class="text-start">{{ ticket.question }}</td>
-                                <td>
-                                    <span class="badge text-uppercase fw-semibold px-3 py-2"
-                                          style="border-radius: 5px;
-                                            {% if ticket.ticket_status == 'open' %}background-color: #17a2b8; color: white;
-                                            {% elif ticket.ticket_status == 'in_progress' %}background-color: #ffc107; color: black;
-                                            {% elif ticket.ticket_status == 'closed' %}background-color: #28a745; color: white;
-                                            {% else %}background-color: #6c757d; color: white;{% endif %}">
-                                        {{ ticket.ticket_status.replace('_', ' ') }}
-                                    </span>
-                                </td>
-                                <td>{{ ticket.created_at }}</td>
-                                <td>
-                                    <a href="{{ url_for('user.ticket_detail_response', ticket_id=ticket.ticket_id) }}"
-                                       class="btn btn-outline-dark btn-sm w-100">
-                                        <i class="fas fa-eye me-1"></i> View
-                                    </a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="alert alert-info text-center mb-0">
-                    No tickets available for your department.
-                </div>
-            {% endif %}
+    </div>
+
+    <!-- User Table -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table id="user_auth" class="table table-hover mb-0">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Profile</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTable">
+                {% for user in users %}
+                    <tr>
+                        <td>
+                            <img src="{{ url_for('user.static', filename='assets/profiles/' + (user.user_detail.profile_image or 'default-profile.jpg')) }}"
+                                 class="rounded-circle" width="40" height="40">
+                        </td>
+                        <td>{{ user.user_detail.firstname }} {{ user.user_detail.lastname }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="badge badge-info">{{ user.role|capitalize }}</span>
+                        </td>
+                        <td>{{ user.department or '—' }}</td>
+                        <td>
+                            {% if user.is_active %}
+                                <span class="badge badge-success">Active</span>
+                            {% else %}
+                                <span class="badge badge-secondary">Disabled</span>
+                            {% endif %}
+                        </td>
+                        <td data-date="{{ user.created_at.strftime('%d %b %Y, %I:%M %p') if user.created_at else '' }}">
+                            {{ user.created_at.strftime('%d %b %Y, %I:%M %p') if user.created_at else 'N/A' }}
+                        </td>
+                        <td class="text-center">
+                            <a href="{{ url_for('admin.view_user', email=user.email) }}" class="text-info me-2" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ url_for('admin.edit_user', email=user.email) }}" class="text-warning me-2" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{{ url_for('admin.toggle_user_status', email=user.email) }}" class="text-danger" title="{{ 'Disable' if user.is_active else 'Enable' }}">
+                                <i class="fas fa-user-slash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
+<!-- Optional: Add basic JS for search filter -->
+<script>
+    document.getElementById('userSearch').addEventListener('keyup', function () {
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#userTable tr');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+    });
+</script>
+<script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
+
 {% endblock %}
-
-# @user.route('dashboard/complaint-center/complaint-history', methods=['GET', 'POST'])
-# @login_required
-# def complaint_history():
-#     return render_template("complaint_history.html")
-
-# @user.route('dashboard/complaint-center/complaint-history', methods=['GET'])
-# @login_required
-# def complaint_history():
-#     complaints = Complaint.query.filter_by(user_email=current_user.email).order_by(Complaint.created_at.desc()).all()
-#     return render_template("complaint_history.html", complaints=complaints)
-
-
-

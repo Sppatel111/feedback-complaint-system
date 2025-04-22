@@ -40,10 +40,12 @@
             <li class="nav-item dropdown ms-auto">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                    data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if current_user.is_authenticated and current_user.user_detail %}
                     <img src="{{ url_for('user.static', filename='assets/profiles/'+current_user.user_detail.profile_image)
                     if current_user.user_detail.profile_image and current_user.user_detail.profile_image != 'assets/profiles/default-profile.jpg'
                     else url_for('user.static', filename='assets/profiles/default-profile.jpg') }}"
                          alt="Profile" class="rounded-circle" width="30" height="30">
+                    {% endif %}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="{{ url_for('user.profile') }}">View Profile</a></li>

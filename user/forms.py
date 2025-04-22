@@ -46,12 +46,32 @@ class ChangePasswordForm(FlaskForm):
 class ComplaintForm(FlaskForm):
     title = StringField('Complaint Title', validators=[DataRequired(), Length(min=5, max=100)])
     department = SelectField('Department', choices=[
-        ('hr', 'Human Resources'),
-        ('it', 'IT'),
-        ('finance', 'Finance'),
-        ('procurement', 'Procurement'),
-        ('tech','Tech'),
-        ('admin', 'Administration')
+        ('HR', 'Human Resources'),
+        ('IT', 'IT'),
+        ('Finance', 'Finance'),
+        ('Procurement', 'Procurement'),
+        ('Tech','Tech'),
+        ('Admin', 'Administration')
     ])
     description = TextAreaField('Description', validators=[DataRequired(), Length(min=10)])
     attachment = FileField('Attach File (optional)')
+
+
+# ('hr', 'Human Resources'),
+#         ('it', 'IT'),
+#         ('finance', 'Finance'),
+#         ('procurement', 'Procurement'),
+#         ('tech','Tech'),
+#         ('admin', 'Administration')
+
+
+# for forget password
+class RequestResetForm(FlaskForm):
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm New Password', validators=[
+        DataRequired(), EqualTo('password', message='Passwords must match')])
+    submit = SubmitField('Reset Password')

@@ -4,6 +4,17 @@
 
 {% block content %}
 <div class="container mt-5">
+     <!-- Filter Bar: Date Range -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <input type="date" id="startDate" class="form-control shadow-sm">
+    </div>
+    <div class="col-md-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <input type="date" id="endDate" class="form-control shadow-sm">
+    </div>
+</div>
     <!-- Flash Messages -->
     <div id="flash-wrapper">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -57,7 +68,7 @@
                                     <td>{{ task.department_name }}</td>
                                     <td>{{ task.ticket_label }}</td>
                                     <td>{{ task.question }}</td>
-                                    <td>{{ task.created_at }}</td>
+                                    <td data-date="{{ task.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}">{{ task.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
                                     <td>
                                         <div class="dropdown d-inline">
                                             <button class="btn btn-sm text-white dropdown-toggle"
@@ -109,4 +120,5 @@
 <!-- Bootstrap & jQuery (if not already included) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
 {% endblock %}

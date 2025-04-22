@@ -3,6 +3,20 @@
 {% block content %}
 
 <div class="container mt-5">
+ <!-- Filter Bar: Date Range -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <input type="date" id="startDate" class="form-control shadow-sm">
+    </div>
+    <div class="col-md-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <input type="date" id="endDate" class="form-control shadow-sm">
+    </div>
+</div>
+
+
+
    <!-- Flash Messages -->
     <div id="flash-wrapper">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -72,7 +86,11 @@
                                 <span class="badge badge-secondary">Disabled</span>
                             {% endif %}
                         </td>
-                        <td>{{ user.created_at.strftime('%d %b %Y') if user.created_at else 'N/A' }}</td>
+
+                        <td data-date="{{ user.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}">
+                            {{ user.created_at.strftime('%d %b %Y, %I:%M %p') if user.created_at else 'N/A' }}
+                        </td>
+
                         <td class="text-center">
                             <a href="{{ url_for('admin.view_user', email=user.email) }}" class="text-info me-2" title="View">
                                 <i class="fas fa-eye"></i>
@@ -103,5 +121,6 @@
         });
     });
 </script>
+<script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
 
 {% endblock %}

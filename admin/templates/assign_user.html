@@ -39,7 +39,7 @@
                     <div class="mb-3">
                         <p class="mb-1"><strong>Label:</strong> {{ ticket.ticket_label }}</p>
                         <p class="mb-1"><strong>Department:</strong> {{ ticket.department_name }}</p>
-                        <p class="mb-1"><strong>Created At:</strong> {{ ticket.created_at }}</p>
+                        <p class="mb-1"><strong>Created At:</strong> {{ ticket.created_at.strftime('%d %b %Y, %I:%M %p') }}</p>
                         <p class="mb-1"><strong>Question:</strong><br>{{ ticket.question }}</p>
                     </div>
                     <hr>
@@ -59,7 +59,7 @@
                                         <tr>
                                             <td>{{ response.user_email }}</td>
                                             <td>{{ response.response }}</td>
-                                            <td>{{ response.created_at }}</td>
+                                            <td>{{ response.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>

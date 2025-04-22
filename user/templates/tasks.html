@@ -5,6 +5,17 @@
 {% block content %}
 
 <div class="container mt-5">
+     <!-- Filter Bar: Date Range -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <label for="startDate" class="form-label">Start Date</label>
+            <input type="date" id="startDate" class="form-control shadow-sm">
+        </div>
+        <div class="col-md-3">
+            <label for="endDate" class="form-label">End Date</label>
+            <input type="date" id="endDate" class="form-control shadow-sm">
+        </div>
+    </div>
     <!-- Flash Messages -->
     <div id="flash-wrapper">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -67,7 +78,7 @@
                                         {{task.ticket_id }}
                                     </td>
                                     <td style="max-width: 400px;">{{ task.details }}</td>
-                                    <td>{{ task.deadline if task.deadline else 'No deadline' }}</td>
+                                    <td data-date="{{ task.deadline.strftime('%Y-%m-%dT%H:%M:%S') }}">{{ task.deadline.strftime('%d %b %Y, %I:%M %p') if task.deadline else 'No deadline' }}</td>
                                     <td>
                                         {% if task.ticket.ticket_status == 'closed' %}
                                             <span class="badge text-white px-3 py-2"
@@ -125,4 +136,5 @@
 <!-- jQuery & Bootstrap -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
 {% endblock %}

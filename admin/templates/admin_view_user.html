@@ -65,9 +65,10 @@
                                         <td>{{ task.task_id }}</td>
                                         <td>{{ task.ticket.department_name }}</td>
                                         <td>
-                                            <a href="{{ url_for('admin.assign_user', ticket_id=task.ticket.ticket_id) }}">
+                                            <a href="{{ url_for('admin.manage_user_assign_detail', ticket_id=task.ticket.ticket_id, email=user.email) }}">
                                                 {{ task.ticket.ticket_label }}
                                             </a>
+
                                         </td>
                                         <td>{{ task.deadline.strftime('%Y-%m-%d') }}</td>
                                         <td>

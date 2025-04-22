@@ -5,6 +5,17 @@
 {% block content %}
 
 <div class="container mt-5">
+     <!-- Filter Bar: Date Range -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <input type="date" id="startDate" class="form-control shadow-sm">
+    </div>
+    <div class="col-md-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <input type="date" id="endDate" class="form-control shadow-sm">
+    </div>
+</div>
     <!-- Flash Messages -->
     <div id="flash-wrapper">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -69,7 +80,7 @@
                                             {{ ticket.ticket_status.replace('_', ' ').title() }}
                                         </span>
                                     </td>
-                                    <td>{{ ticket.created_at }}</td>
+                                    <td data-date="{{ ticket.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}">{{ ticket.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
                                     <td>
                                         <a href="{{ url_for('user.ticket_detail_response', ticket_id=ticket.ticket_id) }}"
                                            class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1">
@@ -90,4 +101,5 @@
         </div>
     </div>
 </div>
+<script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
 {% endblock %}

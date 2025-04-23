@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %} {% endblock %}</title>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('user.static', filename='assets/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('user.static', filename='assets/favicon-16x16.png') }}">
+
+
     <link rel="stylesheet" href="{{ url_for('user.static', filename='css/flash.css') }}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/lux/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -18,7 +23,9 @@
 
 {% if show_navbar is not defined or show_navbar %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="{{ url_for('user.u_dashboard') }}">User Panel</a>
+  <a class="navbar-brand" href="{{ url_for('user.u_dashboard') }}">
+    <img src="/user/static/assets/querydesk_logo.png" alt="QueryDesk" style="height: 30px;" class="d-inline-block align-text-top">
+  </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>

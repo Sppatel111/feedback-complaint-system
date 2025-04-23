@@ -3,20 +3,6 @@
 {% block content %}
 
 <div class="container mt-5">
- <!-- Filter Bar: Date Range -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <label for="startDate" class="form-label">Start Date</label>
-        <input type="date" id="startDate" class="form-control shadow-sm">
-    </div>
-    <div class="col-md-3">
-        <label for="endDate" class="form-label">End Date</label>
-        <input type="date" id="endDate" class="form-control shadow-sm">
-    </div>
-</div>
-
-
-
    <!-- Flash Messages -->
     <div id="flash-wrapper">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -37,9 +23,18 @@
     </div>
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="text-primary">Manage Users</h3>
-        <a href="{{ url_for('admin.add_user') }}" class="btn btn-outline-primary">
-            <i class="fas fa-user-plus"></i> Add User
-        </a>
+        <div class="d-flex flex-wrap align-items-end gap-3 ">
+            <!-- Date Range Filter -->
+             <div>
+                <div class="custom-daterange-wrapper shadow-lg d-flex align-items-center p-2 rounded border bg-white" style="cursor: pointer; min-width: 230px; min-height:50px;">
+                    <i class="fas fa-calendar-alt text-dark mr-3"></i>
+                    <input type="text" id="dateRange" class="form-control border-0 p-0 bg-white" placeholder="Select date range" readonly>
+                </div>
+            </div>
+            <a href="{{ url_for('admin.add_user') }}" class="btn btn-outline-primary ml-3 ">
+                <i class="fas fa-user-plus"></i> Add User
+            </a>
+        </div>
     </div>
 
     <!-- Search Input -->
@@ -83,7 +78,7 @@
                             {% if user.is_active %}
                                 <span class="badge badge-success">Active</span>
                             {% else %}
-                                <span class="badge badge-secondary">Disabled</span>
+                                <span class="badge badge-warning">Disabled</span>
                             {% endif %}
                         </td>
 
@@ -121,6 +116,11 @@
         });
     });
 </script>
+<!-- Flatpickr Core (light compatible) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- (Optional) Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 <script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
 
 {% endblock %}

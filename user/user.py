@@ -7,21 +7,30 @@ import os
 import uuid
 # for forget password
 from utils import send_reset_email
+from collections import Counter
+import plotly.graph_objs as go
+import plotly.io as pio
 
+# PATHS
+#---------------------------------------------
 UPLOAD_FOLDER = 'user/static/assets/profiles/'
 ATTACHMENT_FOLDER='user/static/assets/attachments/'
 ALLOWED_EXTENSIONS = {
     'profile':['png', 'jpg', 'jpeg', 'gif'],
     'attachment':['pdf','jpg','jpeg']
     }
+#----------------------------------------------
 
+# USER DEFINED FUNCTIONS
+#----------------------------------------------
 def allowed_file(filename,category):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS[category]
+
+#----------------------------------------------
 
 
 # Flask Blueprint for user-related routes
 user = Blueprint("user", __name__, template_folder="templates", static_folder="static")
-
 
 # Login Route
 @user.route('/', methods=['GET', 'POST'])
@@ -55,6 +64,7 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('user.login'))
+
 
 
 # Dashboard Route
@@ -143,10 +153,42 @@ def change_password():
     return render_template("change_password.html", form=form, current_user=current_user)
 
 
-@user.route('dashboard/manage-feedback', methods=['GET', 'POST'])
+
+@user.route('/dashboard/manage-feedback', methods=['GET', 'POST'])
 @login_required
 def manage_feedback():
-    return render_template("feedback_management.html", current_user=current_user)
+    tickets = FeedbackTicket.query.all()
+    tasks = Task.query.all()
+
+    # --- Ticket Status Pie Chart ---
+    ticket_status_counts = Counter(ticket.ticket_status for ticket in tickets)
+    ticket_status_chart = go.Figure(data=[
+        go.Pie(labels=list(ticket_status_counts.keys()), values=list(ticket_status_counts.values()))
+    ])
+    ticket_status_html = pio.to_html(ticket_status_chart, full_html=False)
+
+    # --- Task Status Bar Chart (with 0 counts shown) ---
+    all_statuses = ['todo', 'in_progress', 'backlog', 'in_review', 'done', 'completed']
+    task_status_counts = Counter(task.task_status for task in tasks)
+    task_status_data = [task_status_counts.get(status, 0) for status in all_statuses]
+
+    task_status_chart = go.Figure(data=[
+        go.Bar(
+            x=['Todo', 'Progress', 'Backlog', 'Review', 'Done', 'Completed'],
+            y=task_status_data,
+            marker_color='lightblue'
+        )
+    ])
+
+    task_status_html = pio.to_html(task_status_chart, full_html=False)
+
+    return render_template(
+        "feedback_management.html",
+        current_user=current_user,
+        ticket_status_html=ticket_status_html,
+        task_status_html=task_status_html
+    )
+
 
 
 @user.route('dashboard/manage-feedback/view-tickets', methods=['GET', 'POST'])
@@ -263,10 +305,42 @@ def update_task_status(task_id):
 
 # Complaint management system
 
-@user.route('dashboard/complaint-center', methods=['GET', 'POST'])
+@user.route('/dashboard/complaint-center', methods=['GET', 'POST'])
 @login_required
 def manage_complaint():
-    return render_template("complaint_management.html", current_user=current_user)
+    complaints = Complaint.query.all()
+
+    # --- Complaint Status Pie Chart ---
+    complaint_status_counts = Counter(complaint.status for complaint in complaints)
+    complaint_status_chart = go.Figure(data=[
+        go.Pie(labels=list(complaint_status_counts.keys()), values=list(complaint_status_counts.values()))
+    ])
+    complaint_status_html = pio.to_html(complaint_status_chart, full_html=False)
+
+    # --- Complaint Department Bar Chart ---
+
+    all_departments = ['IT', 'Admin', 'HR', 'Finance', 'Procurement', 'Operations']
+    complaint_department_counts = Counter(complaint.department for complaint in complaints)
+    complaint_data = [complaint_department_counts.get(dept, 0) for dept in all_departments]
+
+    department_bar_chart = go.Figure(data=[
+        go.Bar(
+            x=all_departments,
+            y=complaint_data,
+            marker_color='lightblue'
+        )
+    ])
+
+    complaint_department_html = pio.to_html(department_bar_chart, full_html=False)
+
+
+    return render_template(
+        "complaint_management.html",
+        current_user=current_user,
+        complaint_status_html=complaint_status_html,
+        complaint_department_html=complaint_department_html
+    )
+
 
 @user.route('/dashboard/complaint-center/file-complaint', methods=['GET', 'POST'])
 @login_required

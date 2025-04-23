@@ -1,7 +1,7 @@
 from datetime import datetime
 import psycopg2
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm, RaiseTicket
+from .forms import LoginForm, AddUserForm, UserDetailForm, ChangePasswordForm, RaiseTicket, ResetPasswordForm, RequestResetForm
 from dotenv import load_dotenv
 from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task,Complaint,ComplaintResponse
 from flask_login import login_user, current_user, login_required, logout_user
@@ -9,6 +9,7 @@ from werkzeug.utils import secure_filename
 import os
 import uuid
 from sqlalchemy import func
+from utils import send_reset_email, send_assignment_email, send_welcome_email, send_account_status_email
 
 # UPLOAD_FOLDER = 'user/static/assets/'
 # ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -68,7 +69,7 @@ def a_dashboard():
 # Manage User Route (add user,view user,edit user,active mode )
 @admin.route('/manage-user', methods=['GET', 'POST'])
 def manage_users():
-    users = User.query.join(Detail).all()
+    users = User.query.join(Detail).order_by(User.created_at.desc()).all()
     return render_template("admin_manage_users.html", users=users)
 
 # Add user Route
@@ -93,6 +94,7 @@ def add_user():
             )
             db.session.add(new_detail)
             db.session.commit()
+            send_welcome_email(form.email.data)
 
             flash("User registered successfully!", "success")
             return redirect(url_for("admin.manage_users"))
@@ -147,6 +149,7 @@ def toggle_user_status(email):
     user = User.query.filter_by(email=email).first_or_404()
     user.is_active = not user.is_active
     db.session.commit()
+    send_account_status_email(user.email, user.is_active)
     flash(f"User {'enabled' if user.is_active else 'disabled'} successfully!", 'info')
     return redirect(url_for('admin.manage_users'))
 
@@ -254,7 +257,7 @@ def raise_tickets():
         db.session.add(new_ticket)
         db.session.commit()
         flash('Successfully created ticket!!', 'success')
-        return redirect(url_for('admin.manage_feedback'))
+        return redirect(url_for('admin.assign_tasks'))
 
     return render_template("raise_tickets.html", form=form, current_user=current_user)
 
@@ -298,9 +301,10 @@ def view_ticket_details(ticket_id):
 def assign_tasks():
     selected_status = request.args.get('status')
     if selected_status:
-        all_task = FeedbackTicket.query.filter_by(ticket_status=selected_status).all()
+        all_task = FeedbackTicket.query.filter_by(ticket_status=selected_status
+                                                  ).order_by(FeedbackTicket.created_at.desc()).all()
     else:
-        all_task = FeedbackTicket.query.all()
+        all_task = FeedbackTicket.query.order_by(FeedbackTicket.created_at.desc()).all()
 
     status_colors = {
         'open': '#17a2b8',
@@ -359,6 +363,8 @@ def assign_user(ticket_id):
             new_task = Task(ticket_id=ticket_id, assigned_to_email=assigned_email, details=details, deadline=deadline)
             db.session.add(new_task)
             db.session.commit()
+            # Send assignment email
+            send_assignment_email(assigned_email, ticket_id, details, deadline)
             flash('User assigned to the task successfully!', 'success')
             return redirect(url_for('admin.assign_tasks'))
 
@@ -506,3 +512,45 @@ def complaint_detail(complaint_id):
         return redirect(url_for('admin.view_complaints', complaint_id=complaint_id))
 
     return render_template('admin_response_complaints.html', complaint=complaint)
+
+
+## forget password
+@admin.route("/reset-password", methods=['GET', 'POST'])
+def reset_request():
+    if current_user.is_authenticated and current_user.user_detail:
+        print("yes")
+        return redirect(url_for('admin.a_dashboard'))
+
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        print(form.email.data)
+        admin = User.query.filter_by(email=form.email.data).first()
+        if admin:
+            print("no")
+            send_reset_email(admin)
+            flash('A password reset link has been sent to your email.', 'info')
+        else:
+            flash('No account found with that email.', 'warning')
+        return redirect(url_for('admin.login'))
+
+    return render_template('reset_request.html', form=form)
+
+
+@admin.route("/reset-password/<token>", methods=['GET', 'POST'])
+def reset_token(token):
+    if current_user.is_authenticated and current_user.user_detail:
+        return redirect(url_for('admin.a_dashboard'))
+
+    admin = User.verify_reset_token(token)
+    if admin is None:
+        flash('The reset link is invalid or has expired.', 'warning')
+        return redirect(url_for('admin.reset_request'))
+
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        admin.password = form.password.data
+        db.session.commit()
+        flash('Your password has been updated!', 'success')
+        return redirect(url_for('admin.login'))
+
+    return render_template('reset_token.html', form=form)

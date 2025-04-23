@@ -3,17 +3,6 @@
 
 {% block content %}
 <div class="container mt-5">
-     <!-- Filter Bar: Date Range -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <label for="startDate" class="form-label">Start Date</label>
-        <input type="date" id="startDate" class="form-control shadow-sm">
-    </div>
-    <div class="col-md-3">
-        <label for="endDate" class="form-label">End Date</label>
-        <input type="date" id="endDate" class="form-control shadow-sm">
-    </div>
-</div>
     <!-- Flash Messages -->
     <div id="flash-wrapper">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -35,7 +24,15 @@
     <div class="card shadow-lg border-0">
         <div class="card-header d-flex justify-content-between align-items-center bg-white">
             <h4 class="mb-0 text-dark">📢 Complaints</h4>
-            <form class="form-inline" method="get" action="{{ url_for('admin.view_complaints') }}">
+            <div class="d-flex flex-wrap align-items-end gap-3">
+            <!-- Date Range Filter -->
+             <div>
+                <div class="custom-daterange-wrapper shadow-sm d-flex align-items-center p-2 rounded border bg-white" style="cursor: pointer; min-width: 230px;">
+                    <i class="fas fa-calendar-alt text-dark mr-3"></i>
+                    <input type="text" id="dateRange" class="form-control border-0 p-0 bg-white" placeholder="Select date range" readonly>
+                </div>
+            </div>
+            <form class="form-inline ml-3" method="get" action="{{ url_for('admin.view_complaints') }}">
                 <label class="mr-2 text-dark">Department:</label>
                 <select name="department" class="form-control form-control-sm mr-3" onchange="this.form.submit()">
                     <option value="">All</option>
@@ -47,11 +44,30 @@
                 <label class="mr-2 text-dark">Status:</label>
                 <select name="status" class="form-control form-control-sm" onchange="this.form.submit()">
                     <option value="">All</option>
-                    <option value="Submitted" {% if selected_status == 'Submitted' %}selected{% endif %}>Submitted</option>
-                    <option value="In Progress" {% if selected_status == 'In progress' %}selected{% endif %}>In Progress</option>
-                    <option value="Closed" {% if selected_status == 'Closed' %}selected{% endif %}>Closed</option>
+                    <option value="Submitted" {% if selected_status =='Submitted' %}selected{% endif %}>Submitted</option>
+                    <option value="In Progress" {% if selected_status =='Inprogress' %}selected{% endif %}>In Progress</option>
+                    <option value="Closed" {% if selected_status =='Closed' %}selected{% endif %}>Closed</option>
                 </select>
             </form>
+            </div>
+
+<!--            <form class="form-inline" method="get" action="{{ url_for('admin.view_complaints') }}">-->
+<!--                <label class="mr-2 text-dark">Department:</label>-->
+<!--                <select name="department" class="form-control form-control-sm mr-3" onchange="this.form.submit()">-->
+<!--                    <option value="">All</option>-->
+<!--                    {% for dept in departments %}-->
+<!--                        <option value="{{ dept }}" {% if selected_department == dept %}selected{% endif %}>{{ dept }}</option>-->
+<!--                    {% endfor %}-->
+<!--                </select>-->
+
+<!--                <label class="mr-2 text-dark">Status:</label>-->
+<!--                <select name="status" class="form-control form-control-sm" onchange="this.form.submit()">-->
+<!--                    <option value="">All</option>-->
+<!--                    <option value="Submitted" {% if selected_status == 'Submitted' %}selected{% endif %}>Submitted</option>-->
+<!--                    <option value="In Progress" {% if selected_status == 'In progress' %}selected{% endif %}>In Progress</option>-->
+<!--                    <option value="Closed" {% if selected_status == 'Closed' %}selected{% endif %}>Closed</option>-->
+<!--                </select>-->
+<!--            </form>-->
         </div>
 
         <div class="card-body">
@@ -98,22 +114,13 @@
                                                 <form action="{{ url_for('admin.update_complaint_status', complaint_id=c.complaint_id) }}" method="POST" class="px-3 py-2">
                                                     <select name="status" class="form-control form-control-sm mb-2" onchange="this.form.submit()">
                                                         <option value="Submitted" {% if c.status =='Submitted' %}selected{% endif %}>Submitted</option>
-                                                        <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>
-                                                        <option value="Closed" {% if c.status == 'Closed' %}selected{% endif %}>Closed</option>
+                                                        <option value="In Progress" {% if c.status =='InProgress' %}selected{% endif %}>In Progress</option>
+                                                        <option value="Closed" {% if c.status =='Closed' %}selected{% endif %}>Closed</option>
                                                     </select>
                                                 </form>
                                             </div>
                                         </div>
                                     </td>
-<!--                                    <td>-->
-<!--                                        <form action="{{ url_for('admin.update_complaint_status', complaint_id=c.complaint_id) }}" method="POST">-->
-<!--                                            <select name="status" class="form-control form-control-sm" onchange="this.form.submit()">-->
-<!--                                                <option value="Submitted" {% if c.status =='Submitted' %}selected{% endif %}>Submitted</option>-->
-<!--                                                <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>-->
-<!--                                                <option value="Closed" {% if c.status == 'Closed' %}selected{% endif %}>Closed</option>-->
-<!--                                            </select>-->
-<!--                                        </form>-->
-<!--                                    </td>-->
                                     <td>
                                         <a href="{{ url_for('admin.complaint_detail', complaint_id=c.complaint_id) }}"
                                             class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1">
@@ -136,6 +143,11 @@
         </div>
     </div>
 </div>
+<!-- Flatpickr Core (light compatible) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- (Optional) Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 <!-- Bootstrap & jQuery (if not already included) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>

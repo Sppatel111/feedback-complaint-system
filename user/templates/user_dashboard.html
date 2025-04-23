@@ -3,7 +3,6 @@
 {% block title %} User Dashboard {% endblock %}
 
 {% block content %}
-<!-- Main Content Area -->
 <div class="p-4" style="flex: 1;">
 
     <!-- Flash Messages -->
@@ -30,11 +29,52 @@
         {% endwith %}
     </div>
 
-    <!-- Dashboard Image -->
-    <div class="text-center mt-4">
+    <!-- Welcome Header -->
+    <div class="text-center mb-4">
+        <h2>Welcome 👋</h2>
+        <p class="text-muted">Here’s what’s happening in your workspace today.</p>
+    </div>
+
+    <!-- Dashboard Illustration -->
+    <div class="text-center mt-5 mb-4">
         <img src="{{ url_for('user.static', filename='assets/complaints-management.png') }}"
-             alt="Dashboard Image" class="img-fluid"
+             alt="Dashboard Illustration" class="img-fluid"
              style="max-width: 50%; height: auto; object-fit: cover;">
+    </div>
+
+    <!-- Centered Summary Cards -->
+    <div class="d-flex justify-content-center mb-4">
+        <div class="row" style="max-width: 800px; width: 100%;">
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Feedback Tickets</h5>
+                        <p class="text-muted small">Monitor feedback you've shared and stay informed on assigned tasks.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Complaints Center</h5>
+                        <p class="text-muted small">File complaints easily and track their status as they progress.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Placeholder for future charts/graphs -->
+    <div class="text-center my-5">
+        <div class="border rounded p-5 bg-light">
+            <h4 class="text-muted">Your activity insights will appear here soon 📊</h4>
+            <p class="text-muted">Charts and visual summaries of your tickets and complaints will be integrated here in the future.</p>
+            <!-- Plotly Chart Section -->
+<!--            <div class="text-center my-5">-->
+<!--                {{ chart_html|safe }}-->
+<!--            </div>-->
+
+        </div>
     </div>
 
 </div>

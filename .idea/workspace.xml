@@ -5,34 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b4d8c6ce-d23f-4c17-85a8-452d09522676" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/user/static/assets/favicon-16x16.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user/static/assets/favicon-32x32.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user/static/assets/querydesk_logo.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/templates/admin_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_base.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/templates/admin_complaints.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_complaints.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/templates/admin_login.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_login.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/templates/admin_manage_users.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_manage_users.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/templates/admin_view_task_workers.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_view_task_workers.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/templates/assign_tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/assign_tasks.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/templates/manage_feedback.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/manage_feedback.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/templates/view_feedback.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/view_feedback.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/note.txt" beforeDir="false" afterPath="$PROJECT_DIR$/note.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/static/js/date_filters.js" beforeDir="false" afterPath="$PROJECT_DIR$/user/static/js/date_filters.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/templates/complaint_history.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/complaint_history.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/complaint_management.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/complaint_management.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/templates/f_tickets.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/f_tickets.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/feedback_management.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/feedback_management.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/reset_request.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/reset_request.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/reset_token.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/reset_token.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/templates/tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/tasks.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/user_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/user_complaint_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_complaint_detail.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/templates/user_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_dashboard.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,23 +48,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Python.admin.executor&quot;: &quot;Run&quot;,
-    &quot;Python.app.executor&quot;: &quot;Run&quot;,
-    &quot;Python.forms.executor&quot;: &quot;Run&quot;,
-    &quot;Python.models.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test.executor&quot;: &quot;Run&quot;,
-    &quot;Python.user.executor&quot;: &quot;Run&quot;,
-    &quot;Python.utils.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/8SEM/Alian Software/feedback-complaint-system/user/static/assets&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Python.admin.executor": "Run",
+    "Python.app.executor": "Run",
+    "Python.forms.executor": "Run",
+    "Python.models.executor": "Run",
+    "Python.test.executor": "Run",
+    "Python.user.executor": "Run",
+    "Python.utils.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "Rebasing master",
+    "last_opened_file_path": "D:/8SEM/Alian Software/feedback-complaint-system/user/static/assets",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\8SEM\Alian Software\feedback-complaint-system\user\static\assets" />

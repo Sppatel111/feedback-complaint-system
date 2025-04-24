@@ -46,7 +46,7 @@
     <div class="d-flex justify-content-center mb-4">
         <div class="row" style="max-width: 800px; width: 100%;">
             <div class="col-md-6 mb-3">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0.1 card-hover">
                     <div class="card-body text-center">
                         <h5 class="card-title">Feedback Tickets</h5>
                         <p class="text-muted small">Monitor feedback you've shared and stay informed on assigned tasks.</p>
@@ -54,7 +54,7 @@
                 </div>
             </div>
             <div class="col-md-6 mb-3">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0.1 card-hover">
                     <div class="card-body text-center">
                         <h5 class="card-title">Complaints Center</h5>
                         <p class="text-muted small">File complaints easily and track their status as they progress.</p>
@@ -78,4 +78,21 @@
     </div>
 
 </div>
+<style>
+    .card-hover {
+        transition: transform 0.3s ease, font-size 0.3s ease;
+    }
+
+    .card-hover:hover {
+        transform: scale(1.05); /* Slightly increase size */
+    }
+
+    .card-hover:hover .card-title {
+        font-size: 1.0rem; /* Slightly increase font size */
+    }
+
+    .card-hover:hover .card-body p {
+        font-size: 0.8rem; /* Slightly increase font size */
+    }
+</style>
 {% endblock %}

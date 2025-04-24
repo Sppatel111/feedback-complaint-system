@@ -26,13 +26,19 @@
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0 text-dark">📋 All Tasks</h4>
             <div class="d-flex flex-wrap align-items-end gap-3">
-                <!-- Date Range Filter -->
-                 <div>
+                 <!-- Date Range Filter -->
+                <form id="dateFilterForm" method="get" action="{{ url_for('admin.assign_tasks') }}">
+                    <input type="hidden" name="start_date" id="startDateInput" value="{{ start_date or '' }}">
+                    <input type="hidden" name="end_date" id="endDateInput" value="{{ end_date or '' }}">
+                    <input type="hidden" name="status" value="{{ selected_status or '' }}">
                     <div class="custom-daterange-wrapper shadow-sm d-flex align-items-center p-2 rounded border bg-white" style="cursor: pointer; min-width: 230px;">
                         <i class="fas fa-calendar-alt text-dark mr-3"></i>
                         <input type="text" id="dateRange" class="form-control border-0 p-0 bg-white" placeholder="Select date range" readonly>
+                        <button type="button" class="btn btn-sm btn-link text-dark ml-2 p-0" id="clearDateFilter" style="font-size: 12px; line-height: 1;">
+                              <i class="fas fa-sync"></i>
+                        </button>
                     </div>
-                </div>
+                </form>
                 <form method="get" action="{{ url_for('admin.assign_tasks') }}" class="form-inline ml-3">
                     <label for="statusFilter" class="mr-2 font-weight-bold text-dark">Filter by Status:</label>
                     <select id="statusFilter" name="status" class="form-control form-control-sm" onchange="this.form.submit()">
@@ -105,6 +111,46 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    <!--pagination-->
+                    {% if pagination and pagination.pages > 1 %}
+                        <nav aria-label="Task pagination">
+                        <ul class="pagination justify-content-center mt-4">
+                            {% if pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.assign_tasks', page=1, status=selected_status,start_date=start_date, end_date=end_date) }}">&laquo;</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.assign_tasks', page=pagination.prev_num, status=selected_status,start_date=start_date, end_date=end_date) }}">&lsaquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                                <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
+                            {% endif %}
+
+                            {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if p %}
+                                    <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('admin.assign_tasks', page=p, status=selected_status,start_date=start_date, end_date=end_date) }}">{{ p }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.assign_tasks', page=pagination.next_num, status=selected_status,start_date=start_date, end_date=end_date) }}">&rsaquo;</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.assign_tasks', page=pagination.pages, status=selected_status,start_date=start_date, end_date=end_date) }}">&raquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
+                                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                            {% endif %}
+                            </ul>
+                            </nav>
+                    {% endif %}
                 </div>
             {% else %}
                 <div class="alert alert-info">
@@ -114,6 +160,18 @@
         </div>
     </div>
 </div>
+<!--for pagenation-->
+<style>
+    /* Remove space between table and pagination */
+    .table + nav {
+        margin-top: 0 !important;
+    }
+
+    /* Optional: make sure card-body doesn’t add extra space */
+    .card-body {
+        padding-bottom: 0.5rem !important;
+    }
+</style>
 <!-- Flatpickr Core (light compatible) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

@@ -1,30 +1,65 @@
 document.addEventListener('DOMContentLoaded', function () {
-  flatpickr("#dateRange", {
+  const startInput = document.getElementById("startDateInput");
+  const endInput = document.getElementById("endDateInput");
+
+  const defaultStart = startInput?.value ? new Date(startInput.value) : null;
+  const defaultEnd = endInput?.value ? new Date(endInput.value) : null;
+
+  const datePicker = flatpickr("#dateRange", {
     mode: "range",
-    dateFormat: "D, M j",  // e.g., "Sun, May 4"
+    dateFormat: "Y-m-d",
     allowInput: false,
-    onOpen: function(_, __, fp) {
+    defaultDate: [defaultStart, defaultEnd].filter(Boolean),
+    onOpen: function (_, __, fp) {
       fp._positionElement = document.querySelector(".custom-daterange-wrapper");
     },
-    onChange: function(selectedDates) {
+    onChange: function (selectedDates) {
       if (selectedDates.length === 2) {
         const [start, end] = selectedDates;
+
+        if (startInput && endInput) {
+          startInput.value = flatpickr.formatDate(start, "Y-m-d");
+          endInput.value = flatpickr.formatDate(end, "Y-m-d");
+        }
+
         const rows = document.querySelectorAll("table tbody tr");
-
         rows.forEach(row => {
-          const dateCells = row.querySelectorAll("td[data-date]");
-          let showRow = false;
+          const rowDateStr = row.getAttribute("data-date");
+          if (!rowDateStr) return;
 
-          dateCells.forEach(cell => {
-            const cellDate = new Date(cell.getAttribute("data-date"));
-            if (cellDate >= start && cellDate <= end) {
-              showRow = true;
-            }
-          });
+          const rowDate = new Date(rowDateStr);
+          const showRow = rowDate >= start && rowDate <= end;
 
           row.style.display = showRow ? "" : "none";
         });
+
+        const form = document.getElementById("dateFilterForm");
+        if (form) {
+          form.submit();
+        }
+      } else {
+        document.querySelectorAll("table tbody tr").forEach(row => {
+          row.style.display = "";
+        });
+
+        if (startInput && endInput) {
+          startInput.value = "";
+          endInput.value = "";
+        }
       }
+    }
+  });
+
+  // Clear Date Filter Button
+  document.getElementById("clearDateFilter")?.addEventListener("click", function () {
+    datePicker.clear(); // Clear date picker selection
+
+    if (startInput) startInput.value = "";
+    if (endInput) endInput.value = "";
+
+    const form = document.getElementById("dateFilterForm");
+    if (form) {
+      form.submit(); // Resubmit to reset view
     }
   });
 });

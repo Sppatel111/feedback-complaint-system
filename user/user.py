@@ -189,12 +189,16 @@ def manage_feedback():
         task_status_html=task_status_html
     )
 
-
-
+from datetime import datetime
 @user.route('dashboard/manage-feedback/view-tickets', methods=['GET', 'POST'])
 @login_required
 def view_tickets():
     selected_status = request.args.get('status')
+    ##page
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    page = request.args.get('page', 1, type=int)
+    per_page = 2
 
     if current_user.department:
         query = FeedbackTicket.query.filter(
@@ -205,16 +209,35 @@ def view_tickets():
         )
         if selected_status:
             query = query.filter(FeedbackTicket.ticket_status == selected_status)
-        tickets = query.order_by(FeedbackTicket.created_at.desc()).all()
+        # pagination
+        if start_date_str and end_date_str:
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+                end_date = end_date.replace(hour=23, minute=59, second=59)
+                query = query.filter(FeedbackTicket.created_at.between(start_date, end_date))
+            except ValueError:
+                pass  # Ignore invalid date formats silently
+
+        pagination = query.order_by(FeedbackTicket.created_at.desc()).paginate(page=page, per_page=per_page)
+        tickets = pagination.items
+
+        # tickets = query.order_by(FeedbackTicket.created_at.desc()).all()
     else:
+        pagination = None
         tickets = []
 
     return render_template(
         'f_tickets.html',
         tickets=tickets,
+        pagination=pagination,
+        start_date=start_date_str,
+        end_date=end_date_str,
         selected_status=selected_status,
         current_user=current_user
     )
+
+
 
 
 # for the response in view tickets
@@ -251,13 +274,29 @@ def ticket_detail_response(ticket_id):
 @login_required
 def assigned_task():
     selected_status = request.args.get('status', '')
+    ##page
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    page = request.args.get('page', 1, type=int)
+    per_page = 2
 
     query = Task.query.filter_by(assigned_to_email=current_user.email)
 
     if selected_status:
         query = query.filter_by(task_status=selected_status)
+    # pagination
+    if start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+            query = query.filter(Task.deadline.between(start_date, end_date))
+        except ValueError:
+            pass  # Ignore invalid date formats silently
+    # tasks = query.all()
 
-    tasks = query.all()
+    pagination = query.paginate(page=page, per_page=per_page)
+    tasks = pagination.items
 
     status_colors = {
         'todo': 'orange',
@@ -278,6 +317,9 @@ def assigned_task():
     return render_template(
         "tasks.html",
         tasks=tasks,
+        pagination=pagination,
+        start_date=start_date_str,
+        end_date=end_date_str,
         status_colors=status_colors,
         status_options=status_options,
         selected_status=selected_status
@@ -380,25 +422,57 @@ def file_complaint():
 
     return render_template("file_complaint.html", form=form)
 
-
 @user.route('/dashboard/complaint-center/complaint-history', methods=['GET'])
 @login_required
 def complaint_history():
     user_email = current_user.email
-    complaints = Complaint.query.filter_by(user_email=user_email).order_by(Complaint.created_at.desc()).all()
+
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    selected_status = request.args.get('status', 'All')
+    page = request.args.get('page', 1, type=int)
+    per_page = 2
+
+    complaints_query = Complaint.query.filter_by(user_email=user_email)
+
+    # Date filter
+    if start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+            complaints_query = complaints_query.filter(Complaint.created_at.between(start_date, end_date))
+        except ValueError:
+            pass
+
+    # Status filter
+    if selected_status != 'All':
+        complaints_query = complaints_query.filter_by(status=selected_status)
+
+    # Order and paginate
+    complaints_query = complaints_query.order_by(Complaint.created_at.desc())
+    pagination = complaints_query.paginate(page=page, per_page=per_page)
+    complaints = pagination.items
 
     statuses = ['Submitted', 'In Progress', 'Closed']
     colors = ['warning', 'danger', 'success']
     icons = ['fas fa-exclamation-circle', 'fas fa-spinner', 'fas fa-check-circle']
     status_data = list(zip(statuses, colors, icons))
 
-    #Tab data includes 'All' + each status tab
+    # Only populate tab_data with filtered complaints
     tab_data = [('All', complaints)]
     for status in statuses:
         filtered = [c for c in complaints if c.status == status]
         tab_data.append((status, filtered))
 
-    return render_template("complaint_history.html", complaints=complaints, tab_data=tab_data, status_data=status_data)
+    return render_template("complaint_history.html",
+                           pagination=pagination,
+                           start_date=start_date_str,
+                           end_date=end_date_str,
+                           selected_status=selected_status,
+                           complaints=complaints,
+                           tab_data=tab_data,
+                           status_data=status_data)
 
 
 @user.route('/dashboard/complaint-center/complaint/<int:complaint_id>', methods=['GET'])

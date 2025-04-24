@@ -69,8 +69,27 @@ def a_dashboard():
 # Manage User Route (add user,view user,edit user,active mode )
 @admin.route('/manage-user', methods=['GET', 'POST'])
 def manage_users():
-    users = User.query.join(Detail).order_by(User.created_at.desc()).all()
-    return render_template("admin_manage_users.html", users=users)
+    ##page
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+    users = User.query.join(Detail).order_by(User.created_at.desc())
+    # pagination
+    if start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+            users = users.filter(User.created_at.between(start_date, end_date))
+        except ValueError:
+            pass
+
+    pagination = users.paginate(page=page, per_page=per_page)
+    users = pagination.items
+    return render_template("admin_manage_users.html", users=users, pagination=pagination,
+        start_date=start_date_str,
+        end_date=end_date_str)
 
 # Add user Route
 @admin.route('/manage-user/adduser', methods=['GET', 'POST'])
@@ -268,18 +287,98 @@ def raise_tickets():
 def view_feedback():
     departments = db.session.query(FeedbackTicket.department_name).distinct().all()
     department_names = [dept[0] for dept in departments]
+
     selected_department = request.args.get('department')
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    page = request.args.get('page', 1, type=int)
+    per_page = 2
 
+    # Base query (join to allow filtering by department/date)
+    feedback_responses = FeedbackResponse.query.join(FeedbackTicket)
+
+    # Apply department filter if selected
     if selected_department:
-        feedback_responses = FeedbackResponse.query.join(FeedbackTicket).filter(
+        feedback_responses = feedback_responses.filter(
             FeedbackTicket.department_name == selected_department
-        ).order_by(FeedbackResponse.created_at.desc()).all()
-    else:
-        query= FeedbackResponse.query
-        feedback_responses=query.order_by(FeedbackResponse.created_at.desc()).all()
+        )
 
-    return render_template("view_feedback.html", feedback_responses=feedback_responses,
-                           department_names=department_names, selected_department=selected_department)
+    # Apply date range filter if both dates are provided
+    if start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+            feedback_responses = feedback_responses.filter(
+                FeedbackTicket.created_at.between(start_date, end_date)
+            )
+        except ValueError:
+            pass  # Ignore invalid date formats
+
+    # Always order by latest created_at
+    feedback_responses = feedback_responses.order_by(FeedbackResponse.created_at.desc())
+
+    # Paginate
+    pagination = feedback_responses.paginate(page=page, per_page=per_page)
+    feedback_responses = pagination.items
+
+    return render_template("view_feedback.html",
+                           feedback_responses=feedback_responses,
+                           pagination=pagination,
+                           start_date=start_date_str,
+                           end_date=end_date_str,
+                           department_names=department_names,
+                           selected_department=selected_department)
+
+
+# @admin.route('manage-feedback/view-feedback', methods=['GET', 'POST'])
+# @login_required
+# def view_feedback():
+#     departments = db.session.query(FeedbackTicket.department_name).distinct().all()
+#     department_names = [dept[0] for dept in departments]
+#
+#     selected_department = request.args.get('department')
+#     start_date_str = request.args.get('start_date')
+#     end_date_str = request.args.get('end_date')
+#     page = request.args.get('page', 1, type=int)
+#     per_page = 2
+#
+#     # Base query (join to allow filtering by department/date)
+#     feedback_responses = FeedbackResponse.query.join(FeedbackTicket)
+#
+#     # Apply department filter if selected
+#     if selected_department:
+#         feedback_responses = feedback_responses.filter(
+#             FeedbackTicket.department_name == selected_department
+#         )
+#
+#     # Apply date range filter if both dates are provided
+#     if start_date_str and end_date_str:
+#         try:
+#             start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+#             end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+#             end_date = end_date.replace(hour=23, minute=59, second=59)
+#             feedback_responses = feedback_responses.filter(
+#                 FeedbackTicket.created_at.between(start_date, end_date)
+#             )
+#         except ValueError:
+#             pass  # Ignore invalid date formats
+#
+#     # Always order by latest created_at
+#     feedback_responses = feedback_responses.order_by(FeedbackResponse.created_at.desc())
+#
+#     # Paginate
+#     pagination = feedback_responses.paginate(page=page, per_page=per_page)
+#     feedback_responses = pagination.items
+#
+#     return render_template("view_feedback.html",
+#                            feedback_responses=feedback_responses,
+#                            pagination=pagination,
+#                            start_date=start_date_str,
+#                            end_date=end_date_str,
+#                            department_names=department_names,
+#                            selected_department=selected_department)
+
 
 # View ticket and response detail Route
 ### need check below two function
@@ -300,11 +399,39 @@ def view_ticket_details(ticket_id):
 @login_required
 def assign_tasks():
     selected_status = request.args.get('status')
+    ##page
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    page = request.args.get('page', 1, type=int)
+    per_page = 2
+
     if selected_status:
         all_task = FeedbackTicket.query.filter_by(ticket_status=selected_status
-                                                  ).order_by(FeedbackTicket.created_at.desc()).all()
+                                                  ).order_by(FeedbackTicket.created_at.desc())
+        # pagination
+        if start_date_str and end_date_str:
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+                end_date = end_date.replace(hour=23, minute=59, second=59)
+                all_task = all_task.filter(FeedbackTicket.created_at.between(start_date, end_date))
+            except ValueError:
+                pass  # Ignore invalid date formats silently
+        pagination = all_task.paginate(page=page, per_page=per_page)
+        all_task = pagination.items
     else:
-        all_task = FeedbackTicket.query.order_by(FeedbackTicket.created_at.desc()).all()
+        all_task = FeedbackTicket.query.order_by(FeedbackTicket.created_at.desc())
+        # pagination
+        if start_date_str and end_date_str:
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+                end_date = end_date.replace(hour=23, minute=59, second=59)
+                all_task = all_task.filter(FeedbackTicket.created_at.between(start_date, end_date))
+            except ValueError:
+                pass  # Ignore invalid date formats silently
+        pagination = all_task.paginate(page=page, per_page=per_page)
+        all_task = pagination.items
 
     status_colors = {
         'open': '#17a2b8',
@@ -312,6 +439,9 @@ def assign_tasks():
         'in_progress': '#ffc107'
     }
     return render_template("assign_tasks.html", all_task=all_task, status_colors=status_colors,
+                           pagination=pagination,
+                           start_date=start_date_str,
+                           end_date=end_date_str,
                            selected_status=selected_status)
 
 # Ticket status change
@@ -378,12 +508,29 @@ def view_task_workers(ticket_id):
     ticket = FeedbackTicket.query.get_or_404(ticket_id)
 
     selected_status = request.args.get('status', '')
+        ##page
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    page = request.args.get('page', 1, type=int)
+    per_page = 2
+
     query = Task.query.filter_by(ticket_id=ticket_id)
 
     if selected_status:
         query = query.filter_by(task_status=selected_status)
+    task_workers = query
+    # pagination
+    if start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+            task_workers= task_workers.filter(Task.deadline.between(start_date, end_date))
+        except ValueError:
+            pass  # Ignore invalid date formats silently
 
-    task_workers=query.all()
+    pagination = task_workers.paginate(page=page, per_page=per_page)
+    task_workers= pagination.items
 
     status_colors = {
         'todo': 'orange',
@@ -394,7 +541,9 @@ def view_task_workers(ticket_id):
         'done': '#28a745',
         'completed': '#20c997',
     }
-    return render_template('admin_view_task_workers.html', ticket=ticket, task_workers=task_workers, status_colors=status_colors, selected_status=selected_status)
+    return render_template('admin_view_task_workers.html', ticket=ticket, task_workers=task_workers, pagination=pagination,
+        start_date=start_date_str,
+        end_date=end_date_str, status_colors=status_colors, selected_status=selected_status)
 
 # update task status and priority
 @admin.route('manage-feedback/assign-tasks/task-workers/update_task/<int:task_id>', methods=['POST'])

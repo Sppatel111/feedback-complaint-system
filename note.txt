@@ -351,3 +351,266 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
 
 {% endblock %}
+
+
+date_filter.js
+document.addEventListener('DOMContentLoaded', function () {
+  flatpickr("#dateRange", {
+    mode: "range",
+    dateFormat: "D, M j",  // e.g., "Sun, May 4"
+    allowInput: false,
+    onOpen: function(_, __, fp) {
+      fp._positionElement = document.querySelector(".custom-daterange-wrapper");
+    },
+    onChange: function(selectedDates) {
+      if (selectedDates.length === 2) {
+        const [start, end] = selectedDates;
+        const rows = document.querySelectorAll("table tbody tr");
+
+        rows.forEach(row => {
+          const dateCells = row.querySelectorAll("td[data-date]");
+          let showRow = false;
+
+          dateCells.forEach(cell => {
+            const cellDate = new Date(cell.getAttribute("data-date"));
+            if (cellDate >= start && cellDate <= end) {
+              showRow = true;
+            }
+          });
+
+          row.style.display = showRow ? "" : "none";
+        });
+      }
+    }
+  });
+});
+
+##paginatation
+
+ <!-- Date Range Filter -->
+            <form id="dateFilterForm" method="get" action="{{ url_for('user.view_tickets') }}">
+                <input type="hidden" name="start_date" id="startDateInput" value="{{ start_date or '' }}">
+                <input type="hidden" name="end_date" id="endDateInput" value="{{ end_date or '' }}">
+                <input type="hidden" name="status" value="{{ selected_status or '' }}">
+                <div class="custom-daterange-wrapper shadow-sm d-flex align-items-center p-2 rounded border bg-white" style="cursor: pointer; min-width: 230px;">
+                    <i class="fas fa-calendar-alt text-dark mr-3"></i>
+                    <input type="text" id="dateRange" class="form-control border-0 p-0 bg-white" placeholder="Select date range" readonly>
+                    <button type="button" class="btn btn-sm btn-link text-dark ml-2 p-0" id="clearDateFilter" style="font-size: 12px; line-height: 1;">
+                          <i class="fas fa-sync"></i>
+                    </button>
+                </div>
+            </form>
+,start_date=start_date, end_date=end_date
+data-date="{{ task.deadline.strftime('%Y-%m-%dT%H:%M:%S') }}"
+ pagination=pagination,
+        start_date=start_date_str,
+        end_date=end_date_str,
+
+        ##page
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    page = request.args.get('page', 1, type=int)
+    per_page = 2
+     # pagination
+        if start_date_str and end_date_str:
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+                end_date = end_date.replace(hour=23, minute=59, second=59)
+                query = query.filter(FeedbackTicket.created_at.between(start_date, end_date))
+            except ValueError:
+                pass  # Ignore invalid date formats silently
+
+                pagination = query.order_by(FeedbackTicket.created_at.desc()).paginate(page=page, per_page=per_page)
+        tickets = pagination.items
+
+
+
+<!--pagination-->
+{% if pagination and pagination.pages > 1 %}
+    <nav aria-label="Task pagination">
+    <ul class="pagination justify-content-center mt-4">
+        {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('user.assigned_task', page=1, status=selected_status,start_date=start_date, end_date=end_date) }}">&laquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('user.assigned_task', page=pagination.prev_num, status=selected_status,start_date=start_date, end_date=end_date) }}">&lsaquo;</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+            <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
+        {% endif %}
+
+        {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if p %}
+                <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('user.assigned_task', page=p, status=selected_status,start_date=start_date, end_date=end_date) }}">{{ p }}</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">…</span></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('user.assigned_task', page=pagination.next_num, status=selected_status,start_date=start_date, end_date=end_date) }}">&rsaquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('user.assigned_task', page=pagination.pages, status=selected_status,start_date=start_date, end_date=end_date) }}">&raquo;</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
+            <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+        {% endif %}
+        </ul>
+        </nav>
+{% endif %}
+
+<!--for pagenation-->
+<style>
+    /* Remove space between table and pagination */
+    .table + nav {
+        margin-top: 0 !important;
+    }
+
+    /* Optional: make sure card-body doesn’t add extra space */
+    .card-body {
+        padding-bottom: 0.5rem !important;
+    }
+</style>
+
+
+# View feedback Response Route
+@admin.route('manage-feedback/view-feedback', methods=['GET', 'POST'])
+@login_required
+def view_feedback():
+    departments = db.session.query(FeedbackTicket.department_name).distinct().all()
+    department_names = [dept[0] for dept in departments]
+    selected_department = request.args.get('department')
+
+    if selected_department:
+        feedback_responses = FeedbackResponse.query.join(FeedbackTicket).filter(
+            FeedbackTicket.department_name == selected_department
+        ).order_by(FeedbackResponse.created_at.desc()).all()
+    else:
+        query= FeedbackResponse.query
+        feedback_responses=query.order_by(FeedbackResponse.created_at.desc()).all()
+
+    return render_template("view_feedback.html", feedback_responses=feedback_responses,
+                           department_names=department_names, selected_department=selected_department)
+
+
+view_tickets,html
+
+{% extends "admin_base.html" %}
+
+{% block title %}View Feedback Responses{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Flash Messages -->
+    <div id="flash-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-toast {{ category }}">
+                    <span class="icon">
+                        {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>
+                        {% elif category == 'danger' %}	<i class="fas fa-times-circle icon"></i>
+                        {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle icon"></i>
+                        {% elif category == 'info' %}<i class="fas fa-circle-info icon"></i>
+                        {% else %}🔔
+                        {% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+    <div class="card border-0 shadow">
+        <div class="card-header bg-white border-bottom">
+            <h4 class="mb-0 text-dark">📋 Feedback Responses</h4>
+        </div>
+        <div class="card-body">
+            <!-- Filter Form -->
+            <form method="GET" class="row g-3 align-items-end mb-4">
+                <div class="col-md-4">
+                    <label for="department" class="form-label">Filter by Department</label>
+                    <select id="department" name="department" class="form-control">
+                        <option value="">All Departments</option>
+                        {% for department in department_names %}
+                            <option value="{{ department }}" {% if department == selected_department %}selected{% endif %}>
+                                {{ department }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 ">
+                    <button type="submit" class="btn btn-outline-dark px-4">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                </div>
+                <div class="col-md-3 ">
+                </div>
+               <!-- Date Range Filter -->
+                <div class="d-flex flex-wrap align-items-end gap-3 ">
+                 <div class="col-md-3 text-end">
+                    <div class="custom-daterange-wrapper shadow-sm d-flex align-items-center p-2 rounded border bg-white" style="cursor: pointer; min-width: 230px; min-height:45px;">
+                        <i class="fas fa-calendar-alt text-dark mr-3"></i>
+                        <input type="text" id="dateRange" class="form-control border-0 p-0 bg-white" placeholder="Select date range" readonly>
+                    </div>
+                </div>
+                </div>
+            </form>
+
+            <!-- Feedback Table -->
+            {% if feedback_responses %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border rounded shadow-sm">
+                        <thead class="thead-light">
+                            <tr class="table-secondary text-dark">
+                                <th scope="col">#</th>
+                                <th scope="col">Ticket ID</th>
+                                <th scope="col">User Email</th>
+                                <th scope="col">Response</th>
+                                <th scope="col">Created At</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for response in feedback_responses %}
+                                <tr>
+                                    <td>{{ response.response_id }}</td>
+                                    <td>
+                                        {{ response.ticket_id }}
+                                    </td>
+                                    <td>{{ response.user_email }}</td>
+                                    <td class="text-muted">{{ response.response }}</td>
+                                    <td data-date="{{ response.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}">{{ response.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('admin.view_ticket_details', ticket_id=response.ticket_id) }}"
+                                           class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1">
+                                            <i class="fas fa-eye"></i>
+                                            <span class="d-none d-md-inline">View</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-secondary text-center" role="alert">
+                    <i class="fas fa-info-circle me-2"></i> No feedback responses found.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- Flatpickr Core (light compatible) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- (Optional) Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
+{% endblock %}

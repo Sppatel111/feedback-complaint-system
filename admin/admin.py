@@ -292,7 +292,7 @@ def view_feedback():
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
     page = request.args.get('page', 1, type=int)
-    per_page = 2
+    per_page = 3
 
     # Base query (join to allow filtering by department/date)
     feedback_responses = FeedbackResponse.query.join(FeedbackTicket)
@@ -403,7 +403,7 @@ def assign_tasks():
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
     page = request.args.get('page', 1, type=int)
-    per_page = 2
+    per_page = 3
 
     if selected_status:
         all_task = FeedbackTicket.query.filter_by(ticket_status=selected_status
@@ -602,10 +602,15 @@ def manage_complaint():
     return render_template("manage_complaints.html", current_user=current_user, status_data=status_data)
 
 #View complaints Route
-@admin.route('/complaint-centre/compliants')
+@admin.route('/complaint-centre/complaints')
 def view_complaints():
     department = request.args.get('department')
     status = request.args.get('status')
+    ##page
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    page = request.args.get('page', 1, type=int)
+    per_page = 3
 
     query = Complaint.query
 
@@ -614,8 +619,20 @@ def view_complaints():
     if status:
         query = query.filter_by(status=status)
 
-    complaints = query.order_by(Complaint.created_at.desc()).all()
-    # departments = db.session.query(Complaint.department).distinct().all()
+    # pagination
+    if start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+            end_date = end_date.replace(hour=23, minute=59, second=59)
+            query = query.filter(Complaint.created_at.between(start_date, end_date))
+        except ValueError:
+            pass  # Ignore invalid date formats silently
+
+    # complaints = query.order_by(Complaint.created_at.desc()).all()
+    pagination = query.order_by(Complaint.created_at.desc()).paginate(page=page, per_page=per_page)
+    complaints = pagination.items
+
     departments = [dept[0] for dept in db.session.query(Complaint.department.distinct()).all()]
 
     statuses = ['Submitted', 'In Progress', 'Closed']
@@ -624,7 +641,12 @@ def view_complaints():
         'Closed': '#28a745',
         'In Progress': '#ffc107'
     }
-    return render_template('admin_complaints.html', complaints=complaints, departments=departments, statuses=statuses, selected_department=department, selected_status=status,status_colors=status_colors)
+    return render_template('admin_complaints.html', complaints=complaints,
+                           pagination=pagination,
+                           start_date=start_date_str,
+                           end_date=end_date_str,
+                           departments=departments, statuses=statuses, selected_department=department,
+                           selected_status=status,status_colors=status_colors)
 
 @admin.route('/complaint-centre/complaints/<int:complaint_id>/update_status', methods=['POST'])
 def update_complaint_status(complaint_id):

@@ -25,13 +25,20 @@
         <div class="card-header d-flex justify-content-between align-items-center bg-white">
             <h4 class="mb-0 text-dark">📢 Complaints</h4>
             <div class="d-flex flex-wrap align-items-end gap-3">
-            <!-- Date Range Filter -->
-             <div>
+             <!-- Date Range Filter -->
+            <form id="dateFilterForm" method="get" action="{{ url_for('admin.view_complaints') }}">
+                <input type="hidden" name="start_date" id="startDateInput" value="{{ start_date or '' }}">
+                <input type="hidden" name="end_date" id="endDateInput" value="{{ end_date or '' }}">
+                <input type="hidden" name="status" value="{{ selected_status or '' }}">
+                <input type="hidden" name="department" value="{{ selected_department or '' }}">
                 <div class="custom-daterange-wrapper shadow-sm d-flex align-items-center p-2 rounded border bg-white" style="cursor: pointer; min-width: 230px;">
                     <i class="fas fa-calendar-alt text-dark mr-3"></i>
                     <input type="text" id="dateRange" class="form-control border-0 p-0 bg-white" placeholder="Select date range" readonly>
+                    <button type="button" class="btn btn-sm btn-link text-dark ml-2 p-0" id="clearDateFilter" style="font-size: 12px; line-height: 1;">
+                          <i class="fas fa-sync"></i>
+                    </button>
                 </div>
-            </div>
+            </form>
             <form class="form-inline ml-3" method="get" action="{{ url_for('admin.view_complaints') }}">
                 <label class="mr-2 text-dark">Department:</label>
                 <select name="department" class="form-control form-control-sm mr-3" onchange="this.form.submit()">
@@ -45,7 +52,7 @@
                 <select name="status" class="form-control form-control-sm" onchange="this.form.submit()">
                     <option value="">All</option>
                     <option value="Submitted" {% if selected_status =='Submitted' %}selected{% endif %}>Submitted</option>
-                    <option value="In Progress" {% if selected_status =='Inprogress' %}selected{% endif %}>In Progress</option>
+                    <option value="In Progress" {% if selected_status == 'In progress' %}selected{% endif %}>In Progress</option>
                     <option value="Closed" {% if selected_status =='Closed' %}selected{% endif %}>Closed</option>
                 </select>
             </form>
@@ -87,11 +94,11 @@
                         </thead>
                         <tbody>
                             {% for c in complaints %}
-                                <tr>
+                                <tr data-date="{{ c.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}">
                                     <td>{{ c.complaint_id }}</td>
                                     <td>{{ c.title }}</td>
                                     <td>{{ c.department }}</td>
-                                    <td data-date="{{ c.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}">{{ c.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
+                                    <td >{{ c.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
                                     <td>
                                         {% if c.updated_at %}
                                             {{ c.updated_at.strftime('%d %B %Y, %I:%M %p') }}
@@ -142,10 +149,10 @@
                         <ul class="pagination justify-content-center mt-4">
                             {% if pagination.has_prev %}
                                 <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('user.assigned_task', page=1, status=selected_status,start_date=start_date, end_date=end_date) }}">&laquo;</a>
+                                    <a class="page-link" href="{{ url_for('admin.view_complaints', page=1, status=selected_status,department=selected_department, start_date=start_date, end_date=end_date) }}">&laquo;</a>
                                 </li>
                                 <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('user.assigned_task', page=pagination.prev_num, status=selected_status,start_date=start_date, end_date=end_date) }}">&lsaquo;</a>
+                                    <a class="page-link" href="{{ url_for('admin.view_complaints', page=pagination.prev_num, status=selected_status,department=selected_department,start_date=start_date, end_date=end_date) }}">&lsaquo;</a>
                                 </li>
                             {% else %}
                                 <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
@@ -155,7 +162,7 @@
                             {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
                                 {% if p %}
                                     <li class="page-item {% if p == pagination.page %}active{% endif %}">
-                                        <a class="page-link" href="{{ url_for('user.assigned_task', page=p, status=selected_status,start_date=start_date, end_date=end_date) }}">{{ p }}</a>
+                                        <a class="page-link" href="{{ url_for('admin.view_complaints', page=p, status=selected_status,department=selected_department,start_date=start_date, end_date=end_date) }}">{{ p }}</a>
                                     </li>
                                 {% else %}
                                     <li class="page-item disabled"><span class="page-link">…</span></li>
@@ -164,10 +171,10 @@
 
                             {% if pagination.has_next %}
                                 <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('user.assigned_task', page=pagination.next_num, status=selected_status,start_date=start_date, end_date=end_date) }}">&rsaquo;</a>
+                                    <a class="page-link" href="{{ url_for('admin.view_complaints', page=pagination.next_num, status=selected_status,department=selected_department,start_date=start_date, end_date=end_date) }}">&rsaquo;</a>
                                 </li>
                                 <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('user.assigned_task', page=pagination.pages, status=selected_status,start_date=start_date, end_date=end_date) }}">&raquo;</a>
+                                    <a class="page-link" href="{{ url_for('admin.view_complaints', page=pagination.pages, status=selected_status,department=selected_department,start_date=start_date, end_date=end_date) }}">&raquo;</a>
                                 </li>
                             {% else %}
                                 <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>

@@ -24,7 +24,7 @@
                     <div id="flash-wrapper">
                         {% with messages = get_flashed_messages(with_categories=true) %}
                             {% for category, message in messages %}
-                                <div class="flash-toast {{ category }}">
+                                <div class="flash-toast {{ category }}" style="top: 20px; right: 20px;">
                                     <span class="icon">
                                         {% if category == 'success' %}<i class="fas fa-check-circle icon"></i>
                                         {% elif category == 'danger' %}	<i class="fas fa-times-circle icon"></i>

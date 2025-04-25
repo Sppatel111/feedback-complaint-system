@@ -614,3 +614,10 @@ view_tickets,html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 <script src="{{ url_for('user.static', filename='js/date_filters.js') }}"></script>
 {% endblock %}
+
+
+status_options = {
+        'high': ['todo', 'in_progress', 'in_review'],
+        'medium': ['todo', 'in_progress', 'in_review', 'done'],
+        'low': ['todo', 'in_progress', 'backlog', 'in_review', 'done', 'completed'],
+    }

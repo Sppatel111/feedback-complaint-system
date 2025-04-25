@@ -157,17 +157,46 @@ def change_password():
 @user.route('/dashboard/manage-feedback', methods=['GET', 'POST'])
 @login_required
 def manage_feedback():
-    tickets = FeedbackTicket.query.all()
-    tasks = Task.query.all()
+    # tickets = FeedbackTicket.query.all()
+    tickets = FeedbackTicket.query.filter(
+        or_(
+            FeedbackTicket.department_name == current_user.department,
+            FeedbackTicket.department_name == 'ALL'
+        )
+    )
+    # tasks = Task.query.all()
+    tasks = Task.query.filter_by( assigned_to_email=current_user.email).all()
+
+    # Shared chart layout style
+    chart_layout = dict(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(
+            family='"Segoe UI", sans-serif',
+            color='black',
+            size=14
+        ),
+        height=400,
+        margin=dict(t=30, b=30, l=10, r=10),
+        showlegend=True,
+    )
 
     # --- Ticket Status Pie Chart ---
     ticket_status_counts = Counter(ticket.ticket_status for ticket in tickets)
     ticket_status_chart = go.Figure(data=[
-        go.Pie(labels=list(ticket_status_counts.keys()), values=list(ticket_status_counts.values()))
+        go.Pie(
+            labels=list(ticket_status_counts.keys()),
+            values=list(ticket_status_counts.values()),
+            marker=dict(colors=['#BAD8B6', '#E1EACD', '#F9F6E6']),
+            textinfo='percent+label',
+            hole=0.3
+        )
     ])
+    ticket_status_chart.update_layout(chart_layout)
+
     ticket_status_html = pio.to_html(ticket_status_chart, full_html=False)
 
-    # --- Task Status Bar Chart (with 0 counts shown) ---
+    # --- Task Status Bar Chart ---
     all_statuses = ['todo', 'in_progress', 'backlog', 'in_review', 'done', 'completed']
     task_status_counts = Counter(task.task_status for task in tasks)
     task_status_data = [task_status_counts.get(status, 0) for status in all_statuses]
@@ -176,9 +205,10 @@ def manage_feedback():
         go.Bar(
             x=['Todo', 'Progress', 'Backlog', 'Review', 'Done', 'Completed'],
             y=task_status_data,
-            marker_color='lightblue'
+            marker_color='#D5E5D5'
         )
     ])
+    task_status_chart.update_layout(chart_layout)
 
     task_status_html = pio.to_html(task_status_chart, full_html=False)
 
@@ -309,8 +339,8 @@ def assigned_task():
     }
 
     status_options = {
-        'high': ['todo', 'in_progress', 'backlog', 'in_review'],
-        'medium': ['todo', 'in_progress', 'backlog', 'in_review', 'done'],
+        'high': ['todo', 'in_progress', 'in_review'],
+        'medium': ['todo', 'in_progress', 'in_review', 'done'],
         'low': ['todo', 'in_progress', 'backlog', 'in_review', 'done', 'completed'],
     }
 
@@ -346,21 +376,41 @@ def update_task_status(task_id):
 
 
 # Complaint management system
-
 @user.route('/dashboard/complaint-center', methods=['GET', 'POST'])
 @login_required
 def manage_complaint():
-    complaints = Complaint.query.all()
+    # complaints = Complaint.query.all()
+    complaints = Complaint.query.filter_by(user_email=current_user.email).all()
+
+    # Shared chart layout style
+    chart_layout = dict(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(
+            family='"Segoe UI", sans-serif',
+            color='black',
+            size=14
+        ),
+        height=400,
+        margin=dict(t=30, b=30, l=10, r=10),
+        showlegend=True,
+    )
 
     # --- Complaint Status Pie Chart ---
     complaint_status_counts = Counter(complaint.status for complaint in complaints)
     complaint_status_chart = go.Figure(data=[
-        go.Pie(labels=list(complaint_status_counts.keys()), values=list(complaint_status_counts.values()))
+        go.Pie(
+            labels=list(complaint_status_counts.keys()),
+            values=list(complaint_status_counts.values()),
+            marker=dict(colors=['#EF9F9F', '#FAD4D4', '#FFF2F2']),
+            textinfo='percent+label',
+            hole=0.3
+        )
     ])
+    complaint_status_chart.update_layout(chart_layout)
     complaint_status_html = pio.to_html(complaint_status_chart, full_html=False)
 
     # --- Complaint Department Bar Chart ---
-
     all_departments = ['IT', 'Admin', 'HR', 'Finance', 'Procurement', 'Operations']
     complaint_department_counts = Counter(complaint.department for complaint in complaints)
     complaint_data = [complaint_department_counts.get(dept, 0) for dept in all_departments]
@@ -369,12 +419,11 @@ def manage_complaint():
         go.Bar(
             x=all_departments,
             y=complaint_data,
-            marker_color='lightblue'
+            marker_color='#FAD4D4'
         )
     ])
-
+    department_bar_chart.update_layout(chart_layout)
     complaint_department_html = pio.to_html(department_bar_chart, full_html=False)
-
 
     return render_template(
         "complaint_management.html",
@@ -382,7 +431,6 @@ def manage_complaint():
         complaint_status_html=complaint_status_html,
         complaint_department_html=complaint_department_html
     )
-
 
 @user.route('/dashboard/complaint-center/file-complaint', methods=['GET', 'POST'])
 @login_required

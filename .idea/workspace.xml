@@ -7,8 +7,16 @@
     <list default="true" id="b4d8c6ce-d23f-4c17-85a8-452d09522676" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/templates/admin_complaints.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_complaints.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/templates/assign_tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/assign_tasks.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_login.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_manage_users.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_manage_users.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/view_feedback.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/view_feedback.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/note.txt" beforeDir="false" afterPath="$PROJECT_DIR$/note.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/css/flash.css" beforeDir="false" afterPath="$PROJECT_DIR$/user/static/css/flash.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/complaint_management.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/complaint_management.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/user_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/user_login.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +57,7 @@
     "Python.utils.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "Rebasing master",
     "last_opened_file_path": "D:/8SEM/Alian Software/feedback-complaint-system/user/static/assets",
     "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
   }
@@ -72,7 +80,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-d7ad00fb9fc3-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23726.102" />
+        <option value="bundled-python-sdk-50da183f06c8-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.13135.95" />
       </set>
     </attachedChunks>
   </component>

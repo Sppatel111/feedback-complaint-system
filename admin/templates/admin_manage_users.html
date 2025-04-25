@@ -28,7 +28,6 @@
             <form id="dateFilterForm" method="get" action="{{ url_for('admin.manage_users') }}">
                 <input type="hidden" name="start_date" id="startDateInput" value="{{ start_date or '' }}">
                 <input type="hidden" name="end_date" id="endDateInput" value="{{ end_date or '' }}">
-                <input type="hidden" name="status" value="{{ selected_status or '' }}">
                 <div class="custom-daterange-wrapper shadow-lg d-flex align-items-center p-2 rounded border bg-white" style="cursor: pointer; min-width: 230px; min-height:50px;">
                     <i class="fas fa-calendar-alt text-dark mr-3"></i>
                     <input type="text" id="dateRange" class="form-control border-0 p-0 bg-white" placeholder="Select date range" readonly>
@@ -45,12 +44,24 @@
     </div>
 
     <!-- Search Input -->
+    <form method="get" action="{{ url_for('admin.manage_users') }}">
+    <input type="hidden" name="start_date" value="{{ start_date or '' }}">
+    <input type="hidden" name="end_date" value="{{ end_date or '' }}">
     <div class="input-group mb-3 shadow-sm">
-        <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
+        <input type="text" class="form-control" name="query" placeholder="Search users..." value="{{ request.args.get('query', '') }}">
         <div class="input-group-append">
+<!--            <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>-->
             <span class="input-group-text"><i class="fas fa-search"></i></span>
         </div>
     </div>
+</form>
+
+<!--    <div class="input-group mb-3 shadow-sm">-->
+<!--        <input type="text" class="form-control" placeholder="Search users..." id="userSearch">-->
+<!--        <div class="input-group-append">-->
+<!--            <span class="input-group-text"><i class="fas fa-search"></i></span>-->
+<!--        </div>-->
+<!--    </div>-->
 
     <!-- User Table -->
     <div class="card shadow-sm">
@@ -114,10 +125,10 @@
                 <ul class="pagination justify-content-center mt-4">
                     {% if pagination.has_prev %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('admin.manage_users', page=1, status=selected_status,start_date=start_date, end_date=end_date) }}">&laquo;</a>
+                            <a class="page-link" href="{{ url_for('admin.manage_users', page=1, query=request.args.get('query', ''),start_date=start_date, end_date=end_date) }}">&laquo;</a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('admin.manage_users', page=pagination.prev_num, status=selected_status,start_date=start_date, end_date=end_date) }}">&lsaquo;</a>
+                            <a class="page-link" href="{{ url_for('admin.manage_users', page=pagination.prev_num, query=request.args.get('query', ''),start_date=start_date, end_date=end_date) }}">&lsaquo;</a>
                         </li>
                     {% else %}
                         <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
@@ -127,7 +138,7 @@
                     {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
                         {% if p %}
                             <li class="page-item {% if p == pagination.page %}active{% endif %}">
-                                <a class="page-link" href="{{ url_for('admin.manage_users', page=p, status=selected_status,start_date=start_date, end_date=end_date) }}">{{ p }}</a>
+                                <a class="page-link" href="{{ url_for('admin.manage_users', page=p, query=request.args.get('query', ''),start_date=start_date, end_date=end_date) }}">{{ p }}</a>
                             </li>
                         {% else %}
                             <li class="page-item disabled"><span class="page-link">…</span></li>
@@ -136,10 +147,10 @@
 
                     {% if pagination.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('admin.manage_users', page=pagination.next_num, status=selected_status,start_date=start_date, end_date=end_date) }}">&rsaquo;</a>
+                            <a class="page-link" href="{{ url_for('admin.manage_users', page=pagination.next_num, query=request.args.get('query', ''),start_date=start_date, end_date=end_date) }}">&rsaquo;</a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('admin.manage_users', page=pagination.pages, status=selected_status,start_date=start_date, end_date=end_date) }}">&raquo;</a>
+                            <a class="page-link" href="{{ url_for('admin.manage_users', page=pagination.pages, query=request.args.get('query', ''),start_date=start_date, end_date=end_date) }}">&raquo;</a>
                         </li>
                     {% else %}
                         <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
@@ -153,14 +164,25 @@
 </div>
 
 <!-- Optional: Add basic JS for search filter -->
+<!--<script>-->
+<!--    document.getElementById('userSearch').addEventListener('keyup', function () {-->
+<!--        const query = this.value.toLowerCase();-->
+<!--        const rows = document.querySelectorAll('#userTable tr');-->
+<!--        rows.forEach(row => {-->
+<!--            const text = row.innerText.toLowerCase();-->
+<!--            row.style.display = text.includes(query) ? '' : 'none';-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
 <script>
-    document.getElementById('userSearch').addEventListener('keyup', function () {
-        const query = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#userTable tr');
-        rows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-            row.style.display = text.includes(query) ? '' : 'none';
-        });
+    const input = document.getElementById('userSearch');
+    let timeout = null;
+
+    input.addEventListener('input', function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            document.getElementById('searchForm').submit();
+        }, 400); // Wait 400ms after typing stops
     });
 </script>
 <!--for pagenation-->

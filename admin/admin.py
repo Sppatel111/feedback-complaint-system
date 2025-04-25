@@ -8,7 +8,7 @@ from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.utils import secure_filename
 import os
 import uuid
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from utils import send_reset_email, send_assignment_email, send_welcome_email, send_account_status_email
 
 # UPLOAD_FOLDER = 'user/static/assets/'
@@ -69,12 +69,35 @@ def a_dashboard():
 # Manage User Route (add user,view user,edit user,active mode )
 @admin.route('/manage-user', methods=['GET', 'POST'])
 def manage_users():
+    query = request.args.get('query', '', type=str)
+
     ##page
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
     page = request.args.get('page', 1, type=int)
     per_page = 5
-    users = User.query.join(Detail).order_by(User.created_at.desc())
+    users = User.query.join(Detail)
+    if query:
+        query = query.lower()
+        status_filter = None
+
+        if query in ['active', 'enabled']:
+            status_filter = True
+        elif query in ['disabled', 'inactive']:
+            status_filter = False
+
+        filters = [
+            Detail.firstname.ilike(f"%{query}%"),
+            Detail.lastname.ilike(f"%{query}%"),
+            User.email.ilike(f"%{query}%"),
+            User.department.ilike(f"%{query}%"),
+            User.role.ilike(f"%{query}%")
+        ]
+
+        if status_filter is not None:
+            filters.append(User.is_active == status_filter)
+
+        users = users.filter(or_(*filters))
     # pagination
     if start_date_str and end_date_str:
         try:
@@ -85,8 +108,9 @@ def manage_users():
         except ValueError:
             pass
 
-    pagination = users.paginate(page=page, per_page=per_page)
+    pagination = users.order_by(User.created_at.desc()).paginate(page=page, per_page=per_page)
     users = pagination.items
+
     return render_template("admin_manage_users.html", users=users, pagination=pagination,
         start_date=start_date_str,
         end_date=end_date_str)
@@ -287,97 +311,35 @@ def raise_tickets():
 def view_feedback():
     departments = db.session.query(FeedbackTicket.department_name).distinct().all()
     department_names = [dept[0] for dept in departments]
-
     selected_department = request.args.get('department')
+    ##page
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
     page = request.args.get('page', 1, type=int)
-    per_page = 3
-
-    # Base query (join to allow filtering by department/date)
+    per_page = 2
     feedback_responses = FeedbackResponse.query.join(FeedbackTicket)
-
-    # Apply department filter if selected
     if selected_department:
-        feedback_responses = feedback_responses.filter(
+        feedback_responses = FeedbackResponse.query.join(FeedbackTicket).filter(
             FeedbackTicket.department_name == selected_department
-        )
-
-    # Apply date range filter if both dates are provided
+        ).order_by(FeedbackResponse.created_at.desc())
+    # pagination
     if start_date_str and end_date_str:
         try:
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
             end_date = end_date.replace(hour=23, minute=59, second=59)
-            feedback_responses = feedback_responses.filter(
-                FeedbackTicket.created_at.between(start_date, end_date)
-            )
+            feedback_responses = feedback_responses.filter(FeedbackResponse.created_at.between(start_date, end_date))
         except ValueError:
-            pass  # Ignore invalid date formats
-
-    # Always order by latest created_at
-    feedback_responses = feedback_responses.order_by(FeedbackResponse.created_at.desc())
-
-    # Paginate
-    pagination = feedback_responses.paginate(page=page, per_page=per_page)
+            pass
+    pagination = feedback_responses.order_by(FeedbackResponse.created_at.desc()).paginate(page=page, per_page=per_page)
     feedback_responses = pagination.items
 
-    return render_template("view_feedback.html",
-                           feedback_responses=feedback_responses,
+    return render_template("view_feedback.html", feedback_responses=feedback_responses,
                            pagination=pagination,
                            start_date=start_date_str,
                            end_date=end_date_str,
-                           department_names=department_names,
-                           selected_department=selected_department)
+                           department_names=department_names, selected_department=selected_department)
 
-
-# @admin.route('manage-feedback/view-feedback', methods=['GET', 'POST'])
-# @login_required
-# def view_feedback():
-#     departments = db.session.query(FeedbackTicket.department_name).distinct().all()
-#     department_names = [dept[0] for dept in departments]
-#
-#     selected_department = request.args.get('department')
-#     start_date_str = request.args.get('start_date')
-#     end_date_str = request.args.get('end_date')
-#     page = request.args.get('page', 1, type=int)
-#     per_page = 2
-#
-#     # Base query (join to allow filtering by department/date)
-#     feedback_responses = FeedbackResponse.query.join(FeedbackTicket)
-#
-#     # Apply department filter if selected
-#     if selected_department:
-#         feedback_responses = feedback_responses.filter(
-#             FeedbackTicket.department_name == selected_department
-#         )
-#
-#     # Apply date range filter if both dates are provided
-#     if start_date_str and end_date_str:
-#         try:
-#             start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-#             end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
-#             end_date = end_date.replace(hour=23, minute=59, second=59)
-#             feedback_responses = feedback_responses.filter(
-#                 FeedbackTicket.created_at.between(start_date, end_date)
-#             )
-#         except ValueError:
-#             pass  # Ignore invalid date formats
-#
-#     # Always order by latest created_at
-#     feedback_responses = feedback_responses.order_by(FeedbackResponse.created_at.desc())
-#
-#     # Paginate
-#     pagination = feedback_responses.paginate(page=page, per_page=per_page)
-#     feedback_responses = pagination.items
-#
-#     return render_template("view_feedback.html",
-#                            feedback_responses=feedback_responses,
-#                            pagination=pagination,
-#                            start_date=start_date_str,
-#                            end_date=end_date_str,
-#                            department_names=department_names,
-#                            selected_department=selected_department)
 
 
 # View ticket and response detail Route

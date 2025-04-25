@@ -47,23 +47,22 @@
                 </div>
                 <div class="col-md-3 ">
                 </div>
-                <!-- Date Range Filter -->
-               <form id="dateFilterForm" method="get" action="{{ url_for('admin.view_feedback') }}">
-                    <input type="hidden" name="start_date" id="startDateInput" value="{{ start_date or '' }}">
-                    <input type="hidden" name="end_date" id="endDateInput" value="{{ end_date or '' }}">
-                    <input type="hidden" name="department" value="{{ selected_department or '' }}">
-                    <div class="custom-daterange-wrapper shadow-sm d-flex align-items-center p-2 rounded border bg-white" style="cursor: pointer; min-width: 230px;">
-                        <i class="fas fa-calendar-alt text-dark mr-3"></i>
-                        <input type="text" id="dateRange" class="form-control border-0 p-0 bg-white" placeholder="Select date range" readonly>
-                        <button type="button" class="btn btn-sm btn-link text-dark ml-2 p-0" id="clearDateFilter" style="font-size: 12px; line-height: 1;">
-                              <i class="fas fa-sync"></i>
-                        </button>
-                    </div>
-                </form>
-
-
-
             </form>
+                   <!-- Date Range Filter -->
+            <div class="d-flex justify-content-start mb-3 ">
+            <form id="dateFilterForm" method="get" action="{{ url_for('admin.view_feedback') }}">
+                <input type="hidden" name="start_date" id="startDateInput" value="{{ start_date or '' }}">
+                <input type="hidden" name="end_date" id="endDateInput" value="{{ end_date or '' }}">
+                <input type="hidden" name="department" value="{{ selected_department or '' }}">
+                <div class="custom-daterange-wrapper shadow-sm d-flex align-items-center p-2 rounded border bg-white" style="cursor: pointer; min-width: 230px;">
+                    <i class="fas fa-calendar-alt text-dark mr-3"></i>
+                    <input type="text" id="dateRange" class="form-control border-0 p-0 bg-white" placeholder="Select date range" readonly>
+                    <button type="button" class="btn btn-sm btn-link text-dark ml-2 p-0" id="clearDateFilter" style="font-size: 12px; line-height: 1;">
+                          <i class="fas fa-sync"></i>
+                    </button>
+                </div>
+            </form>
+                </div>
 
             <!-- Feedback Table -->
             {% if feedback_responses %}
@@ -81,14 +80,14 @@
                         </thead>
                         <tbody>
                             {% for response in feedback_responses %}
-                                <tr>
+                                <tr data-date="{{ response.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}">
                                     <td>{{ response.response_id }}</td>
                                     <td>
                                         {{ response.ticket_id }}
                                     </td>
                                     <td>{{ response.user_email }}</td>
                                     <td class="text-muted">{{ response.response }}</td>
-                                    <td data-date="{{ response.created_at.strftime('%Y-%m-%dT%H:%M:%S') }}">{{ response.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
+                                    <td >{{ response.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
                                     <td>
                                         <a href="{{ url_for('admin.view_ticket_details', ticket_id=response.ticket_id) }}"
                                            class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1">
@@ -101,47 +100,45 @@
                         </tbody>
                     </table>
                     <!--pagination-->
-                {% if pagination and pagination.pages > 1 %}
-    <nav aria-label="Feedback pagination">
-        <ul class="pagination justify-content-center mt-4">
-            {% if pagination.has_prev %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('admin.view_feedback', page=1, department=selected_department, start_date=start_date, end_date=end_date) }}">&laquo;</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('admin.view_feedback', page=pagination.prev_num, department=selected_department, start_date=start_date, end_date=end_date) }}">&lsaquo;</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-                <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
-            {% endif %}
+                    {% if pagination and pagination.pages > 1 %}
+                        <nav aria-label="Task pagination">
+                        <ul class="pagination justify-content-center mt-4">
+                            {% if pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.view_feedback', page=1, department=selected_department ,start_date=start_date, end_date=end_date) }}">&laquo;</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.view_feedback', page=pagination.prev_num, department=selected_department,start_date=start_date, end_date=end_date) }}">&lsaquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                                <li class="page-item disabled"><span class="page-link">&lsaquo;</span></li>
+                            {% endif %}
 
-            {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
-                {% if p %}
-                    <li class="page-item {% if p == pagination.page %}active{% endif %}">
-                        <a class="page-link" href="{{ url_for('admin.view_feedback', page=p, department=selected_department, start_date=start_date, end_date=end_date) }}">{{ p }}</a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled"><span class="page-link">…</span></li>
-                {% endif %}
-            {% endfor %}
+                            {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if p %}
+                                    <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('admin.view_feedback', page=p, department=selected_department,start_date=start_date, end_date=end_date) }}">{{ p }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                                {% endif %}
+                            {% endfor %}
 
-            {% if pagination.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('admin.view_feedback', page=pagination.next_num, department=selected_department, start_date=start_date, end_date=end_date) }}">&rsaquo;</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('admin.view_feedback', page=pagination.pages, department=selected_department, start_date=start_date, end_date=end_date) }}">&raquo;</a>
-                </li>
-            {% else %}
-                <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
-                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-            {% endif %}
-        </ul>
-    </nav>
-{% endif %}
-
-
+                            {% if pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.view_feedback', page=pagination.next_num, department=selected_department,start_date=start_date, end_date=end_date) }}">&rsaquo;</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.view_feedback', page=pagination.pages, department=selected_department,start_date=start_date, end_date=end_date) }}">&raquo;</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">&rsaquo;</span></li>
+                                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                            {% endif %}
+                            </ul>
+                            </nav>
+                    {% endif %}
                 </div>
             {% else %}
                 <div class="alert alert-secondary text-center" role="alert">

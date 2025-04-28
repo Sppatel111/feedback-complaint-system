@@ -32,7 +32,6 @@
     <!-- Complaint Summary Cards -->
     <div class="row text-center">
 
-
         <!-- New Complaints -->
         <div class="col-md-3 mb-4">
             <div class="card border-0 shadow-lg p-4">
@@ -77,5 +76,22 @@
             </div>
         </div>
     </div>
+    <br>
+    <br>
+        <div class="row">
+            <div class="col-md-1">
+            </div>
+            <div class="col-md-5">
+                <h6>Complaint Status Overview</h6>
+                <div>{{ complaint_status_html|safe }}</div>
+
+            </div>
+            <div class="col-md-5">
+                <h6>Complaint Department</h6>
+                <div>{{ complaint_department_html|safe }}</div>
+            </div>
+            <div class="col-md-1">
+            </div>
+        </div>
 </div>
 {% endblock %}

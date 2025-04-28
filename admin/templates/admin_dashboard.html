@@ -59,8 +59,23 @@
                 <a href="{{ url_for('admin.manage_complaint') }}" class="btn btn-danger w-100">Go to Complaints</a>
             </div>
         </div>
-
-    </div>
+       </div>
+    <br>
+    <br>
+        <div class="row" >
+            <div class="col-md-4">
+                        <h5>User Activation Status</h5>
+                        <div>{{ active_status_html|safe }}</div>
+            </div>
+            <div class="col-md-4">
+                <h5>Department Wise Users</h5>
+                        <div>{{ department_html|safe }}</div>
+            </div>
+            <div class="col-md-4">
+                <h5>Role Distribution</h5>
+                <div>{{ role_html|safe }}</div>
+            </div>
+        </div>
 </div>
 
 {% endblock %}

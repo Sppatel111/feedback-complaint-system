@@ -53,11 +53,11 @@
                     if current_user.user_detail.profile_image and current_user.user_detail.profile_image != 'assets/profiles/default-profile.jpg'
                     else url_for('user.static', filename='assets/profiles/default-profile.jpg') }}"
                          alt="Profile" class="rounded-circle" width="30" height="30">
-                       <span class="fw-semibold text-light">
-                            {% if current_user.user_detail.firstname is not none %}
-                                {{ ' ' + current_user.user_detail.firstname + ' ' + current_user.user_detail.lastname }}
-                            {% endif %}
-                        </span>
+<!--                       <span class="fw-semibold text-light">-->
+<!--                            {% if current_user.user_detail.firstname is not none %}-->
+<!--                                {{ ' ' + current_user.user_detail.firstname + ' ' + current_user.user_detail.lastname }}-->
+<!--                            {% endif %}-->
+<!--                        </span>-->
                     {% endif %}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right mt-2 shadow-sm" aria-labelledby="navbarDropdown">

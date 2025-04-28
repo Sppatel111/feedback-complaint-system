@@ -61,6 +61,22 @@
             </div>
         </div>
     </div>
+    <br>
+    <br>
+    <div class="row">
+                <div class="col-md-4">
+                    <h5>Ticket Status Overview</h5>
+                    <div>{{ ticket_chart_html|safe }}</div>
+                </div>
+                <div class="col-md-4">
+                    <h5>Tickets by Department</h5>
+                    <div>{{ f_department_html|safe }}</div>
+                </div>
+                <div class="col-md-4">
+                    <h5>Assigned Users in Tasks by Department</h5>
+                    <div>{{ assigned_task_department_html|safe }}</div>
+                </div>
+            </div>
 </div>
 
 {% endblock %}

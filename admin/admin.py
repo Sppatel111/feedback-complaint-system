@@ -862,7 +862,8 @@ def reset_token(token):
 
 
 
-@admin.route('/adashboard', methods=['GET'])
+@admin.route('/analytics', methods=['GET'])
+@login_required
 def charts():
     # Query all users
     users = User.query.all()

@@ -65,13 +65,134 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('user.login'))
 
-
-
 # Dashboard Route
+# @user.route('/dashboard')
+# @login_required
+# def u_dashboard():
+#     return render_template("user_dashboard.html", current_user=current_user)
+
 @user.route('/dashboard')
 @login_required
 def u_dashboard():
-    return render_template("user_dashboard.html", current_user=current_user)
+    # Latest Open Tickets (status='open')
+    latest_open_tickets = FeedbackTicket.query.filter(
+        or_(
+            FeedbackTicket.department_name == current_user.department,
+            FeedbackTicket.department_name == 'ALL'
+        ),
+        FeedbackTicket.ticket_status == 'open'
+    ).order_by(FeedbackTicket.created_at.desc()).limit(5).all()
+
+    # Latest todo tasks
+    latest_todo_tasks = Task.query.filter_by(
+        assigned_to_email=current_user.email,
+        task_status='todo'
+    ).order_by(Task.created_at.desc()).limit(5).all()
+    tickets = FeedbackTicket.query.filter(
+        or_(
+            FeedbackTicket.department_name == current_user.department,
+            FeedbackTicket.department_name == 'ALL'
+        )
+    )
+    # tasks = Task.query.all()
+    tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
+    complaints = Complaint.query.filter_by(user_email=current_user.email).all()
+
+    # Shared chart layout style
+    chart_layout = dict(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font=dict(
+            family='"Segoe UI", sans-serif',
+            color='black',
+            size=14
+        ),
+        height=400,
+        margin=dict(t=30, b=30, l=10, r=10),
+        showlegend=True,
+    )
+
+    # --- Ticket Status Sunburst Chart ---
+    ticket_status_counts = Counter(ticket.ticket_status for ticket in tickets)
+    status_colors = {
+        "open": "#A0E7E5",
+        "in_progress": "#F9E79F",
+        "closed": "#C9E9D2"
+    }
+    labels = list(ticket_status_counts.keys())
+    values = list(ticket_status_counts.values())
+
+    ticket_status_chart = go.Figure(go.Sunburst(
+        labels=labels,
+        parents=[""] * len(labels),  # all are root-level
+        values=values,
+        branchvalues="total",
+        marker=dict(
+            colors=[status_colors.get(label, "#CCCCCC") for label in labels]
+        )
+    ))
+    ticket_status_chart.update_layout(chart_layout)
+
+    ticket_status_html = pio.to_html(ticket_status_chart, full_html=False)
+
+    # --- Task Status Horizontal Stacked Bar ---
+    all_statuses = ['todo', 'in_progress', 'backlog', 'in_review', 'done', 'completed']
+    task_status_counts = Counter(task.task_status for task in tasks)
+    task_status_data = [task_status_counts.get(status, 0) for status in all_statuses]
+
+    task_status_chart = go.Figure(go.Bar(
+        x=task_status_data,
+        y=['Todo', 'Progress', 'Backlog', 'Review', 'Done', 'Completed'],
+        orientation='h',
+        marker_color='#D5E5D5'
+    ))
+    task_status_chart.update_layout(chart_layout)
+
+    task_status_html = pio.to_html(task_status_chart, full_html=False)
+
+    # --- Complaint Status Treemap ---
+    complaint_status_counts = Counter(complaint.status for complaint in complaints)
+    status_colors = {
+        "Submitted": "#FFCFCF",
+        "In Progress": "#FAD7A0",
+        "Closed": "#C9E9D2",
+    }
+
+    complaint_status_chart = go.Figure(go.Treemap(
+        labels=list(complaint_status_counts.keys()),
+        parents=[""] * len(complaint_status_counts),
+        values=list(complaint_status_counts.values()),
+        textinfo="label+value+percent entry",
+        marker=dict(
+            colors=[status_colors.get(status, "#CCCCCC") for status in complaint_status_counts.keys()]
+        )
+    ))
+    complaint_status_chart.update_layout(chart_layout)
+
+    complaint_status_html = pio.to_html(complaint_status_chart, full_html=False)
+    chart_layout["showlegend"] = False
+
+    # --- Complaint Department Polar Chart ---
+    all_departments = ['IT', 'Admin', 'HR', 'Finance', 'Procurement', 'Operations']
+    complaint_department_counts = Counter(complaint.department for complaint in complaints)
+    complaint_data = [complaint_department_counts.get(dept, 0) for dept in all_departments]
+
+    department_bar_chart = go.Figure(go.Barpolar(
+        r=complaint_data,
+        theta=all_departments,
+        marker_color='#FAD4D4'
+    ))
+    department_bar_chart.update_layout(chart_layout)
+
+    complaint_department_html = pio.to_html(department_bar_chart, full_html=False)
+    return render_template("user_dashboard.html", current_user=current_user,
+                                                    ticket_status_html = ticket_status_html,
+                                                    task_status_html = task_status_html,
+                           complaint_status_html=complaint_status_html,
+                           complaint_department_html=complaint_department_html,
+                           latest_open_tickets=latest_open_tickets,
+                           latest_todo_tasks=latest_todo_tasks
+                                                    )
 
 
 # Settings Route
@@ -84,6 +205,36 @@ def u_settings():
 @login_required
 def profile():
     return render_template('profile.html', user=current_user)
+
+# @user.route('dashboard/settings/profile')
+# @login_required
+# def profile():
+#     form = UserDetailForm(obj=current_user.user_detail)
+#     if form.validate_on_submit():
+#         if not current_user.user_detail:
+#             user_detail = Detail(email=current_user.email)
+#             db.session.add(user_detail)
+#         else:
+#             user_detail = current_user.user_detail
+#         file = form.profile_image.data
+#         # print(file)
+#
+#         # using uuid
+#         if file or allowed_file(file.filename, 'profile'):
+#             if allowed_file(file.filename, 'profile'):
+#                 file_extension = file.filename.rsplit('.', 1)[1].lower()
+#                 unique_filename = f"{uuid.uuid4()}.{file_extension}"
+#                 file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
+#                 user_detail.profile_image = unique_filename
+#             else:
+#                 flash("Unsupported file type. Please upload an image (png, jpg, jpeg, gif).", "danger")
+#                 return render_template("edit_details.html", form=form, current_user=current_user)
+#         db.session.commit()
+#         flash("pic updated successfully!", "success")
+#         return redirect(url_for("user.profile"))
+#     return render_template('profile.html',form=form, user=current_user)
+
+
 
 # User Details Route
 @user.route('/dashboard/settings/user-details', methods=['GET', 'POST'])
@@ -228,7 +379,7 @@ def view_tickets():
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
     page = request.args.get('page', 1, type=int)
-    per_page = 2
+    per_page = 4
 
     if current_user.department:
         query = FeedbackTicket.query.filter(
@@ -429,7 +580,7 @@ def manage_complaint():
         "complaint_management.html",
         current_user=current_user,
         complaint_status_html=complaint_status_html,
-        complaint_department_html=complaint_department_html
+        complaint_department_html=complaint_department_html,
     )
 
 @user.route('/dashboard/complaint-center/file-complaint', methods=['GET', 'POST'])

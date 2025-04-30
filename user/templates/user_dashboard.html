@@ -67,12 +67,83 @@
     <!-- Placeholder for future charts/graphs -->
     <div class="text-center my-5">
         <div class="border rounded p-5 bg-light">
-            <h4 class="text-muted">Your activity insights will appear here soon 📊</h4>
-            <p class="text-muted">Charts and visual summaries of your tickets and complaints will be integrated here in the future.</p>
-            <!-- Plotly Chart Section -->
-<!--            <div class="text-center my-5">-->
-<!--                {{ chart_html|safe }}-->
-<!--            </div>-->
+            <h4 class="text-muted">Your Activity Insights 📊</h4>
+            <p class="text-muted">
+                Visual summaries of your feedback tickets, tasks, and complaints are shown below.
+                Use these insights to stay on top of your assignments and progress across departments.
+            </p>
+
+            <!-- Recent Open Tickets & Tasks -->
+            <div class="container my-5">
+            <div class="row">
+                <!-- Open Tickets -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Latest Open Tickets</h5>
+                    {% if latest_open_tickets %}
+                        <div class="list-group shadow-sm">
+                            {% for ticket in latest_open_tickets %}
+                                <a href="{{ url_for('user.view_tickets') }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Ticket #{{ ticket.ticket_id }}</h6>
+                                        <small class="text-muted">{{ ticket.created_at.strftime('%Y-%m-%d') }}</small>
+                                    </div>
+                                    <p class="mb-1 text-muted">{{ ticket.ticket_label }}</p>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No open tickets available.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Todo Tasks -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">Latest Assigned Tasks</h5>
+                    {% if latest_todo_tasks %}
+                        <div class="list-group shadow-sm">
+                            {% for task in latest_todo_tasks %}
+                                <a href="{{ url_for('user.assigned_task') }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Task #{{ task.task_id }}</h6>
+                                        <small class="text-muted">{{ task.created_at.strftime('%Y-%m-%d') }}</small>
+                                    </div>
+                                    <p class="mb-1 text-muted">{{ task.details }}</p>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No todo tasks at the moment.</p>
+                    {% endif %}
+                </div>
+            </div>
+            </div>
+
+
+            <!--    Plotly graphs-->
+            <div class="container mt-5">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Ticket Status Distribution</h5>
+                        {{ ticket_status_html|safe }}
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Task Status Overview</h5>
+                        {{ task_status_html|safe }}
+                    </div>
+                </div>
+            </div>
+            <div class="container mt-5">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Complaint Status Distribution</h5>
+                        {{ complaint_status_html|safe }}
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Complaint Department Distribution</h5>
+                        {{ complaint_department_html|safe }}
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>

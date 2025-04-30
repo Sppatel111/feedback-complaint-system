@@ -104,20 +104,32 @@ def a_dashboard():
     department_chart = go.Figure(data=[go.Bar(
         x=list(department_counts.keys()),
         y=list(department_counts.values()),
+        name='Department',
         marker_color='#C9E9D2'  # Pastel Blue
     )])
     department_chart.update_layout(chart_layout)
 
     # --- Role Wise (Admin vs Employee) Pie Chart ---
     role_counts = Counter(u.role for u in users)
-    role_chart = go.Figure(data=[go.Pie(
-        labels=list(role_counts.keys()),
-        values=list(role_counts.values()),
-        marker=dict(colors=['#FFCFCF','#FFE2E2']),
-        textinfo='percent+label',
-        hole=0.3
-    )])
+    role_chart = go.Figure(data=[
+        go.Bar(
+            x=list(role_counts.values()),
+            y=list(role_counts.keys()),
+            orientation='h',
+            name='Role',
+            marker_color=['#FFCFCF', '#FFE2E2']
+        )
+    ])
     role_chart.update_layout(chart_layout)
+
+    # role_chart = go.Figure(data=[go.Pie(
+    #     labels=list(role_counts.keys()),
+    #     values=list(role_counts.values()),
+    #     marker=dict(colors=['#FFCFCF','#FFE2E2']),
+    #     textinfo='percent+label',
+    #     hole=0.3
+    # )])
+    # role_chart.update_layout(chart_layout)
     active_status_html = pio.to_html(active_status_chart, full_html=False)
     department_html = pio.to_html(department_chart, full_html=False)
     role_html = pio.to_html(role_chart, full_html=False)
@@ -136,7 +148,7 @@ def manage_users():
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
     page = request.args.get('page', 1, type=int)
-    per_page = 5
+    per_page = 4
     users = User.query.join(Detail)
     if query:
         query = query.lower()
@@ -381,9 +393,11 @@ def manage_feedback():
 
     # --- Department-wise Tickets Bar Chart ---
     f_department_counts = Counter(t.department_name if t.department_name else "No Department" for t in tickets)
+
     f_department_chart = go.Figure(data=[go.Bar(
         x=list(f_department_counts.keys()),
         y=list(f_department_counts.values()),
+        name='Tickets',
         marker_color='#C9E9D2'
     )])
     f_department_chart.update_layout(chart_layout)
@@ -396,10 +410,12 @@ def manage_feedback():
     assigned_task_department_chart = go.Figure(data=[go.Bar(
         x=list(assigned_task_department_counts.keys()),
         y=list(assigned_task_department_counts.values()),
+        name='assigned',
         marker_color='#FAD7A0'
         # Pastel Peach
     )])
     assigned_task_department_chart.update_layout(chart_layout)
+
     ticket_chart_html = pio.to_html(ticket_chart, full_html=False)
     f_department_html = pio.to_html(f_department_chart, full_html=False)
     assigned_task_department_html = pio.to_html(assigned_task_department_chart, full_html=False)
@@ -691,7 +707,6 @@ def manage_complaint():
     complaint_status_chart = go.Figure(data=[go.Pie(
         labels=list(complaint_status_counts.keys()),
         values=list(complaint_status_counts.values()),
-        # marker=dict(colors=['#F6E58D','#FF8B94','#A8E6CF']),
         marker=dict(colors=['#FAD7A0', '#FFB9B9', '#C9E9D2']),
         textinfo='percent+label',
         hole=0.4
@@ -703,8 +718,9 @@ def manage_complaint():
     complaint_department_chart = go.Figure(data=[go.Bar(
         x=list(complaint_department_counts.keys()),
         y=list(complaint_department_counts.values()),
+        name='Department',
         marker_color='#A6D0DD'
-        # marker_color='#A6D0DD'
+
     )])
     complaint_department_chart.update_layout(chart_layout)
     complaint_status_html = pio.to_html(complaint_status_chart, full_html=False)
@@ -865,119 +881,101 @@ def reset_token(token):
 @admin.route('/analytics', methods=['GET'])
 @login_required
 def charts():
-    # Query all users
     users = User.query.all()
-    # Query all tickets
     tickets = FeedbackTicket.query.all()
-    # Query all tasks
     tasks = Task.query.all()
-    # Query all complaints
     complaints = Complaint.query.all()
 
-    # Set default Plotly template
     pio.templates.default = "plotly_white"
 
-    # Shared Chart Layout
     chart_layout = dict(
-        paper_bgcolor='rgba(0,0,0,0)',  # Keep transparent inside plot (fix gradient issue)
+        paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        font=dict(
-            family='"Segoe UI", sans-serif',
-            color='black',
-            size=14
-        ),
+        font=dict(family='"Segoe UI", sans-serif', color='black', size=14),
         height=320,
         width=340,
         margin=dict(t=30, b=30, l=10, r=10),
         showlegend=True,
     )
 
-    # --- Active vs Disabled Users Pie Chart ---
     active_status_counts = Counter('Active' if u.is_active else 'Disabled' for u in users)
     active_status_chart = go.Figure(data=[go.Pie(
         labels=list(active_status_counts.keys()),
         values=list(active_status_counts.values()),
-        marker=dict(colors=['#A8E6CF', '#FF8B94']),  # Pastel Green, Pastel Red
+        marker=dict(colors=['#A8E6CF', '#FF8B94']),
         textinfo='percent+label',
         hole=0.3
     )])
     active_status_chart.update_layout(chart_layout)
 
-    # --- Department Wise User Count Bar Chart ---
     department_counts = Counter(u.department if u.department else 'No Department' for u in users)
     department_chart = go.Figure(data=[go.Bar(
-        x=list(department_counts.keys()),
-        y=list(department_counts.values()),
-        marker_color='#AED6F1'  # Pastel Blue
+        y=list(department_counts.keys()),
+        x=list(department_counts.values()),
+        orientation='h',
+        marker_color='#AED6F1'
     )])
     department_chart.update_layout(chart_layout)
 
-    # --- Role Wise (Admin vs Employee) Pie Chart ---
     role_counts = Counter(u.role for u in users)
-    role_chart = go.Figure(data=[go.Pie(
-        labels=list(role_counts.keys()),
-        values=list(role_counts.values()),
-        marker=dict(colors=['#F6E58D', '#FF9F43']),  # Pastel Yellow, Pastel Orange
-        textinfo='percent+label',
-        hole=0.3
+    role_chart = go.Figure(data=[go.Scatter(
+        x=list(role_counts.keys()),
+        y=list(role_counts.values()),
+        mode='lines+markers',
+        line=dict(color='#FF9F43', width=2),
+        marker=dict(size=10)
     )])
     role_chart.update_layout(chart_layout)
 
-    # --- Tickets Status Pie Chart ---
     ticket_status_counts = Counter(t.ticket_status for t in tickets)
-    ticket_chart = go.Figure(data=[go.Pie(
+    ticket_chart = go.Figure(go.Sunburst(
         labels=list(ticket_status_counts.keys()),
+        parents=[""] * len(ticket_status_counts),
         values=list(ticket_status_counts.values()),
-        marker=dict(colors=['#A3E4D7', '#F9E79F', '#D5DBDB']),  # Pastel Teal, Pastel Yellow, Pastel Grey
-        textinfo='percent+label',
-        hole=0.3
-    )])
+        branchvalues="total",
+        marker=dict(colors=['#A3E4D7', '#F9E79F', '#D5DBDB'])
+    ))
     ticket_chart.update_layout(chart_layout)
 
-    # --- Department-wise Tickets Bar Chart ---
     f_department_counts = Counter(t.department_name if t.department_name else "No Department" for t in tickets)
     f_department_chart = go.Figure(data=[go.Bar(
-        x=list(f_department_counts.keys()),
-        y=list(f_department_counts.values()),
-        marker_color='#FAD7A0'  # Pastel Peach
+        y=list(f_department_counts.keys()),
+        x=list(f_department_counts.values()),
+        orientation='h',
+        marker_color='#A3E4D7'
     )])
     f_department_chart.update_layout(chart_layout)
 
-    # --- Department-wise Assigned Users from Tasks ---
     assigned_task_department_counts = Counter(
         t.ticket.department_name if t.assigned_to_email else "Unassigned"
         for t in tasks
     )
-    assigned_task_department_chart = go.Figure(data=[go.Bar(
-        x=list(assigned_task_department_counts.keys()),
-        y=list(assigned_task_department_counts.values()),
-        marker_color='#FAD7A0'  # Pastel Peach
+    assigned_task_department_chart = go.Figure(data=[go.Histogram(
+        x=list(assigned_task_department_counts.elements()),
+        marker_color='#FFB347'
     )])
     assigned_task_department_chart.update_layout(chart_layout)
 
-    # --- Complaint Status Pie Chart ---
     complaint_status_counts = Counter(c.status for c in complaints)
-    complaint_status_chart = go.Figure(data=[go.Pie(
+    complaint_status_chart = go.Figure(go.Treemap(
         labels=list(complaint_status_counts.keys()),
+        parents=[""] * len(complaint_status_counts),
         values=list(complaint_status_counts.values()),
-        marker=dict(colors=['#A8E6CF', '#F6E58D', '#FF8B94']),  # Pastel Green, Yellow, Red
+        marker=dict(colorscale=[[0, '#FFCFCF'], [0.5, '#FFE2E2'], [1.0, '#FFF5E1']]),
+        textinfo="label+value+percent entry"
+    ))
+    complaint_status_chart.update_layout(chart_layout)
+
+    complaint_department_counts = Counter(c.department if c.department else "No Department" for c in complaints)
+    complaint_department_chart = go.Figure(data=[go.Pie(
+        labels=list(complaint_department_counts.keys()),
+        values=list(complaint_department_counts.values()),
+        marker=dict(colors=['#C9E9D2', '#F6E58D', '#FF8B94', '#D5DBDB']),
         textinfo='percent+label',
         hole=0.3
     )])
-    complaint_status_chart.update_layout(chart_layout)
-
-    # --- Department-wise Complaints Bar Chart ---
-    complaint_department_counts = Counter(c.department if c.department else "No Department" for c in complaints)
-    complaint_department_chart = go.Figure(data=[go.Bar(
-        x=list(complaint_department_counts.keys()),
-        y=list(complaint_department_counts.values()),
-        marker_color='#D5DBDB'  # Pastel Grey
-    )])
     complaint_department_chart.update_layout(chart_layout)
 
-
-
-    # Convert to HTML without display toolbar
     active_status_html = pio.to_html(active_status_chart, full_html=False)
     department_html = pio.to_html(department_chart, full_html=False)
     role_html = pio.to_html(role_chart, full_html=False)
@@ -987,7 +985,6 @@ def charts():
     complaint_status_html = pio.to_html(complaint_status_chart, full_html=False)
     complaint_department_html = pio.to_html(complaint_department_chart, full_html=False)
 
-
     return render_template('dashboard.html', current_user=current_user,
                            active_status_html=active_status_html,
                            department_html=department_html,
@@ -996,6 +993,4 @@ def charts():
                            f_department_html=f_department_html,
                            assigned_task_department_html=assigned_task_department_html,
                            complaint_status_html=complaint_status_html,
-                           complaint_department_html=complaint_department_html
-                           )
-
+                           complaint_department_html=complaint_department_html)

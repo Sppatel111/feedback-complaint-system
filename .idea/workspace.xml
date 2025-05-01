@@ -5,19 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b4d8c6ce-d23f-4c17-85a8-452d09522676" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ruff.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/admin/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/admin/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin/templates/add_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/add_user.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_login.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/admin_view_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/admin_view_user.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/assign_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/assign_user.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/admin/templates/manage_user_assign_task_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin/templates/manage_user_assign_task_detail.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/note.txt" beforeDir="false" afterPath="$PROJECT_DIR$/note.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/complaint_history.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/complaint_history.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/complaint_management.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/complaint_management.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/f_tickets.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/f_tickets.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/feedback_management.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/feedback_management.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/static/assets/login_image2.png" beforeDir="false" afterPath="$PROJECT_DIR$/user/static/assets/login_image2.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/templates/file_complaint.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/file_complaint.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/tasks.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/tasks.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/user_base.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user/templates/user_dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/user_dashboard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/reset_request.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/reset_request.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user/templates/reset_token.html" beforeDir="false" afterPath="$PROJECT_DIR$/user/templates/reset_token.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/user/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/user/user.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -28,8 +28,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -102,7 +102,13 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="false" />
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>

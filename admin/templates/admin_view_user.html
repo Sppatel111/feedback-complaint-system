@@ -72,24 +72,22 @@
                                         </td>
                                         <td>{{ task.deadline.strftime('%Y-%m-%d') }}</td>
                                         <td>
-                                            <span class="badge
-                                                {% if task.task_status == 'todo' %}bg-warning text-white{% endif %}
-                                                {% if task.task_status == 'in_progress' %}bg-info text-white{% endif %}
-                                                {% if task.task_status == 'done' %}bg-success text-white{% endif %}
-                                                {% if task.task_status == 'in_review' %}bg-purple text-white{% endif %}
-                                                {% if task.task_status == 'backlog' %}bg-danger text-white{% endif %}
-                                                {% if task.task_status == 'on_hold' %}bg-warning text-white{% endif %}
-                                                {% if task.task_status == 'completed' %}bg-teal text-white{% endif %}
-                                                text-uppercase">{{ task.task_status.replace('_', ' ') }}</span>
+                                            <span class="badge text-white px-3 py-2 text-uppercase" style="background-color:
+                                                {% if task.task_status == 'todo' %}orange
+                                                {% elif task.task_status == 'in_progress' %}#17a2b8
+                                                {% elif task.task_status == 'in_review' %}#AA60C8
+                                                {% elif task.task_status == 'backlog' %}#CC2B52
+                                                {% elif task.task_status == 'on_hold' %}#ffc107; color: #212529
+                                                {% elif task.task_status == 'done' %}#28a745
+                                                {% elif task.task_status == 'completed' %}#6BCB77
+                                                {% else %}#adb5bd
+                                                {% endif %}; border-radius: 5px;">
+                                                {{ task.task_status.replace('_', ' ') }}
+                                            </span>
+
                                         </td>
-                                        <td>
-                                            {% set priority_class = {
-                                                'low': 'badge-success',
-                                                'medium': 'badge-warning',
-                                                'high': 'badge-danger'
-                                            }[task.priority] %}
-                                            <span class="badge {{ priority_class }}">{{ task.priority.title() }}</span>
-                                        </td>
+
+                                        <td>{{ task.priority.title() }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

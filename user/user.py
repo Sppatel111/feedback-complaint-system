@@ -12,25 +12,30 @@ import plotly.graph_objs as go
 import plotly.io as pio
 
 # PATHS
-#---------------------------------------------
+# ---------------------------------------------
 UPLOAD_FOLDER = 'user/static/assets/profiles/'
-ATTACHMENT_FOLDER='user/static/assets/attachments/'
+ATTACHMENT_FOLDER = 'user/static/assets/attachments/'
 ALLOWED_EXTENSIONS = {
-    'profile':['png', 'jpg', 'jpeg', 'gif'],
-    'attachment':['pdf','jpg','jpeg']
-    }
-#----------------------------------------------
+    'profile': ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'tiff'],
+    'attachment': ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp',
+                   'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt']
+}
+
+
+# ----------------------------------------------
 
 # USER DEFINED FUNCTIONS
-#----------------------------------------------
-def allowed_file(filename,category):
+# ----------------------------------------------
+def allowed_file(filename, category):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS[category]
 
-#----------------------------------------------
+
+# ----------------------------------------------
 
 
 # Flask Blueprint for user-related routes
 user = Blueprint("user", __name__, template_folder="templates", static_folder="static")
+
 
 # Login Route
 @user.route('/', methods=['GET', 'POST'])
@@ -64,6 +69,7 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('user.login'))
+
 
 # Dashboard Route
 # @user.route('/dashboard')
@@ -186,13 +192,13 @@ def u_dashboard():
 
     complaint_department_html = pio.to_html(department_bar_chart, full_html=False)
     return render_template("user_dashboard.html", current_user=current_user,
-                                                    ticket_status_html = ticket_status_html,
-                                                    task_status_html = task_status_html,
+                           ticket_status_html=ticket_status_html,
+                           task_status_html=task_status_html,
                            complaint_status_html=complaint_status_html,
                            complaint_department_html=complaint_department_html,
                            latest_open_tickets=latest_open_tickets,
                            latest_todo_tasks=latest_todo_tasks
-                                                    )
+                           )
 
 
 # Settings Route
@@ -201,10 +207,12 @@ def u_dashboard():
 def u_settings():
     return render_template("settings.html", current_user=current_user)
 
+
 @user.route('dashboard/settings/profile')
 @login_required
 def profile():
     return render_template('profile.html', user=current_user)
+
 
 # @user.route('dashboard/settings/profile')
 # @login_required
@@ -235,7 +243,6 @@ def profile():
 #     return render_template('profile.html',form=form, user=current_user)
 
 
-
 # User Details Route
 @user.route('/dashboard/settings/user-details', methods=['GET', 'POST'])
 @login_required
@@ -264,14 +271,14 @@ def u_details():
         # print(file)
 
         # using uuid
-        if file or allowed_file(file.filename,'profile'):
-            if allowed_file(file.filename,'profile'):
+        if file or allowed_file(file.filename, 'profile'):
+            if allowed_file(file.filename, 'profile'):
                 file_extension = file.filename.rsplit('.', 1)[1].lower()
                 unique_filename = f"{uuid.uuid4()}.{file_extension}"
                 file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
                 user_detail.profile_image = unique_filename
             else:
-                flash("Unsupported file type. Please upload an image (png, jpg, jpeg, gif).","danger")
+                flash("Unsupported file type. Please upload an image (png, jpg, jpeg, gif).", "danger")
                 return render_template("edit_details.html", form=form, current_user=current_user)
 
         db.session.commit()
@@ -279,7 +286,7 @@ def u_details():
         return redirect(url_for("user.profile"))
 
     elif request.method == 'POST':
-        flash("Invalid phone number.","danger")
+        flash("Invalid phone number.", "danger")
         print(form.errors)
     return render_template("edit_details.html", form=form, current_user=current_user)
 
@@ -304,7 +311,6 @@ def change_password():
     return render_template("change_password.html", form=form, current_user=current_user)
 
 
-
 @user.route('/dashboard/manage-feedback', methods=['GET', 'POST'])
 @login_required
 def manage_feedback():
@@ -316,7 +322,7 @@ def manage_feedback():
         )
     )
     # tasks = Task.query.all()
-    tasks = Task.query.filter_by( assigned_to_email=current_user.email).all()
+    tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
 
     # Shared chart layout style
     chart_layout = dict(
@@ -356,6 +362,7 @@ def manage_feedback():
         go.Bar(
             x=['Todo', 'Progress', 'Backlog', 'Review', 'Done', 'Completed'],
             y=task_status_data,
+            name='Task',
             marker_color='#D5E5D5'
         )
     ])
@@ -370,7 +377,10 @@ def manage_feedback():
         task_status_html=task_status_html
     )
 
+
 from datetime import datetime
+
+
 @user.route('dashboard/manage-feedback/view-tickets', methods=['GET', 'POST'])
 @login_required
 def view_tickets():
@@ -419,8 +429,6 @@ def view_tickets():
     )
 
 
-
-
 # for the response in view tickets
 @user.route('dashboard/manage-feedback/view-tickets/respond/<int:ticket_id>', methods=['POST'])
 @login_required
@@ -451,6 +459,7 @@ def ticket_detail_response(ticket_id):
 
     return render_template("ticket_detail_response.html", ticket=ticket)
 
+
 @user.route('/dashboard/manage-feedback/task', methods=['GET'])
 @login_required
 def assigned_task():
@@ -459,7 +468,7 @@ def assigned_task():
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
     page = request.args.get('page', 1, type=int)
-    per_page = 2
+    per_page = 3
 
     query = Task.query.filter_by(assigned_to_email=current_user.email)
 
@@ -479,14 +488,23 @@ def assigned_task():
     pagination = query.paginate(page=page, per_page=per_page)
     tasks = pagination.items
 
+    # status_colors = {
+    #     'todo': 'orange',
+    #     'in_progress': '#007bff',
+    #     'in_review': '#6f42c1',
+    #     'backlog': 'red',
+    #     'on_hold': '#ffc107',
+    #     'done': '#28a745',
+    #     'completed': '#20c997',
+    # }
     status_colors = {
         'todo': 'orange',
-        'in_progress': '#007bff',
-        'in_review': '#6f42c1',
-        'backlog': 'red',
+        'in_progress': '#17a2b8',
+        'in_review': '#AA60C8',
+        'backlog': '#CC2B52',
         'on_hold': '#ffc107',
         'done': '#28a745',
-        'completed': '#20c997',
+        'completed': '#6BCB77',
     }
 
     status_options = {
@@ -570,6 +588,7 @@ def manage_complaint():
         go.Bar(
             x=all_departments,
             y=complaint_data,
+            name='Complaint',
             marker_color='#FAD4D4'
         )
     ])
@@ -582,6 +601,7 @@ def manage_complaint():
         complaint_status_html=complaint_status_html,
         complaint_department_html=complaint_department_html,
     )
+
 
 @user.route('/dashboard/complaint-center/file-complaint', methods=['GET', 'POST'])
 @login_required
@@ -620,6 +640,7 @@ def file_complaint():
         return redirect(url_for('user.manage_complaint'))
 
     return render_template("file_complaint.html", form=form)
+
 
 @user.route('/dashboard/complaint-center/complaint-history', methods=['GET'])
 @login_required

@@ -634,15 +634,25 @@ def view_task_workers(ticket_id):
     pagination = task_workers.paginate(page=page, per_page=per_page)
     task_workers= pagination.items
 
+    # status_colors = {
+    #     'todo': 'orange',
+    #     'in_progress': '#007bff',
+    #     'in_review': '#6f42c1',
+    #     'backlog': 'red',
+    #     'on_hold': '#ffc107',
+    #     'done': '#28a745',
+    #     'completed': '#20c997',
+    # }
     status_colors = {
         'todo': 'orange',
-        'in_progress': '#007bff',
-        'in_review': '#6f42c1',
-        'backlog': 'red',
+        'in_progress': '#17a2b8',
+        'in_review': '#AA60C8',
+        'backlog': '#CC2B52',
         'on_hold': '#ffc107',
         'done': '#28a745',
-        'completed': '#20c997',
+        'completed': '#6BCB77',
     }
+
     return render_template('admin_view_task_workers.html', ticket=ticket, task_workers=task_workers, pagination=pagination,
         start_date=start_date_str,
         end_date=end_date_str, status_colors=status_colors, selected_status=selected_status)
@@ -836,46 +846,45 @@ def complaint_detail(complaint_id):
 
 
 ## forget password
-@admin.route("/reset-password", methods=['GET', 'POST'])
-def reset_request():
-    if current_user.is_authenticated and current_user.user_detail:
-        print("yes")
-        return redirect(url_for('admin.a_dashboard'))
-
-    form = RequestResetForm()
-    if form.validate_on_submit():
-        print(form.email.data)
-        admin = User.query.filter_by(email=form.email.data).first()
-        if admin:
-            print("no")
-            send_reset_email(admin)
-            flash('A password reset link has been sent to your email.', 'info')
-        else:
-            flash('No account found with that email.', 'warning')
-        return redirect(url_for('admin.login'))
-
-    return render_template('reset_request.html', form=form)
-
-
-@admin.route("/reset-password/<token>", methods=['GET', 'POST'])
-def reset_token(token):
-    if current_user.is_authenticated and current_user.user_detail:
-        return redirect(url_for('admin.a_dashboard'))
-
-    admin = User.verify_reset_token(token)
-    if admin is None:
-        flash('The reset link is invalid or has expired.', 'warning')
-        return redirect(url_for('admin.reset_request'))
-
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        admin.password = form.password.data
-        db.session.commit()
-        flash('Your password has been updated!', 'success')
-        return redirect(url_for('admin.login'))
-
-    return render_template('reset_token.html', form=form)
-
+# @admin.route("/reset-password", methods=['GET', 'POST'])
+# def reset_request():
+#     if current_user.is_authenticated and current_user.user_detail:
+#         print("yes")
+#         return redirect(url_for('admin.a_dashboard'))
+#
+#     form = RequestResetForm()
+#     if form.validate_on_submit():
+#         print(form.email.data)
+#         admin = User.query.filter_by(email=form.email.data).first()
+#         if admin:
+#             print("no")
+#             send_reset_email(admin)
+#             flash('A password reset link has been sent to your email.', 'info')
+#         else:
+#             flash('No account found with that email.', 'warning')
+#         return redirect(url_for('admin.login'))
+#
+#     return render_template('reset_request.html', form=form)
+#
+#
+# @admin.route("/reset-password/<token>", methods=['GET', 'POST'])
+# def reset_token(token):
+#     if current_user.is_authenticated and current_user.user_detail:
+#         return redirect(url_for('admin.a_dashboard'))
+#
+#     admin = User.verify_reset_token(token)
+#     if admin is None:
+#         flash('The reset link is invalid or has expired.', 'warning')
+#         return redirect(url_for('admin.reset_request'))
+#
+#     form = ResetPasswordForm()
+#     if form.validate_on_submit():
+#         admin.password = form.password.data
+#         db.session.commit()
+#         flash('Your password has been updated!', 'success')
+#         return redirect(url_for('admin.login'))
+#
+#     return render_template('reset_token.html', form=form)
 
 
 @admin.route('/analytics', methods=['GET'])
@@ -913,6 +922,7 @@ def charts():
         y=list(department_counts.keys()),
         x=list(department_counts.values()),
         orientation='h',
+        name='User',
         marker_color='#AED6F1'
     )])
     department_chart.update_layout(chart_layout)
@@ -922,6 +932,7 @@ def charts():
         x=list(role_counts.keys()),
         y=list(role_counts.values()),
         mode='lines+markers',
+        name='Role',
         line=dict(color='#FF9F43', width=2),
         marker=dict(size=10)
     )])
@@ -942,6 +953,7 @@ def charts():
         y=list(f_department_counts.keys()),
         x=list(f_department_counts.values()),
         orientation='h',
+        name='Ticket',
         marker_color='#A3E4D7'
     )])
     f_department_chart.update_layout(chart_layout)
@@ -952,6 +964,7 @@ def charts():
     )
     assigned_task_department_chart = go.Figure(data=[go.Histogram(
         x=list(assigned_task_department_counts.elements()),
+        name='Assigned',
         marker_color='#FFB347'
     )])
     assigned_task_department_chart.update_layout(chart_layout)
@@ -961,10 +974,12 @@ def charts():
         labels=list(complaint_status_counts.keys()),
         parents=[""] * len(complaint_status_counts),
         values=list(complaint_status_counts.values()),
-        marker=dict(colorscale=[[0, '#FFCFCF'], [0.5, '#FFE2E2'], [1.0, '#FFF5E1']]),
+        marker=dict(
+            colors=['#FFF5E1', '#FFE2E2', '#FFCFCF']
+        ),
         textinfo="label+value+percent entry"
     ))
-    complaint_status_chart.update_layout(chart_layout)
+    complaint_status_chart.update_layout(chart_layout,width=310)
 
     complaint_department_counts = Counter(c.department if c.department else "No Department" for c in complaints)
     complaint_department_chart = go.Figure(data=[go.Pie(

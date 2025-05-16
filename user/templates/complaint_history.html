@@ -34,10 +34,10 @@
                     </div>
                     <div>
                         <strong>Total Complaints</strong><br>
-                        <span class="h5">{{ complaints | length }}</span>
+<!--                        <span class="h5">{{ complaints | length }}</span>-->
+                        <span class="h5">{{ count_data.total }}</span>
                     </div>
                 </div>
-<!--                <a href="#all" class="text-primary" data-toggle="tab">View Details</a>-->
             </div>
         </div>
 
@@ -51,12 +51,12 @@
                     </div>
                     <div>
                         <strong>{{ status }}</strong><br>
-                        <span class="h5">
-                            {{ complaints | selectattr("status", "equalto", status) | list | length }}
-                        </span>
+<!--                        <span class="h5">-->
+<!--                            {{ complaints | selectattr("status", "equalto", status) | list | length }}-->
+<!--                        </span>-->
+                        <span class="h5">{{ count_data[status] }}</span>
                     </div>
                 </div>
-<!--                <a href="#{{ status|lower|replace(' ', '') }}" class="text-primary" data-toggle="tab">View Details</a>-->
             </div>
         </div>
         {% endfor %}

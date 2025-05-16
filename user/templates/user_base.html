@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %} {% endblock %}</title>
 
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('user.static', filename='assets/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('user.static', filename='assets/favicon-16x16.png') }}">
-
+<!--    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('user.static', filename='assets/favicon-32x32.png') }}">-->
+<!--    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('user.static', filename='assets/favicon-16x16.png') }}">-->
 
     <link rel="stylesheet" href="{{ url_for('user.static', filename='css/flash.css') }}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.3.1/lux/bootstrap.min.css">
@@ -18,6 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
      <script src="{{ url_for('user.static', filename='js/scale-adjust.js') }}"></script>
+
 <!--    <style>-->
 <!--        .list-group-item:hover {-->
 <!--            background-color: #f8f9fa;-->
@@ -38,6 +38,9 @@
 
   <div class="collapse navbar-collapse" id="navbarColor02">
     <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="{{url_for('user.u_dashboard')}}#dashboard">Dashboard</a>
+        </li>
         <li class="nav-item">
             <a class="nav-link" href="{{ url_for('user.manage_feedback') }}">Feedback</a>
         </li>
@@ -87,13 +90,13 @@
                         <i class="fas fa-comments mr-2 text-primary"></i> Feedback Management
                         <i class="fas fa-chevron-down"></i>
                     </a>
-                    <div class="collapse {% if request.endpoint in ['user.manage_feedback', 'user.view_tickets', 'user.assigned_task'] %}show{% endif %}" id="feedbackCollapse">
+                    <div class="collapse {% if request.endpoint in ['user.manage_feedback', 'user.view_tickets', 'user.assigned_task','user.ticket_detail_response'] %}show{% endif %}" id="feedbackCollapse">
                         <a href="{{ url_for('user.manage_feedback') }}"
                            class="list-group-item list-group-item-action pl-5 {% if request.endpoint == 'user.manage_feedback' %}active bg-primary text-white{% endif %}">
                            Feedback Overview
                         </a>
                         <a href="{{ url_for('user.view_tickets') }}"
-                           class="list-group-item list-group-item-action pl-5 {% if request.endpoint == 'user.view_tickets' %}active bg-primary text-white{% endif %}">
+                           class="list-group-item list-group-item-action pl-5 {% if request.endpoint in ['user.view_tickets','user.ticket_detail_response'] %}active bg-primary text-white{% endif %}">
                            View Tickets
                         </a>
                         <a href="{{ url_for('user.assigned_task') }}"
@@ -110,7 +113,7 @@
                         <i class="fas fa-exclamation-circle mr-2 text-primary"></i> Complaint Center
                         <i class="fas fa-chevron-down"></i>
                     </a>
-                    <div class="collapse {% if request.endpoint in ['user.manage_complaint', 'user.file_complaint', 'user.complaint_history'] %}show{% endif %}" id="complaintCollapse">
+                    <div class="collapse {% if request.endpoint in ['user.manage_complaint', 'user.file_complaint', 'user.complaint_history','user.view_complaint'] %}show{% endif %}" id="complaintCollapse">
                         <a href="{{ url_for('user.manage_complaint') }}"
                            class="list-group-item list-group-item-action pl-5 {% if request.endpoint == 'user.manage_complaint' %}active bg-primary text-white{% endif %}">
                            Complaint Overview
@@ -120,21 +123,12 @@
                            File Complaint
                         </a>
                         <a href="{{ url_for('user.complaint_history') }}"
-                           class="list-group-item list-group-item-action pl-5 {% if request.endpoint == 'user.complaint_history' %}active bg-primary text-white{% endif %}">
+                           class="list-group-item list-group-item-action pl-5 {% if request.endpoint in ['user.complaint_history', 'user.view_complaint'] %}active bg-primary text-white{% endif %}">
                            Complaint History
                         </a>
                     </div>
                 </div>
             </div>
-
-<!--            <div class="list-group list-group-flush">-->
-<!--                <a href="{{ url_for('user.manage_feedback') }}" class="list-group-item list-group-item-action {% if active_tab == 'feedback' %}active{% endif %}">-->
-<!--                    <i class="fas fa-comments mr-2"></i> Feedback Management-->
-<!--                </a>-->
-<!--                <a href="{{ url_for('user.manage_complaint') }}" class="list-group-item list-group-item-action {% if active_tab == 'complaint' %}active{% endif %}">-->
-<!--                    <i class="fas fa-exclamation-circle mr-2"></i> Complaint Center-->
-<!--                </a>-->
-<!--            </div>-->
         </div>
 
 

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from .forms import LoginForm, UserDetailForm, ChangePasswordForm, ComplaintForm, ResetPasswordForm, RequestResetForm
 from models import db, User, Detail, FeedbackTicket, FeedbackResponse, Task, Complaint
 from flask_login import login_user, current_user, logout_user, login_required
@@ -80,7 +80,6 @@ def logout():
 @user.route('/dashboard')
 @login_required
 def u_dashboard():
-    # Latest Open Tickets (status='open')
     latest_open_tickets = FeedbackTicket.query.filter(
         or_(
             FeedbackTicket.department_name == current_user.department,
@@ -100,7 +99,7 @@ def u_dashboard():
             FeedbackTicket.department_name == 'ALL'
         )
     )
-    # tasks = Task.query.all()
+
     tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
     complaints = Complaint.query.filter_by(user_email=current_user.email).all()
 
@@ -130,7 +129,7 @@ def u_dashboard():
 
     ticket_status_chart = go.Figure(go.Sunburst(
         labels=labels,
-        parents=[""] * len(labels),  # all are root-level
+        parents=[""] * len(labels),
         values=values,
         branchvalues="total",
         marker=dict(
@@ -214,35 +213,6 @@ def profile():
     return render_template('profile.html', user=current_user)
 
 
-# @user.route('dashboard/settings/profile')
-# @login_required
-# def profile():
-#     form = UserDetailForm(obj=current_user.user_detail)
-#     if form.validate_on_submit():
-#         if not current_user.user_detail:
-#             user_detail = Detail(email=current_user.email)
-#             db.session.add(user_detail)
-#         else:
-#             user_detail = current_user.user_detail
-#         file = form.profile_image.data
-#         # print(file)
-#
-#         # using uuid
-#         if file or allowed_file(file.filename, 'profile'):
-#             if allowed_file(file.filename, 'profile'):
-#                 file_extension = file.filename.rsplit('.', 1)[1].lower()
-#                 unique_filename = f"{uuid.uuid4()}.{file_extension}"
-#                 file.save(os.path.join(UPLOAD_FOLDER, unique_filename))
-#                 user_detail.profile_image = unique_filename
-#             else:
-#                 flash("Unsupported file type. Please upload an image (png, jpg, jpeg, gif).", "danger")
-#                 return render_template("edit_details.html", form=form, current_user=current_user)
-#         db.session.commit()
-#         flash("pic updated successfully!", "success")
-#         return redirect(url_for("user.profile"))
-#     return render_template('profile.html',form=form, user=current_user)
-
-
 # User Details Route
 @user.route('/dashboard/settings/user-details', methods=['GET', 'POST'])
 @login_required
@@ -314,14 +284,12 @@ def change_password():
 @user.route('/dashboard/manage-feedback', methods=['GET', 'POST'])
 @login_required
 def manage_feedback():
-    # tickets = FeedbackTicket.query.all()
     tickets = FeedbackTicket.query.filter(
         or_(
             FeedbackTicket.department_name == current_user.department,
             FeedbackTicket.department_name == 'ALL'
         )
     )
-    # tasks = Task.query.all()
     tasks = Task.query.filter_by(assigned_to_email=current_user.email).all()
 
     # Shared chart layout style
@@ -408,12 +376,11 @@ def view_tickets():
                 end_date = end_date.replace(hour=23, minute=59, second=59)
                 query = query.filter(FeedbackTicket.created_at.between(start_date, end_date))
             except ValueError:
-                pass  # Ignore invalid date formats silently
+                pass  # Ignore invalid date formats
 
         pagination = query.order_by(FeedbackTicket.created_at.desc()).paginate(page=page, per_page=per_page)
         tickets = pagination.items
 
-        # tickets = query.order_by(FeedbackTicket.created_at.desc()).all()
     else:
         pagination = None
         tickets = []
@@ -483,7 +450,6 @@ def assigned_task():
             query = query.filter(Task.deadline.between(start_date, end_date))
         except ValueError:
             pass  # Ignore invalid date formats silently
-    # tasks = query.all()
 
     pagination = query.paginate(page=page, per_page=per_page)
     tasks = pagination.items
@@ -548,7 +514,6 @@ def update_task_status(task_id):
 @user.route('/dashboard/complaint-center', methods=['GET', 'POST'])
 @login_required
 def manage_complaint():
-    # complaints = Complaint.query.all()
     complaints = Complaint.query.filter_by(user_email=current_user.email).all()
 
     # Shared chart layout style
@@ -632,7 +597,6 @@ def file_complaint():
             description=form.description.data,
             attachment=attachment_filename,
             status='Submitted',
-            # notification='Your complaint has been submitted and is awaiting review.'
         )
         db.session.add(complaint)
         db.session.commit()
@@ -685,6 +649,32 @@ def complaint_history():
         filtered = [c for c in complaints if c.status == status]
         tab_data.append((status, filtered))
 
+    #above all complaints count
+    complaint_counts = db.session.query(
+        Complaint.status, func.count(Complaint.complaint_id)
+    ).filter(
+        Complaint.user_email == current_user.email
+    ).group_by(
+        Complaint.status
+    ).all()
+
+    # default counts
+    count_data = {
+        "total": 0,
+        "Submitted": 0,
+        "In Progress": 0,
+        "Closed": 0
+    }
+
+    for status, count in complaint_counts:
+        count_data["total"] += count
+        if status == 'Submitted':
+            count_data["Submitted"] = count
+        elif status == 'In Progress':
+            count_data["In Progress"] = count
+        elif status == 'Closed':
+            count_data["Closed"] = count
+
     return render_template("complaint_history.html",
                            pagination=pagination,
                            start_date=start_date_str,
@@ -692,9 +682,9 @@ def complaint_history():
                            selected_status=selected_status,
                            complaints=complaints,
                            tab_data=tab_data,
-                           status_data=status_data)
-
-
+                           status_data=status_data,
+                           count_data=count_data,
+                           current_user=current_user)
 @user.route('/dashboard/complaint-center/complaint/<int:complaint_id>', methods=['GET'])
 @login_required
 def view_complaint(complaint_id):
@@ -742,3 +732,4 @@ def reset_token(token):
         return redirect(url_for('user.login'))
 
     return render_template('reset_token.html', form=form)
+

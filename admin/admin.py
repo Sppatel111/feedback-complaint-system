@@ -456,7 +456,7 @@ def view_feedback():
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
     page = request.args.get('page', 1, type=int)
-    per_page = 3
+    per_page = 2
     feedback_responses = FeedbackResponse.query.join(FeedbackTicket)
     if selected_department:
         feedback_responses = FeedbackResponse.query.join(FeedbackTicket).filter(
@@ -762,6 +762,7 @@ def manage_complaint():
                             complaint_department_html = complaint_department_html)
 
 #View complaints Route
+@login_required
 @admin.route('/complaint-centre/complaints')
 def view_complaints():
     department = request.args.get('department')
@@ -808,6 +809,7 @@ def view_complaints():
                            departments=departments, statuses=statuses, selected_department=department,
                            selected_status=status,status_colors=status_colors)
 
+@login_required
 @admin.route('/complaint-centre/complaints/<int:complaint_id>/update_status', methods=['POST'])
 def update_complaint_status(complaint_id):
     new_status = request.form.get('status')
@@ -818,6 +820,7 @@ def update_complaint_status(complaint_id):
     flash('Complaint status updated.', 'success')
     return redirect(url_for('admin.view_complaints'))
 
+@login_required
 @admin.route('/complaint-centre/complaints/<int:complaint_id>', methods=['GET', 'POST'])
 def complaint_detail(complaint_id):
     complaint = Complaint.query.get_or_404(complaint_id)

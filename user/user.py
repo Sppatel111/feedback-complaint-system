@@ -357,7 +357,7 @@ def view_tickets():
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
     page = request.args.get('page', 1, type=int)
-    per_page = 4
+    per_page = 2
 
     if current_user.department:
         query = FeedbackTicket.query.filter(

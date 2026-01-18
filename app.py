@@ -11,7 +11,7 @@ from flask_mail import Mail
 load_dotenv()
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = '9c6a7d0a3e4f2b1c8d5e9f7a2b3c4d6e'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY1')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('database')
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
